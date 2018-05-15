@@ -41,10 +41,6 @@ class View{
         controller.setPath(path);
     }
 
-    void editPathField(String path){
-
-    }
-
     private void createPathField(String path){
         TextField textField = new TextField();
         textField.setText(path);
@@ -62,15 +58,21 @@ class View{
     void showFiles(@NotNull File[] files, String path){
         pane.getChildren().clear();
         createPathField(path);
-        int i = 0;
-        for (File file : files) {
+        if(files!=null) {
+            int i = 0;
+            for (File file : files) {
+                Label label = new Label();
+                label.setText(file.getName());
+                label.setOnMouseClicked(event -> {
+                    if (file.isDirectory()) changeDirectory(file.getPath());
+                });
+                pane.add(label, 0, i + 1);
+                i++;
+            }
+        } else {
             Label label = new Label();
-            label.setText(file.getName());
-            label.setOnMouseClicked(event -> {
-                if(file.isDirectory()) changeDirectory(file.getPath());
-            });
-            pane.add(label,0, i+1);
-            i++;
+            label.setText("directory does not exist");
+            pane.add(label,0,1);
         }
     }
 
