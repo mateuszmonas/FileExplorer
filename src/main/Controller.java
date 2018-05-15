@@ -4,8 +4,8 @@ import java.io.File;
 
 class Controller {
 
-    View view;
-    String path;
+    private View view;
+    private String path;
 
     Controller(View view) {
         this.view = view;
@@ -26,6 +26,6 @@ class Controller {
         File folder = new File(path);
         //get files in the directory
         File[] fileList = folder.listFiles();
-        view.showFiles(fileList);
+        view.showFiles(fileList, path);
     }
 }
