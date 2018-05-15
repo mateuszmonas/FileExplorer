@@ -8,21 +8,21 @@ import javafx.stage.Stage;
 
 import java.io.File;
 
-public class View{
+class View{
 
     private GridPane pane;
     private Stage primaryStage;
     private Controller controller;
 
-    public View(Stage primaryStage) {
+    View(Stage primaryStage) {
         this.primaryStage = primaryStage;
     }
 
-    public void setController(Controller controller) {
+    void setController(Controller controller) {
         this.controller = controller;
     }
 
-    public void start(){
+    void start(){
         pane = new GridPane();
         pane.setGridLinesVisible(true);
         primaryStage.setTitle("FileNameEditor");
@@ -34,7 +34,7 @@ public class View{
         controller.setPath(path);
     }
 
-    public void showFiles(@NotNull File[] files){
+    void showFiles(@NotNull File[] files){
         pane.getChildren().clear();
         int i = 0;
         for (File file : files) {

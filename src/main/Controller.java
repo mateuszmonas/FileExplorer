@@ -2,22 +2,22 @@ package main;
 
 import java.io.File;
 
-public class Controller {
+class Controller {
 
     View view;
     String path;
 
-    public Controller(View view) {
+    Controller(View view) {
         this.view = view;
     }
 
-    public void start(){
+    void start(){
         view.start();
         path="D:";
         getFiles(path);
     }
 
-    public void setPath(String path) {
+    void setPath(String path) {
         this.path = path;
         getFiles(path);
     }
