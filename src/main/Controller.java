@@ -26,6 +26,12 @@ class Controller {
         getFiles(path);
     }
 
+    void editFiles(){
+        File folder = new File(path);
+        File[] fileList = folder.listFiles();
+        view.editFiles(fileList, path);
+    }
+
     /**
      * Gets all files in the given path
      * and updates the view

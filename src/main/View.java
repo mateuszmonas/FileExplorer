@@ -31,6 +31,7 @@ class View{
     void start(){
         borderPane = new BorderPane();
         filesPane = new VBox();
+        createMenu();
         borderPane.setCenter(filesPane);
         primaryStage.setTitle("FileNameEditor");
         primaryStage.setScene(new Scene(borderPane, 300, 275));
@@ -43,14 +44,15 @@ class View{
 
     private void createMenu(){
         HBox menu = new HBox();
-        Button button1 = new Button();
-        button1.setStyle("-fx-pref-height: 28px");
-        button1.setStyle("-fx-pref-width: 28px");
-        Button button2 = new Button();
-        button2.setStyle("-fx-pref-height: 28px");
-        button2.setStyle("-fx-pref-width: 28px");
-        menu.getChildren().add(button1);
-        menu.getChildren().add(button2);
+        Button backButton = new Button();
+        backButton.setStyle("-fx-pref-height: 28px");
+        backButton.setStyle("-fx-pref-width: 28px");
+        menu.getChildren().add(backButton);
+        Button editAllButton = new Button();
+        editAllButton.setStyle("-fx-pref-height: 28px");
+        editAllButton.setStyle("-fx-pref-width: 28px");
+        editAllButton.setOnMouseClicked(event -> controller.editFiles());
+        menu.getChildren().add(editAllButton);
         borderPane.setTop(menu);
     }
 
@@ -73,6 +75,24 @@ class View{
         filesPane.getChildren().add(textField);
     }
 
+    void editFiles(File[] files, String path){
+        filesPane.getChildren().clear();
+        createPathField(path);
+        if(files!=null) {
+            int i = 0;
+            for (File file : files) {
+                TextField textField = new TextField();
+                textField.setText(file.getName());
+                filesPane.getChildren().add(textField);
+                i++;
+            }
+        } else {
+            Label label = new Label();
+            label.setText("directory does not exist");
+            filesPane.getChildren().add(label);
+        }
+    }
+
     /**
      * displays the names of all the files in the given path
      * @param files array of files to display
@@ -80,7 +100,6 @@ class View{
      */
     void showFiles(File[] files, String path){
         filesPane.getChildren().clear();
-        createMenu();
         createPathField(path);
         if(files!=null) {
             int i = 0;
