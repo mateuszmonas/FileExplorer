@@ -1,22 +1,22 @@
 package main;
 
-import com.sun.istack.internal.NotNull;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.fxml.FXML;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.awt.event.ActionEvent;
 import java.io.File;
 
 class View{
 
-    private GridPane pane;
+    private VBox filesPane;
+    private BorderPane borderPane;
     private Stage primaryStage;
     private Controller controller;
 
@@ -29,11 +29,11 @@ class View{
     }
 
     void start(){
-        pane = new GridPane();
-        pane.setGridLinesVisible(true);
-        pane.setGridLinesVisible(true);
+        borderPane = new BorderPane();
+        filesPane = new VBox();
+        borderPane.setCenter(filesPane);
         primaryStage.setTitle("FileNameEditor");
-        primaryStage.setScene(new Scene(pane, 300, 275));
+        primaryStage.setScene(new Scene(borderPane, 300, 275));
         primaryStage.show();
     }
 
@@ -41,10 +41,28 @@ class View{
         controller.setPath(path);
     }
 
+    private void createMenu(){
+        HBox menu = new HBox();
+        Button button1 = new Button();
+        button1.setStyle("-fx-pref-height: 28px");
+        button1.setStyle("-fx-pref-width: 28px");
+        Button button2 = new Button();
+        button2.setStyle("-fx-pref-height: 28px");
+        button2.setStyle("-fx-pref-width: 28px");
+        menu.getChildren().add(button1);
+        menu.getChildren().add(button2);
+        borderPane.setTop(menu);
+    }
+
+    /**
+     * creates input field for the filesystem path
+     * @param path current filesystem path
+     */
     private void createPathField(String path){
         TextField textField = new TextField();
         textField.setText(path);
         textField.setEditable(false);
+        //make text color in the disable TextField black
         textField.setStyle("-fx-opacity: 1.0;");
         textField.setOnMouseClicked(event -> textField.setEditable(true));
         textField.setOnKeyPressed(event -> {
@@ -52,11 +70,17 @@ class View{
                 changeDirectory(textField.getText());
             }
         });
-        pane.add(textField, 0,0,2,1);
+        filesPane.getChildren().add(textField);
     }
 
-    void showFiles(@NotNull File[] files, String path){
-        pane.getChildren().clear();
+    /**
+     * displays the names of all the files in the given path
+     * @param files array of files to display
+     * @param path  filesystem path
+     */
+    void showFiles(File[] files, String path){
+        filesPane.getChildren().clear();
+        createMenu();
         createPathField(path);
         if(files!=null) {
             int i = 0;
@@ -66,13 +90,13 @@ class View{
                 label.setOnMouseClicked(event -> {
                     if (file.isDirectory()) changeDirectory(file.getPath());
                 });
-                pane.add(label, 0, i + 1);
+                filesPane.getChildren().add(label);
                 i++;
             }
         } else {
             Label label = new Label();
             label.setText("directory does not exist");
-            pane.add(label,0,1);
+            filesPane.getChildren().add(label);
         }
     }
 

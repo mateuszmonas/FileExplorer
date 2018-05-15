@@ -17,14 +17,22 @@ class Controller {
         getFiles(path);
     }
 
+    /**
+     * sets path currently operated on
+     * @param path filesystem path
+     */
     void setPath(String path) {
         this.path = path;
         getFiles(path);
     }
 
+    /**
+     * Gets all files in the given path
+     * and updates the view
+     * @param path filesystem path
+     */
     private void getFiles(String path){
         File folder = new File(path);
-        //get files in the directory
         File[] fileList = folder.listFiles();
         view.showFiles(fileList, path);
     }
