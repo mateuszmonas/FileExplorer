@@ -1,9 +1,11 @@
 package main;
 
+import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -15,7 +17,6 @@ import java.util.ResourceBundle;
 
 public class View implements Initializable {
 
-    private Stage primaryStage;
     private Controller controller;
     @FXML private VBox filesA;
     @FXML private VBox filesB;
@@ -23,6 +24,7 @@ public class View implements Initializable {
     @FXML private TextField filePathB;
     private TextField[] filePaths = new TextField[2];
     private VBox[] fileLists= new VBox[2];
+    @FXML private BorderPane root;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -33,6 +35,8 @@ public class View implements Initializable {
         filePaths[1]= filePathB;
         controller.start();
     }
+
+
 
     private void changeDirectory(String path, int whichList){
         controller.changeDirectory(path, whichList);
