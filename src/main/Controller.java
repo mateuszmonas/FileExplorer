@@ -9,18 +9,12 @@ public class Controller {
     private String path;
 
     Controller(View view) {
+        path="D:";
         this.view = view;
     }
 
-    void start() throws IOException{
-    }
-
-    /**
-     * sets path currently operated on
-     * @param path filesystem path
-     */
-    void setPath(String path) {
-        this.path = path;
+    void start(){
+        //getFiles();
     }
 
     /**

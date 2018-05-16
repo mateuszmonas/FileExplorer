@@ -6,14 +6,17 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import javafx.scene.text.Text?>
+<?import com.sun.javafx.scene.control.skin.SplitPaneSkin.Content?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="main.Main">
+            fx:controller="main.View">
     <VBox
             fx:id="menu"
             BorderPane.alignment="TOP_CENTER">
         <HBox>
-            <Button>a</Button>
+            <Button
+            fx:id="a" onAction="#test">a</Button>
             <Button>b</Button>
         </HBox>
         <HBox>
@@ -21,18 +24,33 @@
             <TextField>d</TextField>
         </HBox>
     </VBox>
-    <ScrollPane
-            BorderPane.alignment="CENTER_LEFT">
-        <VBox
-                fx:id="prev_files">
+            <VBox BorderPane.alignment="BOTTOM_LEFT"
+                    fx:id="prev_files">
+                <Label text="asd"/>
+                <Label text="asd"/>
+                <Label text="asd"/>
+                <Label text="asd"/>
+                <Label text="asd"/>
+                <Label text="asd"/>
+                <Label text="asd"/>
+                <Label text="asd"/>
+                <Label text="asd"/>
+                <Label text="asd"/>
+                <Label text="asd"/>
+            </VBox>
 
-        </VBox>
-
-    </ScrollPane>
-    <ScrollPane
-            BorderPane.alignment="CENTER_RIGHT">
-        <VBox
+        <VBox BorderPane.alignment="BOTTOM_RIGHT"
                 fx:id="cur_files">
+            <Label text="dsa"/>
+            <Label text="dsa"/>
+            <Label text="dsa"/>
+            <Label text="dsa"/>
+            <Label text="dsa"/>
+            <Label text="dsa"/>
+            <Label text="dsa"/>
+            <Label text="dsa"/>
+            <Label text="dsa"/>
+            <Label text="dsa"/>
+            <Label text="dsa"/>
         </VBox>
-    </ScrollPane>
 </BorderPane>

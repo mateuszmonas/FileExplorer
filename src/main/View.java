@@ -1,7 +1,10 @@
 package main;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -17,34 +20,28 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
 
-public class View extends Application {
+public class View implements Initializable {
 
-    private VBox filesPane;
-    private BorderPane borderPane;
     private Stage primaryStage;
     private Controller controller;
-    private String path = "D:";
+    @FXML private VBox cur_files;
+    @FXML VBox menu;
+    @FXML Button a;
 
-    View(Stage primaryStage) {
-        this.primaryStage = primaryStage;
-    }
-
-    void setController(Controller controller) {
-        this.controller = controller;
+    @FXML protected void test(ActionEvent event) {
+        System.out.println("lollolol");
     }
 
     @Override
-    public void start(Stage stage) throws IOException{
-        BorderPane root = FXMLLoader.load(getClass().getResource("fxml_layout.fxml"));
-        primaryStage.setTitle("FileNameEditor");
-        primaryStage.setScene(new Scene(root, 300, 200));
-        primaryStage.show();
+    public void initialize(URL location, ResourceBundle resources) {
+        controller = new Controller(this);
+        controller.start();
     }
 
     private void changeDirectory(String path){
-        controller.setPath(path);
-        controller.getFiles();
     }
 
     private void editFiles(File[] files){
@@ -52,7 +49,7 @@ public class View extends Application {
             TextField textField = new TextField();
             textField.setText(file.getName());
             textField.setStyle("-fx-padding: 0 0 0 0;");
-            filesPane.getChildren().add(textField);
+            cur_files.getChildren().add(textField);
         }
     }
 
@@ -64,7 +61,7 @@ public class View extends Application {
             label.setOnMouseClicked(event -> {
                 if (file.isDirectory()) changeDirectory(file.getPath());
             });
-            filesPane.getChildren().add(label);
+            cur_files.getChildren().add(label);
         }
     }
 
@@ -73,14 +70,12 @@ public class View extends Application {
      * @param files array of files to display
      */
     void displayFiles(File[] files){
-        filesPane.getChildren().clear();
         if(files!=null) {
-            if(editingFiles) editFiles(files);
-            else viewFiles(files);
+            viewFiles(files);
         } else {
             Label label = new Label();
             label.setText("directory does not exist");
-            filesPane.getChildren().add(label);
+            cur_files.getChildren().add(label);
         }
     }
 
