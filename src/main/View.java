@@ -35,6 +35,7 @@ public class View implements Initializable {
     }
 
     private void changeDirectory(String path, int whichList){
+        controller.changeDirectory(path, whichList);
     }
 
     private void editFiles(File[] files){
