@@ -15,20 +15,19 @@
             fx:id="menu"
             BorderPane.alignment="TOP_CENTER">
         <HBox>
-            <Button
-            fx:id="a" onAction="#test">a</Button>
+            <Button>a</Button>
             <Button>b</Button>
         </HBox>
         <HBox>
-            <TextField>c</TextField>
-            <TextField>d</TextField>
+            <TextField fx:id="filePathA"/>
+            <TextField fx:id="filePathB"/>
         </HBox>
     </VBox>
     </top>
     <left>
     <ScrollPane>
         <VBox
-                fx:id="prev_files">
+                fx:id="filesA">
         </VBox>
 
     </ScrollPane>
@@ -36,7 +35,7 @@
     <right>
     <ScrollPane fitToWidth="true" fitToHeight="true">
         <VBox
-                fx:id="cur_files">
+                fx:id="filesB">
         </VBox>
     </ScrollPane>
     </right>
