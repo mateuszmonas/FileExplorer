@@ -1,8 +1,9 @@
 package main;
 
 import java.io.File;
+import java.io.IOException;
 
-class Controller {
+public class Controller {
 
     private View view;
     private String path;
@@ -11,10 +12,7 @@ class Controller {
         this.view = view;
     }
 
-    void start(){
-        path="D:";
-        view.start();
-        getFiles();
+    void start() throws IOException{
     }
 
     /**
