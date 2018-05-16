@@ -14,7 +14,7 @@ public class Controller {
     }
 
     void start(){
-        //getFiles();
+        getFiles();
     }
 
     /**

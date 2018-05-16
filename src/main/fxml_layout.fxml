@@ -7,10 +7,10 @@
 <?import javafx.scene.layout.*?>
 
 <?import javafx.scene.text.Text?>
-<?import com.sun.javafx.scene.control.skin.SplitPaneSkin.Content?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="main.View">
+    <top>
     <VBox
             fx:id="menu"
             BorderPane.alignment="TOP_CENTER">
@@ -24,33 +24,20 @@
             <TextField>d</TextField>
         </HBox>
     </VBox>
-            <VBox BorderPane.alignment="BOTTOM_LEFT"
-                    fx:id="prev_files">
-                <Label text="asd"/>
-                <Label text="asd"/>
-                <Label text="asd"/>
-                <Label text="asd"/>
-                <Label text="asd"/>
-                <Label text="asd"/>
-                <Label text="asd"/>
-                <Label text="asd"/>
-                <Label text="asd"/>
-                <Label text="asd"/>
-                <Label text="asd"/>
-            </VBox>
-
-        <VBox BorderPane.alignment="BOTTOM_RIGHT"
-                fx:id="cur_files">
-            <Label text="dsa"/>
-            <Label text="dsa"/>
-            <Label text="dsa"/>
-            <Label text="dsa"/>
-            <Label text="dsa"/>
-            <Label text="dsa"/>
-            <Label text="dsa"/>
-            <Label text="dsa"/>
-            <Label text="dsa"/>
-            <Label text="dsa"/>
-            <Label text="dsa"/>
+    </top>
+    <left>
+    <ScrollPane>
+        <VBox
+                fx:id="prev_files">
         </VBox>
+
+    </ScrollPane>
+</left>
+    <right>
+    <ScrollPane fitToWidth="true" fitToHeight="true">
+        <VBox
+                fx:id="cur_files">
+        </VBox>
+    </ScrollPane>
+    </right>
 </BorderPane>
