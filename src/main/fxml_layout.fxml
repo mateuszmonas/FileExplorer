@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="root" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.View">
+<BorderPane prefWidth="400" fx:id="root" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.View">
     <top>
     <VBox fx:id="menu" BorderPane.alignment="TOP_CENTER">
         <HBox>
@@ -21,14 +21,16 @@
     </VBox>
     </top>
     <left>
-    <ScrollPane>
+    <ScrollPane
+            fx:id="scrollPaneA">
         <VBox fx:id="filesA">
         </VBox>
 
     </ScrollPane>
 </left>
     <right>
-    <ScrollPane>
+    <ScrollPane
+    fx:id="scrollPaneB">
         <VBox fx:id="filesB">
         </VBox>
     </ScrollPane>

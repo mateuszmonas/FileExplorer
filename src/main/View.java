@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
@@ -17,6 +18,8 @@ import java.util.ResourceBundle;
 
 public class View implements Initializable {
 
+    @FXML private ScrollPane scrollPaneA;
+    @FXML private ScrollPane scrollPaneB;
     private Controller controller;
     @FXML private VBox filesA;
     @FXML private VBox filesB;
@@ -31,6 +34,10 @@ public class View implements Initializable {
         controller = new Controller(this);
         fileLists[0] = filesA;
         fileLists[1] = filesB;
+        scrollPaneA.setMaxWidth(root.getPrefWidth());
+        scrollPaneB.setMaxWidth(root.getPrefWidth());
+        filesA.setMaxWidth(root.getPrefWidth());
+        filesB.setMaxWidth(root.getPrefWidth());
         filePaths[0]= filePathA;
         filePaths[1]= filePathB;
         controller.start();
