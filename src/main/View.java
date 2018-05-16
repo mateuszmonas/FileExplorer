@@ -3,6 +3,7 @@ package main;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
@@ -21,6 +22,7 @@ class View{
     private Stage primaryStage;
     private Controller controller;
     private boolean editingFiles = false;
+    private String path = "D:";
 
     View(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -31,12 +33,14 @@ class View{
     }
 
     void start(){
+        ScrollPane sp = new ScrollPane();
         borderPane = new BorderPane();
         filesPane = new VBox();
         createMenu();
-        borderPane.setCenter(filesPane);
+        sp.setContent(filesPane);
+        borderPane.setCenter(sp);
         primaryStage.setTitle("FileNameEditor");
-        primaryStage.setScene(new Scene(borderPane, 300, 275));
+        primaryStage.setScene(new Scene(borderPane, 300, 200));
         primaryStage.show();
     }
 
@@ -47,6 +51,20 @@ class View{
 
     private void createMenu(){
         HBox menu = new HBox();
+        VBox vBox = new VBox();
+        vBox.getChildren().add(menu);
+        TextField textField = new TextField();
+        textField.setText(path);
+        textField.setEditable(false);
+        //make text color in the disable TextField black
+        textField.setStyle("-fx-opacity: 1.0;");
+        textField.setOnMouseClicked(event -> textField.setEditable(true));
+        textField.setOnKeyPressed(event -> {
+            if(event.getCode()== KeyCode.ENTER){
+                changeDirectory(textField.getText());
+            }
+        });
+        vBox.getChildren().add(textField);
         Button backButton = new Button();
         backButton.setStyle("-fx-pref-height: 28px");
         backButton.setStyle("-fx-pref-width: 28px");
@@ -59,14 +77,14 @@ class View{
             controller.getFiles();
         });
         menu.getChildren().add(editAllButton);
-        borderPane.setTop(menu);
+        borderPane.setTop(vBox);
     }
 
     /**
      * creates input field for the filesystem path
      * @param path current filesystem path
      */
-    private void createPathField(String path){
+    private void createPathField(){
         TextField textField = new TextField();
         textField.setText(path);
         textField.setEditable(false);
@@ -105,11 +123,9 @@ class View{
     /**
      * displays the names of all the files in the given path
      * @param files array of files to display
-     * @param path  filesystem path
      */
-    void displayFiles(File[] files, String path){
+    void displayFiles(File[] files){
         filesPane.getChildren().clear();
-        createPathField(path);
         if(files!=null) {
             if(editingFiles) editFiles(files);
             else viewFiles(files);
