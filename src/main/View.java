@@ -19,6 +19,7 @@ class View{
     private BorderPane borderPane;
     private Stage primaryStage;
     private Controller controller;
+    private boolean editingFiles = false;
 
     View(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -40,6 +41,7 @@ class View{
 
     private void changeDirectory(String path){
         controller.setPath(path);
+        controller.getFiles();
     }
 
     private void createMenu(){
@@ -51,7 +53,10 @@ class View{
         Button editAllButton = new Button();
         editAllButton.setStyle("-fx-pref-height: 28px");
         editAllButton.setStyle("-fx-pref-width: 28px");
-        editAllButton.setOnMouseClicked(event -> controller.editFiles());
+        editAllButton.setOnMouseClicked(event -> {
+            editingFiles=!editingFiles;
+            controller.getFiles();
+        });
         menu.getChildren().add(editAllButton);
         borderPane.setTop(menu);
     }
@@ -75,20 +80,22 @@ class View{
         filesPane.getChildren().add(textField);
     }
 
-    void editFiles(File[] files, String path){
-        filesPane.getChildren().clear();
-        createPathField(path);
-        if(files!=null) {
-            int i = 0;
-            for (File file : files) {
-                TextField textField = new TextField();
-                textField.setText(file.getName());
-                filesPane.getChildren().add(textField);
-                i++;
-            }
-        } else {
+    private void editFiles(File[] files){
+        for (File file : files) {
+            TextField textField = new TextField();
+            textField.setText(file.getName());
+            filesPane.getChildren().add(textField);
+        }
+    }
+
+
+    private void viewFiles(File[] files){
+        for (File file : files) {
             Label label = new Label();
-            label.setText("directory does not exist");
+            label.setText(file.getName());
+            label.setOnMouseClicked(event -> {
+                if (file.isDirectory()) changeDirectory(file.getPath());
+            });
             filesPane.getChildren().add(label);
         }
     }
@@ -98,20 +105,12 @@ class View{
      * @param files array of files to display
      * @param path  filesystem path
      */
-    void showFiles(File[] files, String path){
+    void displayFiles(File[] files, String path){
         filesPane.getChildren().clear();
         createPathField(path);
         if(files!=null) {
-            int i = 0;
-            for (File file : files) {
-                Label label = new Label();
-                label.setText(file.getName());
-                label.setOnMouseClicked(event -> {
-                    if (file.isDirectory()) changeDirectory(file.getPath());
-                });
-                filesPane.getChildren().add(label);
-                i++;
-            }
+            if(editingFiles) editFiles(files);
+            else viewFiles(files);
         } else {
             Label label = new Label();
             label.setText("directory does not exist");

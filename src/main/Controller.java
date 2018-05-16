@@ -12,9 +12,9 @@ class Controller {
     }
 
     void start(){
-        view.start();
         path="D:";
-        getFiles(path);
+        view.start();
+        getFiles();
     }
 
     /**
@@ -23,23 +23,15 @@ class Controller {
      */
     void setPath(String path) {
         this.path = path;
-        getFiles(path);
-    }
-
-    void editFiles(){
-        File folder = new File(path);
-        File[] fileList = folder.listFiles();
-        view.editFiles(fileList, path);
     }
 
     /**
      * Gets all files in the given path
      * and updates the view
-     * @param path filesystem path
      */
-    private void getFiles(String path){
+    void getFiles(){
         File folder = new File(path);
         File[] fileList = folder.listFiles();
-        view.showFiles(fileList, path);
+        view.displayFiles(fileList, path);
     }
 }
