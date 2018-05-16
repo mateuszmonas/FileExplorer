@@ -9,6 +9,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -84,6 +85,7 @@ class View{
         for (File file : files) {
             TextField textField = new TextField();
             textField.setText(file.getName());
+            textField.setStyle("-fx-padding: 0 0 0 0;");
             filesPane.getChildren().add(textField);
         }
     }
@@ -91,7 +93,7 @@ class View{
 
     private void viewFiles(File[] files){
         for (File file : files) {
-            Label label = new Label();
+            Text label = new Text();
             label.setText(file.getName());
             label.setOnMouseClicked(event -> {
                 if (file.isDirectory()) changeDirectory(file.getPath());
