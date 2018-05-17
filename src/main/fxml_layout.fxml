@@ -18,10 +18,10 @@
                 maxHeight="25" minHeight="25" prefHeight="25">
             <TextField fx:id="filePathA" maxWidth="350" minWidth="350" prefWidth="350"
                         maxHeight="25" minHeight="25" prefHeight="25"
-                       onKeyPressed="#onPathChange"/>
+                       onKeyPressed="#onPathChangeA"/>
             <TextField fx:id="filePathB" maxWidth="350" minWidth="350" prefWidth="350"
                        maxHeight="25" minHeight="25" prefHeight="25"
-                       onKeyPressed="#onPathChange"/>
+                       onKeyPressed="#onPathChangeB"/>
         </HBox>
     </VBox>
         <HBox maxWidth="700" minWidth="700" prefWidth="700"

@@ -41,10 +41,20 @@ public class View implements Initializable {
         controller.start();
     }
 
+    void displayPath(String path, int whichList){
+        filePaths[whichList].setText(path);
+    }
+
     @FXML
-    private void onPathChange(KeyEvent event){
+    private void onPathChangeA(KeyEvent event){
         if (event.getCode()== KeyCode.ENTER){
-            changeDirectory(filePathA.getText(), 0);
+            changeDirectory(filePathB.getText(), 0);
+        }
+    }
+
+    @FXML
+    private void onPathChangeB(KeyEvent event){
+        if (event.getCode()== KeyCode.ENTER){
             changeDirectory(filePathB.getText(), 1);
         }
     }
@@ -80,12 +90,11 @@ public class View implements Initializable {
     void displayFiles(File[] files, int whichList){
         fileLists[whichList].getChildren().clear();
         if(files!=null) {
-            filePaths[whichList].setText(files[0].getParent());
             viewFiles(files, whichList);
         } else {
             Label label = new Label();
             label.setText("directory does not exist");
-            filesA.getChildren().add(label);
+            fileLists[whichList].getChildren().add(label);
         }
     }
 

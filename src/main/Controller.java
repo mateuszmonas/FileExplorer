@@ -30,6 +30,7 @@ class Controller {
     private void getFiles(int whichList){
         File folder = new File(paths[whichList]);
         File[] fileList = folder.listFiles();
+        view.displayPath(paths[whichList], whichList);
         view.displayFiles(fileList, whichList);
     }
 }
