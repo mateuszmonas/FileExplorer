@@ -7,21 +7,23 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefWidth="400" fx:id="root" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.View">
+<BorderPane prefWidth="700" maxWidth="700" minWidth="700"
+            prefHeight="500" maxHeight="500" minHeight="500" fx:id="root" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.View">
     <top>
-    <VBox fx:id="menu" BorderPane.alignment="TOP_CENTER">
+    <VBox BorderPane.alignment="TOP_CENTER">
         <HBox>
             <Button>a</Button>
             <Button>b</Button>
         </HBox>
         <HBox>
-            <TextField fx:id="filePathA" />
-            <TextField fx:id="filePathB" />
+            <TextField fx:id="filePathA" prefWidth="350" maxWidth="350" minWidth="350"/>
+            <TextField fx:id="filePathB" prefWidth="350" maxWidth="350" minWidth="350"/>
         </HBox>
     </VBox>
     </top>
     <left>
     <ScrollPane
+            prefWidth="350" maxWidth="350" minWidth="350"
             fx:id="scrollPaneA">
         <VBox fx:id="filesA">
         </VBox>
@@ -30,7 +32,8 @@
 </left>
     <right>
     <ScrollPane
-    fx:id="scrollPaneB">
+            prefWidth="350" maxWidth="350" minWidth="350"
+            fx:id="scrollPaneB">
         <VBox fx:id="filesB">
         </VBox>
     </ScrollPane>

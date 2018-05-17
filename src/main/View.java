@@ -34,10 +34,6 @@ public class View implements Initializable {
         controller = new Controller(this);
         fileLists[0] = filesA;
         fileLists[1] = filesB;
-        scrollPaneA.setMaxWidth(root.getPrefWidth());
-        scrollPaneB.setMaxWidth(root.getPrefWidth());
-        filesA.setMaxWidth(root.getPrefWidth());
-        filesB.setMaxWidth(root.getPrefWidth());
         filePaths[0]= filePathA;
         filePaths[1]= filePathB;
         controller.start();

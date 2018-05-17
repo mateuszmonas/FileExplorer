@@ -14,7 +14,8 @@ public class Main extends Application{
     public void start(Stage stage) throws IOException {
         BorderPane root = FXMLLoader.load(getClass().getResource("fxml_layout.fxml"));
         stage.setTitle("FileNameEditor");
-        stage.setScene(new Scene(root, 300, 200));
+        stage.setScene(new Scene(root, 700, 500));
+        stage.setResizable(false);
         stage.show();
     }
 
