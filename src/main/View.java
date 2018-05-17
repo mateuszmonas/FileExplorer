@@ -3,9 +3,12 @@ package main;
 import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -38,7 +41,13 @@ public class View implements Initializable {
         controller.start();
     }
 
-
+    @FXML
+    private void onPathChange(KeyEvent event){
+        if (event.getCode()== KeyCode.ENTER){
+            changeDirectory(filePathA.getText(), 0);
+            changeDirectory(filePathB.getText(), 1);
+        }
+    }
 
     private void changeDirectory(String path, int whichList){
         controller.changeDirectory(path, whichList);
@@ -48,11 +57,10 @@ public class View implements Initializable {
         for (File file : files) {
             TextField textField = new TextField();
             textField.setText(file.getName());
-            textField.setStyle("-fx-padding: 0 0 0 0;");
+            textField.setPadding(new Insets(0,0,0,0));
             filesA.getChildren().add(textField);
         }
     }
-
 
     private void viewFiles(File[] files, int whichList){
         for (File file : files) {
