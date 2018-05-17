@@ -3,39 +3,37 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefWidth="700" maxWidth="700" minWidth="700"
-            prefHeight="500" maxHeight="500" minHeight="500" fx:id="root" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.View">
-    <top>
-    <VBox BorderPane.alignment="TOP_CENTER">
-        <HBox>
+<VBox maxHeight="500" maxWidth="700" minHeight="500" minWidth="700" prefHeight="500" prefWidth="700" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.View">
+    <VBox maxHeight="50" minHeight="50" prefHeight="50"
+          maxWidth="700" minWidth="700" prefWidth="700">
+        <HBox  maxWidth="700" minWidth="700" prefWidth="700"
+                maxHeight="25" minHeight="25" prefHeight="25">
             <Button>a</Button>
             <Button>b</Button>
         </HBox>
-        <HBox>
-            <TextField fx:id="filePathA" prefWidth="350" maxWidth="350" minWidth="350"/>
-            <TextField fx:id="filePathB" prefWidth="350" maxWidth="350" minWidth="350"/>
+        <HBox  maxWidth="700" minWidth="700" prefWidth="700"
+                maxHeight="25" minHeight="25" prefHeight="25">
+            <TextField fx:id="filePathA" maxWidth="350" minWidth="350" prefWidth="350"
+                        maxHeight="25" minHeight="25" prefHeight="25"/>
+            <TextField fx:id="filePathB" maxWidth="350" minWidth="350" prefWidth="350"
+                       maxHeight="25" minHeight="25" prefHeight="25"/>
         </HBox>
     </VBox>
-    </top>
-    <left>
-    <ScrollPane
-            prefWidth="350" maxWidth="350" minWidth="350"
-            fx:id="scrollPaneA">
-        <VBox fx:id="filesA">
-        </VBox>
-
-    </ScrollPane>
-</left>
-    <right>
-    <ScrollPane
-            prefWidth="350" maxWidth="350" minWidth="350"
-            fx:id="scrollPaneB">
-        <VBox fx:id="filesB">
-        </VBox>
-    </ScrollPane>
-    </right>
-</BorderPane>
+        <HBox maxWidth="700" minWidth="700" prefWidth="700"
+              maxHeight="450" minHeight="450" prefHeight="450"
+                >
+            <ScrollPane fx:id="scrollPaneA" maxWidth="350" minWidth="350" prefWidth="350"
+                        maxHeight="450" minHeight="450" prefHeight="450">
+                <VBox fx:id="filesA" minWidth="348"
+                      minHeight="448"/>
+            </ScrollPane>
+            <ScrollPane fx:id="scrollPaneB" maxWidth="350" minWidth="350" prefWidth="350"
+                        maxHeight="450" minHeight="450" prefHeight="450">
+                <VBox fx:id="filesB" minWidth="348"
+                      minHeight="448"/>
+            </ScrollPane>
+        </HBox>
+</VBox>

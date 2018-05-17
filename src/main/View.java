@@ -27,7 +27,6 @@ public class View implements Initializable {
     @FXML private TextField filePathB;
     private TextField[] filePaths = new TextField[2];
     private VBox[] fileLists= new VBox[2];
-    @FXML private BorderPane root;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
