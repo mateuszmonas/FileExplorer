@@ -222,7 +222,6 @@ public class View implements Initializable {
         }
     }
 
-    //dasdas
 
     /**
      * displays the names of all the files in the given path
