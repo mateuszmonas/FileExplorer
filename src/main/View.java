@@ -2,6 +2,8 @@ package main;
 
 import javafx.application.Application;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -11,8 +13,10 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -30,8 +34,10 @@ public class View implements Initializable {
     @FXML private VBox filesB;
     @FXML private TextField filePathA;
     @FXML private TextField filePathB;
+    @FXML private Pane drawingPane;
     private TextField[] filePaths = new TextField[2];
     private VBox[] fileLists= new VBox[2];
+    private Rectangle selectionRectangle;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -40,6 +46,7 @@ public class View implements Initializable {
         fileLists[1] = filesB;
         filePaths[0]= filePathA;
         filePaths[1]= filePathB;
+        handleMouse();
         controller.start();
     }
 
@@ -72,6 +79,67 @@ public class View implements Initializable {
             textField.setPadding(new Insets(0,0,0,0));
             filesA.getChildren().add(textField);
         }
+    }
+
+    @FXML
+    private void test(MouseEvent me){
+        //drawingPane.getChildren().add(new Rectangle(me.getSceneX(), me.getSceneY(), 20,20));
+    }
+
+    private class Delta{
+        double startX = 0;
+        double startY = 0;
+        double x = 0;
+        double y = 0;
+    }
+
+    private void setSelectionRectangleDimensions(double startX, double startY, double width, double height){
+        selectionRectangle.setX(startX);
+        selectionRectangle.setY(startY);
+        selectionRectangle.setWidth(width);
+        selectionRectangle.setHeight(height);
+    }
+
+    private void handleMouse(){
+        final Delta dragDelta = new Delta();
+        selectionRectangle = new Rectangle();
+        selectionRectangle.setOpacity(0.5);
+        selectionRectangle.setFill(Color.LIGHTBLUE);
+        filesA.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                dragDelta.startX = event.getSceneX();
+                dragDelta.startY = event.getSceneY();
+            }
+        });
+        filesA.setOnMouseDragged(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                ObservableList<Node> nodes = drawingPane.getChildren();
+                nodes.remove(selectionRectangle);
+                dragDelta.x=event.getSceneX();
+                dragDelta.y=event.getSceneY();
+                if(dragDelta.x>dragDelta.startX && dragDelta.y>dragDelta.startY){
+                    setSelectionRectangleDimensions(dragDelta.startX,dragDelta.startY, dragDelta.x-dragDelta.startX, dragDelta.y-dragDelta.startY);
+                    nodes.add(selectionRectangle);
+                }else if (dragDelta.x>dragDelta.startX && dragDelta.y<dragDelta.startY){
+                    setSelectionRectangleDimensions(dragDelta.startX,dragDelta.y, dragDelta.x-dragDelta.startX, dragDelta.startY-dragDelta.y);
+                    nodes.add(selectionRectangle);
+                }else if (dragDelta.x<dragDelta.startX && dragDelta.y>dragDelta.startY){
+                    setSelectionRectangleDimensions(dragDelta.x,dragDelta.startY, dragDelta.startX-dragDelta.x, dragDelta.y-dragDelta.startY);
+                    nodes.add(selectionRectangle);
+                }else if (dragDelta.x<dragDelta.startX && dragDelta.y<dragDelta.startY){
+                    setSelectionRectangleDimensions(dragDelta.x,dragDelta.y, dragDelta.startX-dragDelta.x, dragDelta.startY-dragDelta.y);
+                    nodes.add(selectionRectangle);
+                }
+            }
+        });
+        filesA.setOnMouseReleased(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                drawingPane.getChildren().remove(selectionRectangle);
+            }
+        });
     }
 
     private void viewFiles(File[] files, int whichList){
