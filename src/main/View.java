@@ -105,16 +105,11 @@ public class View implements Initializable {
         selectionRectangle = new Rectangle();
         selectionRectangle.setOpacity(0.5);
         selectionRectangle.setFill(Color.LIGHTBLUE);
-        filesA.setOnMousePressed(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
+        filesA.setOnMousePressed(event->{
                 dragDelta.startX = event.getSceneX();
                 dragDelta.startY = event.getSceneY();
-            }
         });
-        filesA.setOnMouseDragged(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
+        filesA.setOnMouseDragged(event-> {
                 ObservableList<Node> nodes = drawingPane.getChildren();
                 nodes.remove(selectionRectangle);
                 dragDelta.x=event.getSceneX();
@@ -132,14 +127,10 @@ public class View implements Initializable {
                     setSelectionRectangleDimensions(dragDelta.x,dragDelta.y, dragDelta.startX-dragDelta.x, dragDelta.startY-dragDelta.y);
                     nodes.add(selectionRectangle);
                 }
-            }
         });
-        filesA.setOnMouseReleased(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                drawingPane.getChildren().remove(selectionRectangle);
-            }
-        });
+        filesA.setOnMouseReleased(event ->
+                drawingPane.getChildren().remove(selectionRectangle)
+        );
     }
 
     private void viewFiles(File[] files, int whichList){
