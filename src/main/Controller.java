@@ -1,6 +1,7 @@
 package main;
 
 import java.io.File;
+import java.util.Arrays;
 
 class Controller {
 
@@ -30,6 +31,9 @@ class Controller {
     private void getFiles(int whichList){
         File folder = new File(paths[whichList]);
         File[] fileList = folder.listFiles();
+        if(fileList!=null) {
+            fileList = Arrays.stream(fileList).filter(file -> !file.isHidden()).toArray(File[]::new);
+        }
         view.displayPath(paths[whichList], whichList);
         view.displayFiles(fileList, whichList);
     }

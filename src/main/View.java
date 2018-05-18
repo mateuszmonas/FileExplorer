@@ -1,9 +1,11 @@
 package main;
 
 import javafx.application.Application;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
@@ -72,22 +74,149 @@ public class View implements Initializable {
         }
     }
 
+    void isShiftDown(FileLabel label){
+        ObservableList<Node> nodes = label.getParent().getChildrenUnmodifiable();
+        int clickedItemPosition = 0;
+        int firstSelectedItemPosition = 0;
+        int lastSelectedItemPosition = nodes.size()-1;
+        for (Node n : nodes) {
+            if (label.equals(n)) {
+                break;
+            }
+            clickedItemPosition++;
+        }
+        for (Node n : nodes) {
+            if (n instanceof FileLabel && ((FileLabel)n).isSelected()) {
+                break;
+            }
+            firstSelectedItemPosition++;
+        }
+        while (lastSelectedItemPosition>firstSelectedItemPosition){
+            if (nodes.get(lastSelectedItemPosition) instanceof FileLabel && ((FileLabel)nodes.get(lastSelectedItemPosition)).isSelected()) {
+                break;
+            }
+            lastSelectedItemPosition--;
+        }
+        nodes.forEach(n -> {
+            if (n instanceof FileLabel && !label.equals(n)) ((FileLabel) n).setSelected(false);
+        });
+        if (clickedItemPosition < lastSelectedItemPosition && clickedItemPosition < firstSelectedItemPosition) {
+            for (int i = clickedItemPosition; i <= lastSelectedItemPosition; i++) {
+                ((FileLabel) nodes.get(i)).setSelected(true);
+            }
+        } else if (clickedItemPosition<lastSelectedItemPosition && clickedItemPosition > firstSelectedItemPosition){
+            for (int i = firstSelectedItemPosition; i <= clickedItemPosition; i++) {
+                ((FileLabel) nodes.get(i)).setSelected(true);
+            }
+        } else  {
+            for (int i = firstSelectedItemPosition; i <= clickedItemPosition; i++) {
+                ((FileLabel) nodes.get(i)).setSelected(true);
+            }
+        }
+    }
+
+    void isShiftAndControlDown(FileLabel label){
+        ObservableList<Node> nodes = label.getParent().getChildrenUnmodifiable();
+        int clickedItemPosition = 0;
+        int firstSelectedItemPosition = 0;
+        int lastSelectedItemPosition = nodes.size()-1;
+        for (Node n : nodes) {
+            if (label.equals(n)) {
+                break;
+            }
+            clickedItemPosition++;
+        }
+        for (Node n : nodes) {
+            if (n instanceof FileLabel && ((FileLabel)n).isSelected()) {
+                break;
+            }
+            firstSelectedItemPosition++;
+        }
+        while (lastSelectedItemPosition>firstSelectedItemPosition){
+            if (nodes.get(lastSelectedItemPosition) instanceof FileLabel && ((FileLabel)nodes.get(lastSelectedItemPosition)).isSelected()) {
+                break;
+            }
+            lastSelectedItemPosition--;
+        }
+        if (clickedItemPosition < lastSelectedItemPosition && clickedItemPosition < firstSelectedItemPosition) {
+            for (int i = clickedItemPosition; i <= lastSelectedItemPosition; i++) {
+                ((FileLabel) nodes.get(i)).setSelected(true);
+            }
+        } else if (clickedItemPosition<lastSelectedItemPosition && clickedItemPosition > firstSelectedItemPosition){
+            for (int i = firstSelectedItemPosition; i <= clickedItemPosition; i++) {
+                ((FileLabel) nodes.get(i)).setSelected(true);
+            }
+        } else  {
+            for (int i = firstSelectedItemPosition; i <= clickedItemPosition; i++) {
+                ((FileLabel) nodes.get(i)).setSelected(true);
+            }
+        }
+    }
+
     private void viewFiles(File[] files, int whichList){
         for (File file : files) {
             FileLabel label = new FileLabel();
             label.setText(file.getName());
             label.setOnMouseClicked(event -> {
-                //remove background from all other nodes
-                label.getParent().getChildrenUnmodifiable().forEach(n -> {
-                    if(n instanceof FileLabel && !label.equals(n)) ((FileLabel)n).setSelected(false);
-                });
-                //check if this node was already selected
-                //if it was change path
-                if(label.isSelected()){
-                    if (file.isDirectory()) changeDirectory(file.getPath(), whichList);
+                ObservableList<Node> nodes = label.getParent().getChildrenUnmodifiable();
+                if(event.isShiftDown()) {
+
+                    int clickedItemPosition = 0;
+                    int firstSelectedItemPosition = 0;
+                    int lastSelectedItemPosition = nodes.size()-1;
+                    //get clicked item position
+                    for (Node n : nodes) {
+                        if (label.equals(n)) {
+                            break;
+                        }
+                        clickedItemPosition++;
+                    }
+                    //get first selected item position
+                    for (Node n : nodes) {
+                        if (n instanceof FileLabel && ((FileLabel)n).isSelected()) {
+                            break;
+                        }
+                        firstSelectedItemPosition++;
+                    }
+                    //get last selected item position
+                    while (lastSelectedItemPosition>firstSelectedItemPosition){
+                        if (nodes.get(lastSelectedItemPosition) instanceof FileLabel && ((FileLabel)nodes.get(lastSelectedItemPosition)).isSelected()) {
+                            break;
+                        }
+                        lastSelectedItemPosition--;
+                    }
+                    //if control is not pressed down then clear all selections
+                    if(!event.isControlDown()) {
+                        nodes.forEach(n -> {
+                            if (n instanceof FileLabel && !label.equals(n)) ((FileLabel) n).setSelected(false);
+                        });
+                    }
+                    //if clicked item is higher than both last and first selected item
+                    //then select all items between clicked item and last selected item
+                    if (clickedItemPosition < lastSelectedItemPosition && clickedItemPosition < firstSelectedItemPosition) {
+                        for (int i = clickedItemPosition; i <= lastSelectedItemPosition; i++) {
+                            ((FileLabel) nodes.get(i)).setSelected(true);
+                        }
+                    }
+                    //if clicked item is lower than first selected item
+                    //then select all items between clicked item and first selected item
+                    else{
+                        for (int i = firstSelectedItemPosition; i <= clickedItemPosition; i++) {
+                            ((FileLabel) nodes.get(i)).setSelected(true);
+                        }
+                    }
+
+                }else if(!event.isShiftDown() && event.isControlDown()){
+                    label.setSelected(!label.isSelected());
+                }else {
+                    if(label.isSelected()) changeDirectory(file.getPath(), 0);
+                    else{
+                        nodes.forEach(n -> {
+                            if (n instanceof FileLabel && !label.equals(n)) ((FileLabel) n).setSelected(false);
+                        });
+                        label.setSelected(true);
+                    }
                 }
-                //change node background if it was not selected yet
-                label.setSelected(true);
             });
             fileLists[whichList].getChildren().add(label);
         }
