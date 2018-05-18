@@ -74,85 +74,6 @@ public class View implements Initializable {
         }
     }
 
-    void isShiftDown(FileLabel label){
-        ObservableList<Node> nodes = label.getParent().getChildrenUnmodifiable();
-        int clickedItemPosition = 0;
-        int firstSelectedItemPosition = 0;
-        int lastSelectedItemPosition = nodes.size()-1;
-        for (Node n : nodes) {
-            if (label.equals(n)) {
-                break;
-            }
-            clickedItemPosition++;
-        }
-        for (Node n : nodes) {
-            if (n instanceof FileLabel && ((FileLabel)n).isSelected()) {
-                break;
-            }
-            firstSelectedItemPosition++;
-        }
-        while (lastSelectedItemPosition>firstSelectedItemPosition){
-            if (nodes.get(lastSelectedItemPosition) instanceof FileLabel && ((FileLabel)nodes.get(lastSelectedItemPosition)).isSelected()) {
-                break;
-            }
-            lastSelectedItemPosition--;
-        }
-        nodes.forEach(n -> {
-            if (n instanceof FileLabel && !label.equals(n)) ((FileLabel) n).setSelected(false);
-        });
-        if (clickedItemPosition < lastSelectedItemPosition && clickedItemPosition < firstSelectedItemPosition) {
-            for (int i = clickedItemPosition; i <= lastSelectedItemPosition; i++) {
-                ((FileLabel) nodes.get(i)).setSelected(true);
-            }
-        } else if (clickedItemPosition<lastSelectedItemPosition && clickedItemPosition > firstSelectedItemPosition){
-            for (int i = firstSelectedItemPosition; i <= clickedItemPosition; i++) {
-                ((FileLabel) nodes.get(i)).setSelected(true);
-            }
-        } else  {
-            for (int i = firstSelectedItemPosition; i <= clickedItemPosition; i++) {
-                ((FileLabel) nodes.get(i)).setSelected(true);
-            }
-        }
-    }
-
-    void isShiftAndControlDown(FileLabel label){
-        ObservableList<Node> nodes = label.getParent().getChildrenUnmodifiable();
-        int clickedItemPosition = 0;
-        int firstSelectedItemPosition = 0;
-        int lastSelectedItemPosition = nodes.size()-1;
-        for (Node n : nodes) {
-            if (label.equals(n)) {
-                break;
-            }
-            clickedItemPosition++;
-        }
-        for (Node n : nodes) {
-            if (n instanceof FileLabel && ((FileLabel)n).isSelected()) {
-                break;
-            }
-            firstSelectedItemPosition++;
-        }
-        while (lastSelectedItemPosition>firstSelectedItemPosition){
-            if (nodes.get(lastSelectedItemPosition) instanceof FileLabel && ((FileLabel)nodes.get(lastSelectedItemPosition)).isSelected()) {
-                break;
-            }
-            lastSelectedItemPosition--;
-        }
-        if (clickedItemPosition < lastSelectedItemPosition && clickedItemPosition < firstSelectedItemPosition) {
-            for (int i = clickedItemPosition; i <= lastSelectedItemPosition; i++) {
-                ((FileLabel) nodes.get(i)).setSelected(true);
-            }
-        } else if (clickedItemPosition<lastSelectedItemPosition && clickedItemPosition > firstSelectedItemPosition){
-            for (int i = firstSelectedItemPosition; i <= clickedItemPosition; i++) {
-                ((FileLabel) nodes.get(i)).setSelected(true);
-            }
-        } else  {
-            for (int i = firstSelectedItemPosition; i <= clickedItemPosition; i++) {
-                ((FileLabel) nodes.get(i)).setSelected(true);
-            }
-        }
-    }
-
     private void viewFiles(File[] files, int whichList){
         for (File file : files) {
             FileLabel label = new FileLabel();
@@ -206,7 +127,7 @@ public class View implements Initializable {
                         }
                     }
 
-                }else if(!event.isShiftDown() && event.isControlDown()){
+                }else if(event.isControlDown()){
                     label.setSelected(!label.isSelected());
                 }else {
                     if(label.isSelected()) changeDirectory(file.getPath(), 0);
