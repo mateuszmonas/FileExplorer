@@ -129,17 +129,16 @@ public class View implements Initializable {
                 nodes.add(selectionRectangle);
             }
             filesA.getChildren().forEach(node -> {
-                Bounds nodeBounds = node.getBoundsInParent();
-                Bounds parentBounds = node.getParent().getBoundsInParent();
-                double nodeMinX = nodeBounds.getMinX()+parentBounds.getMinX();
-                double nodeMaxX = nodeBounds.getMaxX()+parentBounds.getMinX();
-                double nodeMaxY = nodeBounds.getMaxY()+parentBounds.getMinY();
-                double nodeMinY = nodeBounds.getMinY()+parentBounds.getMinY();
+                Bounds nodeBounds = node.localToScene(node.getBoundsInLocal());
+                double nodeMinX = nodeBounds.getMinX();
+                double nodeMaxX = nodeBounds.getMaxX();
+                double nodeMaxY = nodeBounds.getMaxY();
+                double nodeMinY = nodeBounds.getMinY();
                 double selectionMinX = dragDelta.startX<dragDelta.x?dragDelta.startX:dragDelta.x;
                 double selectionMaxX = dragDelta.startX>dragDelta.x?dragDelta.startX:dragDelta.x;
                 double selectionMinY = dragDelta.startY<dragDelta.y?dragDelta.startY:dragDelta.y;
                 double selectionMaxY = dragDelta.startY<dragDelta.y?dragDelta.startY:dragDelta.y;
-
+                if(nodeMaxX>selectionMinX && nodeMaxY>selectionMinY) ((FileLabel)node).setSelected(true);
             });
         });
         filesA.setOnMouseReleased(event ->

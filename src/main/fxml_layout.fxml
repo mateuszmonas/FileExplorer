@@ -6,7 +6,6 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.layout.Pane?>
 <StackPane maxHeight="500" maxWidth="700" minHeight="500" minWidth="700" prefHeight="500" prefWidth="700" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.View">
@@ -28,20 +27,20 @@
                        onKeyPressed="#onPathChangeB"/>
         </HBox>
     </VBox>
-        <HBox maxWidth="700" minWidth="700" prefWidth="700"
-              maxHeight="450" minHeight="450" prefHeight="450"
-                >
-            <ScrollPane fx:id="scrollPaneA" maxWidth="350" minWidth="350" prefWidth="350"
-                        maxHeight="450" minHeight="450" prefHeight="450">
-                <VBox fx:id="filesA" minWidth="348" onMouseDragged="#test"
-                      minHeight="448"/>
-            </ScrollPane>
-            <ScrollPane fx:id="scrollPaneB" maxWidth="350" minWidth="350" prefWidth="350"
-                        maxHeight="450" minHeight="450" prefHeight="450">
-                <VBox fx:id="filesB" minWidth="348"
-                      minHeight="448"/>
-            </ScrollPane>
-        </HBox>
+    <HBox maxWidth="700" minWidth="700" prefWidth="700"
+          maxHeight="450" minHeight="450" prefHeight="450"
+            >
+        <ScrollPane fx:id="scrollPaneA" maxWidth="350" minWidth="350" prefWidth="350"
+                    maxHeight="450" minHeight="450" prefHeight="450">
+            <VBox fx:id="filesA" minWidth="348" onMouseDragged="#test"
+                  minHeight="448"/>
+        </ScrollPane>
+        <ScrollPane fx:id="scrollPaneB" maxWidth="350" minWidth="350" prefWidth="350"
+                    maxHeight="450" minHeight="450" prefHeight="450">
+            <VBox fx:id="filesB" minWidth="348"
+                  minHeight="448"/>
+        </ScrollPane>
+    </HBox>
 </VBox>
 <Pane fx:id="drawingPane" maxHeight="500" maxWidth="700" minHeight="500" minWidth="700" prefHeight="500" prefWidth="700" mouseTransparent="true">
     <Rectangle x="20" y="20" width="20" height="20"/>
