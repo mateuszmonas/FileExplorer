@@ -9,8 +9,8 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -74,10 +74,20 @@ public class View implements Initializable {
 
     private void viewFiles(File[] files, int whichList){
         for (File file : files) {
-            Text label = new Text();
+            Label label = new Label();
             label.setText(file.getName());
             label.setOnMouseClicked(event -> {
-                if (file.isDirectory()) changeDirectory(file.getPath(), whichList);
+                //remove background from all other nodes
+                label.getParent().getChildrenUnmodifiable().forEach(n -> {
+                    if(n instanceof Label && !label.equals(n)) ((Label)n).setBackground(null);
+                });
+                //check if this node was already selected
+                //if it was change path
+                if(label.getBackground()!=null){
+                    if (file.isDirectory()) changeDirectory(file.getPath(), whichList);
+                }
+                //change node background if it was not selected yet
+                label.setBackground(new Background(new BackgroundFill(Color.BLUE, CornerRadii.EMPTY, Insets.EMPTY)));
             });
             fileLists[whichList].getChildren().add(label);
         }
