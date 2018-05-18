@@ -130,7 +130,7 @@ public class View implements Initializable {
                 }else if(event.isControlDown()){
                     label.setSelected(!label.isSelected());
                 }else {
-                    if(label.isSelected()) changeDirectory(file.getPath(), 0);
+                    if(label.isSelected()) changeDirectory(file.getPath(), whichList);
                     else{
                         nodes.forEach(n -> {
                             if (n instanceof FileLabel && !label.equals(n)) ((FileLabel) n).setSelected(false);
