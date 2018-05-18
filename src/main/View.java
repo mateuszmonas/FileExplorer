@@ -137,8 +137,12 @@ public class View implements Initializable {
                 double selectionMinX = dragDelta.startX<dragDelta.x?dragDelta.startX:dragDelta.x;
                 double selectionMaxX = dragDelta.startX>dragDelta.x?dragDelta.startX:dragDelta.x;
                 double selectionMinY = dragDelta.startY<dragDelta.y?dragDelta.startY:dragDelta.y;
-                double selectionMaxY = dragDelta.startY<dragDelta.y?dragDelta.startY:dragDelta.y;
-                if(nodeMaxX>selectionMinX && nodeMaxY>selectionMinY) ((FileLabel)node).setSelected(true);
+                double selectionMaxY = dragDelta.startY>dragDelta.y?dragDelta.startY:dragDelta.y;
+                if(selectionMinY<nodeMaxY && selectionMaxY>nodeMinY && selectionMinX<nodeMaxX && selectionMaxX>nodeMinX) {
+                    ((FileLabel)node).setSelected(true);
+                } else {
+                    ((FileLabel)node).setSelected(false);
+                }
             });
         });
         filesA.setOnMouseReleased(event ->
