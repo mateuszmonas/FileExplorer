@@ -6,6 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -106,30 +107,43 @@ public class View implements Initializable {
         selectionRectangle.setOpacity(0.5);
         selectionRectangle.setFill(Color.LIGHTBLUE);
         filesA.setOnMousePressed(event->{
-                dragDelta.startX = event.getSceneX();
-                dragDelta.startY = event.getSceneY();
+            dragDelta.startX = event.getSceneX();
+            dragDelta.startY = event.getSceneY();
         });
         filesA.setOnMouseDragged(event-> {
-                ObservableList<Node> nodes = drawingPane.getChildren();
-                nodes.remove(selectionRectangle);
-                dragDelta.x=event.getSceneX();
-                dragDelta.y=event.getSceneY();
-                if(dragDelta.x>dragDelta.startX && dragDelta.y>dragDelta.startY){
-                    setSelectionRectangleDimensions(dragDelta.startX,dragDelta.startY, dragDelta.x-dragDelta.startX, dragDelta.y-dragDelta.startY);
-                    nodes.add(selectionRectangle);
-                }else if (dragDelta.x>dragDelta.startX && dragDelta.y<dragDelta.startY){
-                    setSelectionRectangleDimensions(dragDelta.startX,dragDelta.y, dragDelta.x-dragDelta.startX, dragDelta.startY-dragDelta.y);
-                    nodes.add(selectionRectangle);
-                }else if (dragDelta.x<dragDelta.startX && dragDelta.y>dragDelta.startY){
-                    setSelectionRectangleDimensions(dragDelta.x,dragDelta.startY, dragDelta.startX-dragDelta.x, dragDelta.y-dragDelta.startY);
-                    nodes.add(selectionRectangle);
-                }else if (dragDelta.x<dragDelta.startX && dragDelta.y<dragDelta.startY){
-                    setSelectionRectangleDimensions(dragDelta.x,dragDelta.y, dragDelta.startX-dragDelta.x, dragDelta.startY-dragDelta.y);
-                    nodes.add(selectionRectangle);
-                }
+            ObservableList<Node> nodes = drawingPane.getChildren();
+            nodes.remove(selectionRectangle);
+            dragDelta.x=event.getSceneX();
+            dragDelta.y=event.getSceneY();
+            if(dragDelta.x>dragDelta.startX && dragDelta.y>dragDelta.startY){
+                setSelectionRectangleDimensions(dragDelta.startX,dragDelta.startY, dragDelta.x-dragDelta.startX, dragDelta.y-dragDelta.startY);
+                nodes.add(selectionRectangle);
+            }else if (dragDelta.x>dragDelta.startX && dragDelta.y<dragDelta.startY){
+                setSelectionRectangleDimensions(dragDelta.startX,dragDelta.y, dragDelta.x-dragDelta.startX, dragDelta.startY-dragDelta.y);
+                nodes.add(selectionRectangle);
+            }else if (dragDelta.x<dragDelta.startX && dragDelta.y>dragDelta.startY){
+                setSelectionRectangleDimensions(dragDelta.x,dragDelta.startY, dragDelta.startX-dragDelta.x, dragDelta.y-dragDelta.startY);
+                nodes.add(selectionRectangle);
+            }else if (dragDelta.x<dragDelta.startX && dragDelta.y<dragDelta.startY){
+                setSelectionRectangleDimensions(dragDelta.x,dragDelta.y, dragDelta.startX-dragDelta.x, dragDelta.startY-dragDelta.y);
+                nodes.add(selectionRectangle);
+            }
+            filesA.getChildren().forEach(node -> {
+                Bounds nodeBounds = node.getBoundsInParent();
+                Bounds parentBounds = node.getParent().getBoundsInParent();
+                double nodeMinX = nodeBounds.getMinX()+parentBounds.getMinX();
+                double nodeMaxX = nodeBounds.getMaxX()+parentBounds.getMinX();
+                double nodeMaxY = nodeBounds.getMaxY()+parentBounds.getMinY();
+                double nodeMinY = nodeBounds.getMinY()+parentBounds.getMinY();
+                double selectionMinX = dragDelta.startX<dragDelta.x?dragDelta.startX:dragDelta.x;
+                double selectionMaxX = dragDelta.startX>dragDelta.x?dragDelta.startX:dragDelta.x;
+                double selectionMinY = dragDelta.startY<dragDelta.y?dragDelta.startY:dragDelta.y;
+                double selectionMaxY = dragDelta.startY<dragDelta.y?dragDelta.startY:dragDelta.y;
+
+            });
         });
         filesA.setOnMouseReleased(event ->
-                drawingPane.getChildren().remove(selectionRectangle)
+            drawingPane.getChildren().remove(selectionRectangle)
         );
     }
 
