@@ -208,6 +208,7 @@ public class View implements Initializable {
 
                 }else if(!event.isShiftDown() && event.isControlDown()){
                     label.setSelected(!label.isSelected());
+                    //asdasdasdasd
                 }else {
                     if(label.isSelected()) changeDirectory(file.getPath(), 0);
                     else{
