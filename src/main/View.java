@@ -25,6 +25,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 public class View implements Initializable {
 
@@ -47,7 +48,8 @@ public class View implements Initializable {
         fileLists[1] = filesB;
         filePaths[0]= filePathA;
         filePaths[1]= filePathB;
-        handleMouse();
+        handleMouse(fileLists[0]);
+        handleMouse(fileLists[1]);
         controller.start();
     }
 
@@ -82,11 +84,6 @@ public class View implements Initializable {
         }
     }
 
-    @FXML
-    private void test(MouseEvent me){
-        //drawingPane.getChildren().add(new Rectangle(me.getSceneX(), me.getSceneY(), 20,20));
-    }
-
     private class Delta{
         double startX = 0;
         double startY = 0;
@@ -101,34 +98,41 @@ public class View implements Initializable {
         selectionRectangle.setHeight(height);
     }
 
-    private void handleMouse(){
+    //function responsible for drawing a selection rectangle and selecting files with it
+    private void handleMouse(Pane pane){
         final Delta dragDelta = new Delta();
         selectionRectangle = new Rectangle();
         selectionRectangle.setOpacity(0.5);
         selectionRectangle.setFill(Color.LIGHTBLUE);
-        filesA.setOnMousePressed(event->{
+        final ArrayList<Node> nodesSelectedBeforeDrawing = new ArrayList<>();
+        pane.setOnMousePressed(event->{
+            if (event.isControlDown()) {
+                nodesSelectedBeforeDrawing.clear();
+                nodesSelectedBeforeDrawing.addAll(pane.getChildrenUnmodifiable().stream().filter(node -> node instanceof FileLabel && ((FileLabel) node).isSelected()).collect(Collectors.toList()));
+            } else {
+                pane.getChildrenUnmodifiable().forEach(node -> {if(node instanceof FileLabel)((FileLabel)node).setSelected(false);});
+            }
             dragDelta.startX = event.getSceneX();
             dragDelta.startY = event.getSceneY();
         });
-        filesA.setOnMouseDragged(event-> {
+        pane.setOnMouseDragged(event-> {
             ObservableList<Node> nodes = drawingPane.getChildren();
             nodes.remove(selectionRectangle);
             dragDelta.x=event.getSceneX();
             dragDelta.y=event.getSceneY();
+            //we have to calculate where the current position of the cursor
+            //is relative to where it was clicked
             if(dragDelta.x>dragDelta.startX && dragDelta.y>dragDelta.startY){
                 setSelectionRectangleDimensions(dragDelta.startX,dragDelta.startY, dragDelta.x-dragDelta.startX, dragDelta.y-dragDelta.startY);
-                nodes.add(selectionRectangle);
             }else if (dragDelta.x>dragDelta.startX && dragDelta.y<dragDelta.startY){
                 setSelectionRectangleDimensions(dragDelta.startX,dragDelta.y, dragDelta.x-dragDelta.startX, dragDelta.startY-dragDelta.y);
-                nodes.add(selectionRectangle);
             }else if (dragDelta.x<dragDelta.startX && dragDelta.y>dragDelta.startY){
                 setSelectionRectangleDimensions(dragDelta.x,dragDelta.startY, dragDelta.startX-dragDelta.x, dragDelta.y-dragDelta.startY);
-                nodes.add(selectionRectangle);
             }else if (dragDelta.x<dragDelta.startX && dragDelta.y<dragDelta.startY){
                 setSelectionRectangleDimensions(dragDelta.x,dragDelta.y, dragDelta.startX-dragDelta.x, dragDelta.startY-dragDelta.y);
-                nodes.add(selectionRectangle);
             }
-            filesA.getChildren().forEach(node -> {
+            nodes.add(selectionRectangle);
+            pane.getChildren().forEach(node -> {
                 Bounds nodeBounds = node.localToScene(node.getBoundsInLocal());
                 double nodeMinX = nodeBounds.getMinX();
                 double nodeMaxX = nodeBounds.getMaxX();
@@ -138,15 +142,20 @@ public class View implements Initializable {
                 double selectionMaxX = dragDelta.startX>dragDelta.x?dragDelta.startX:dragDelta.x;
                 double selectionMinY = dragDelta.startY<dragDelta.y?dragDelta.startY:dragDelta.y;
                 double selectionMaxY = dragDelta.startY>dragDelta.y?dragDelta.startY:dragDelta.y;
+                //check if node is in the selection rectangle
                 if(selectionMinY<nodeMaxY && selectionMaxY>nodeMinY && selectionMinX<nodeMaxX && selectionMaxX>nodeMinX) {
                     ((FileLabel)node).setSelected(true);
                 } else {
-                    ((FileLabel)node).setSelected(false);
+                    if(!nodesSelectedBeforeDrawing.contains(node)) {
+                        ((FileLabel) node).setSelected(false);
+                    }
                 }
             });
         });
-        filesA.setOnMouseReleased(event ->
-            drawingPane.getChildren().remove(selectionRectangle)
+        pane.setOnMouseReleased(event -> {
+                drawingPane.getChildren().remove(selectionRectangle);
+                setSelectionRectangleDimensions(0,0,0,0);
+            }
         );
     }
 
