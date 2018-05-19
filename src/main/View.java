@@ -50,6 +50,8 @@ public class View implements Initializable {
         handleMouseEvents(fileLists[1]);
         handleKeyEvents(scrollPaneA, 0);
         handleKeyEvents(scrollPaneB, 1);
+        filePathA.setOnKeyPressed(event -> { if(event.getCode()==KeyCode.ENTER) changeDirectory(filePaths[0].getText(), 0); });
+        filePathB.setOnKeyPressed(event -> { if(event.getCode()==KeyCode.ENTER) changeDirectory(filePaths[1].getText(), 1); });
         copyFilesA.setOnMouseClicked(event -> copyFilesEvent(0));
         copyFilesB.setOnMouseClicked(event -> copyFilesEvent(1));
         controller.start();
@@ -92,20 +94,6 @@ public class View implements Initializable {
 
     void displayPath(String path, int whichList){
         filePaths[whichList].setText(path);
-    }
-
-    @FXML
-    private void onPathChangeA(KeyEvent event){
-        if (event.getCode()== KeyCode.ENTER){
-            changeDirectory(filePathA.getText(), 0);
-        }
-    }
-
-    @FXML
-    private void onPathChangeB(KeyEvent event){
-        if (event.getCode()== KeyCode.ENTER){
-            changeDirectory(filePathB.getText(), 1);
-        }
     }
 
     private void changeDirectory(String path, int whichList){
@@ -210,7 +198,6 @@ public class View implements Initializable {
             label.setOnMouseClicked(event -> {
                 ObservableList<Node> nodes = label.getParent().getChildrenUnmodifiable();
                 if(event.isShiftDown()) {
-
                     int clickedItemPosition = 0;
                     int firstSelectedItemPosition = 0;
                     int lastSelectedItemPosition = nodes.size()-1;
@@ -255,11 +242,13 @@ public class View implements Initializable {
                             ((SelectableFileLabel) nodes.get(i)).setSelected(true);
                         }
                     }
-
-                }else if(event.isControlDown()){
+                }
+                else if(event.isControlDown()){
                     label.setSelected(!label.isSelected());
                 }else {
-                    if(label.isSelected()) changeDirectory(label.getFile().getPath(), whichList);
+                    if(label.isSelected()) {
+                        changeDirectory(label.getFile().getPath(), whichList);
+                    }
                     else{
                         nodes.forEach(n -> {
                             if (n instanceof SelectableFileLabel && !label.equals(n)) ((SelectableFileLabel) n).setSelected(false);
