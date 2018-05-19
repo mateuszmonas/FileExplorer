@@ -98,7 +98,7 @@ public class View implements Initializable {
         final Delta dragDelta = new Delta();
         selectionRectangle = new Rectangle();
         selectionRectangle.setOpacity(0.5);
-        selectionRectangle.setFill(Color.LIGHTBLUE);
+        selectionRectangle.setFill(Color.BLUE);
         final ArrayList<Node> nodesSelectedBeforeDrawing = new ArrayList<>();
         pane.setOnMousePressed(event->{
             //if control is pressed don't remove the selection from previously selected nodes
@@ -164,6 +164,7 @@ public class View implements Initializable {
     private void viewFiles(File[] files, int whichList){
         for (File file : files) {
             SelectableLabel label = new SelectableLabel();
+            label.setMinWidth(200);
             label.setText(file.getName());
             label.setOnMouseClicked(event -> {
                 ObservableList<Node> nodes = label.getParent().getChildrenUnmodifiable();

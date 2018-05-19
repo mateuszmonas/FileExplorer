@@ -20,7 +20,7 @@ public class SelectableLabel extends Label {
     }
 
     public void setSelected(boolean selected) {
-        if(selected) setBackground(new Background(new BackgroundFill(Color.BLUE, CornerRadii.EMPTY, Insets.EMPTY)));
+        if(selected) setBackground(new Background(new BackgroundFill(Color.LIGHTBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
         else setBackground(null);
         isSelected = selected;
     }
