@@ -173,6 +173,8 @@ public class View implements Initializable {
                     double selectionMinY = dragDelta.startY < dragDelta.y ? dragDelta.startY : dragDelta.y;
                     double selectionMaxY = dragDelta.startY > dragDelta.y ? dragDelta.startY : dragDelta.y;
                     //check if node is in the selection rectangle
+                    // FIXME: 2018-05-19 sometimes this selects node, and then label onclick is called selecting the node again, effectively entering the directory after one click
+                    // FIXME: 2018-05-19 if the mouse is released before cursor leves the node it was pressed on it happens
                     if (selectionMinY < nodeMaxY && selectionMaxY > nodeMinY && selectionMinX < nodeMaxX && selectionMaxX > nodeMinX) {
                         ((SelectableFileLabel) node).setSelected(true);
                     } else {
