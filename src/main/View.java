@@ -1,17 +1,16 @@
 package main;
 
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -48,11 +47,32 @@ public class View implements Initializable {
         fileLists[1] = filesB;
         filePaths[0]= filePathA;
         filePaths[1]= filePathB;
-        handleMouse(fileLists[0]);
-        handleMouse(fileLists[1]);
+        handleMouseEvents(fileLists[0]);
+        handleMouseEvents(fileLists[1]);
+        handleKeyEvents(scrollPaneA, 0);
+        handleKeyEvents(scrollPaneB, 1);
         copyFilesA.setOnMouseClicked(event -> copyFilesButtonClicked(0));
         copyFilesB.setOnMouseClicked(event -> copyFilesButtonClicked(1));
         controller.start();
+    }
+
+    private void handleKeyEvents(Control pane, int whichList){
+        pane.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY).match(event)) {
+                copyFilesButtonClicked(whichList);
+            }
+            if (new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_ANY).match(event)) {
+                System.out.println("paste");
+            }
+            if (new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_ANY).match(event)) {
+                System.out.println("cut");
+            }
+            if (new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_ANY).match(event)) {
+                fileLists[whichList].getChildrenUnmodifiable().forEach(node -> {
+                    if(node instanceof SelectableFileLabel) ((SelectableFileLabel) node).setSelected(true);
+                });
+            }
+        });
     }
 
     private void copyFilesButtonClicked(int whichList){
@@ -109,7 +129,7 @@ public class View implements Initializable {
     }
 
     //function responsible for drawing a selection rectangle and selecting files with it
-    private void handleMouse(Pane pane){
+    private void handleMouseEvents(Pane pane){
         final Delta dragDelta = new Delta();
         selectionRectangle = new Rectangle();
         selectionRectangle.setOpacity(0.5);
