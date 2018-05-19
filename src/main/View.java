@@ -135,10 +135,13 @@ public class View implements Initializable {
             dragDelta.startX = event.getSceneX();
             dragDelta.startY = event.getSceneY();
             nodesSelectedBeforeDrawing.clear();
-            //if control is pressed don't remove the selection from previously selected nodes
-            if (event.isControlDown() || pane.getChildrenUnmodifiable().stream().anyMatch(
-                    node -> node instanceof SelectableFileLabel && ((SelectableFileLabel) node).areCoordinatesInsideNode(dragDelta.startX, dragDelta.startY) && ((SelectableFileLabel) node).isSelected()
-            )) {
+            //if control is pressed or if clicked node was already selected
+            // don't remove the selection from previously selected nodes
+            if (event.isControlDown() ||
+                    pane.getChildrenUnmodifiable().stream().anyMatch(
+                            node -> node instanceof SelectableFileLabel &&
+                            ((SelectableFileLabel) node).areCoordinatesInsideNode(dragDelta.startX, dragDelta.startY) &&
+                            ((SelectableFileLabel) node).isSelected())) {
                 nodesSelectedBeforeDrawing.addAll(pane.getChildrenUnmodifiable().stream().filter(node -> node instanceof SelectableFileLabel && ((SelectableFileLabel) node).isSelected()).collect(Collectors.toList()));
             } else {
                 pane.getChildrenUnmodifiable().forEach(node -> {
@@ -148,6 +151,7 @@ public class View implements Initializable {
             }
         });
         pane.setOnMouseDragged(event-> {
+            //check if first node clicked was not already selected
             if(nodesSelectedBeforeDrawing.stream().noneMatch(
                     node -> node instanceof SelectableFileLabel && ((SelectableFileLabel) node).areCoordinatesInsideNode(dragDelta.startX, dragDelta.startY)
             )) {
