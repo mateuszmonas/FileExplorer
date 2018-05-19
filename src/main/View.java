@@ -1,7 +1,6 @@
 package main;
 
 import javafx.collections.ObservableList;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Bounds;
@@ -51,15 +50,15 @@ public class View implements Initializable {
         handleMouseEvents(fileLists[1]);
         handleKeyEvents(scrollPaneA, 0);
         handleKeyEvents(scrollPaneB, 1);
-        copyFilesA.setOnMouseClicked(event -> copyFilesButtonClicked(0));
-        copyFilesB.setOnMouseClicked(event -> copyFilesButtonClicked(1));
+        copyFilesA.setOnMouseClicked(event -> copyFilesEvent(0));
+        copyFilesB.setOnMouseClicked(event -> copyFilesEvent(1));
         controller.start();
     }
 
     private void handleKeyEvents(Control pane, int whichList){
         pane.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY).match(event)) {
-                copyFilesButtonClicked(whichList);
+                copyFilesEvent(whichList);
             }
             if (new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_ANY).match(event)) {
                 System.out.println("paste");
@@ -75,7 +74,15 @@ public class View implements Initializable {
         });
     }
 
-    private void copyFilesButtonClicked(int whichList){
+    private void pasteFilesEvent(int whichList){
+
+    }
+
+    private void cutFilesEvent(int whichList){
+
+    }
+
+    private void copyFilesEvent(int whichList){
         List<File> files = fileLists[whichList].getChildrenUnmodifiable().stream().filter(node ->
             node instanceof SelectableFileLabel && ((SelectableFileLabel) node).isSelected()
         ).map(node -> ((SelectableFileLabel)node).getFile()
