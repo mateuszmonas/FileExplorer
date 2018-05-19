@@ -132,9 +132,13 @@ public class View implements Initializable {
         selectionRectangle.setFill(Color.BLUE);
         final ArrayList<Node> nodesSelectedBeforeDrawing = new ArrayList<>();
         pane.setOnMousePressed(event->{
+            dragDelta.startX = event.getSceneX();
+            dragDelta.startY = event.getSceneY();
+            nodesSelectedBeforeDrawing.clear();
             //if control is pressed don't remove the selection from previously selected nodes
-            if (event.isControlDown()) {
-                nodesSelectedBeforeDrawing.clear();
+            if (event.isControlDown() || pane.getChildrenUnmodifiable().stream().anyMatch(
+                    node -> node instanceof SelectableFileLabel && ((SelectableFileLabel) node).areCoordinatesInsideNode(dragDelta.startX, dragDelta.startY) && ((SelectableFileLabel) node).isSelected()
+            )) {
                 nodesSelectedBeforeDrawing.addAll(pane.getChildrenUnmodifiable().stream().filter(node -> node instanceof SelectableFileLabel && ((SelectableFileLabel) node).isSelected()).collect(Collectors.toList()));
             } else {
                 pane.getChildrenUnmodifiable().forEach(node -> {
@@ -142,58 +146,60 @@ public class View implements Initializable {
                         ((SelectableFileLabel)node).setSelected(false);
                 });
             }
-            dragDelta.startX = event.getSceneX();
-            dragDelta.startY = event.getSceneY();
         });
         pane.setOnMouseDragged(event-> {
-            ObservableList<Node> nodes = drawingPane.getChildren();
-            nodes.remove(selectionRectangle);
-            dragDelta.x=event.getSceneX();
-            dragDelta.y=event.getSceneY();
-            //we have to calculate where the current position of the cursor
-            //is relative to where it was clicked
-            if(dragDelta.x>dragDelta.startX && dragDelta.y>dragDelta.startY){
-                setSelectionRectangleDimensions(dragDelta.startX,dragDelta.startY, dragDelta.x-dragDelta.startX, dragDelta.y-dragDelta.startY);
-            }else if (dragDelta.x>dragDelta.startX && dragDelta.y<dragDelta.startY){
-                setSelectionRectangleDimensions(dragDelta.startX,dragDelta.y, dragDelta.x-dragDelta.startX, dragDelta.startY-dragDelta.y);
-            }else if (dragDelta.x<dragDelta.startX && dragDelta.y>dragDelta.startY){
-                setSelectionRectangleDimensions(dragDelta.x,dragDelta.startY, dragDelta.startX-dragDelta.x, dragDelta.y-dragDelta.startY);
-            }else if (dragDelta.x<dragDelta.startX && dragDelta.y<dragDelta.startY){
-                setSelectionRectangleDimensions(dragDelta.x,dragDelta.y, dragDelta.startX-dragDelta.x, dragDelta.startY-dragDelta.y);
-            }
-            nodes.add(selectionRectangle);
-            pane.getChildrenUnmodifiable().forEach(node -> {
-                if(node instanceof SelectableFileLabel) {
-                    Bounds nodeBounds = node.localToScene(node.getBoundsInLocal());
-                    double nodeMinX = nodeBounds.getMinX();
-                    double nodeMaxX = nodeBounds.getMaxX();
-                    double nodeMaxY = nodeBounds.getMaxY();
-                    double nodeMinY = nodeBounds.getMinY();
-                    double selectionMinX = dragDelta.startX < dragDelta.x ? dragDelta.startX : dragDelta.x;
-                    double selectionMaxX = dragDelta.startX > dragDelta.x ? dragDelta.startX : dragDelta.x;
-                    double selectionMinY = dragDelta.startY < dragDelta.y ? dragDelta.startY : dragDelta.y;
-                    double selectionMaxY = dragDelta.startY > dragDelta.y ? dragDelta.startY : dragDelta.y;
-                    //check if node is in the selection rectangle
-                    if (selectionMinY <= nodeMaxY && selectionMaxY >= nodeMinY && selectionMinX <= nodeMaxX && selectionMaxX >= nodeMinX) {
-                        ((SelectableFileLabel) node).setSelected(true);
-                    } else {
-                        if (!nodesSelectedBeforeDrawing.contains(node)) {
-                            ((SelectableFileLabel) node).setSelected(false);
+            if(nodesSelectedBeforeDrawing.stream().noneMatch(
+                    node -> node instanceof SelectableFileLabel && ((SelectableFileLabel) node).areCoordinatesInsideNode(dragDelta.startX, dragDelta.startY)
+            )) {
+                ObservableList<Node> nodes = drawingPane.getChildren();
+                nodes.remove(selectionRectangle);
+                dragDelta.x = event.getSceneX();
+                dragDelta.y = event.getSceneY();
+                //we have to calculate where the current position of the cursor
+                //is relative to where it was clicked
+                if (dragDelta.x > dragDelta.startX && dragDelta.y > dragDelta.startY) {
+                    setSelectionRectangleDimensions(dragDelta.startX, dragDelta.startY, dragDelta.x - dragDelta.startX, dragDelta.y - dragDelta.startY);
+                } else if (dragDelta.x > dragDelta.startX && dragDelta.y < dragDelta.startY) {
+                    setSelectionRectangleDimensions(dragDelta.startX, dragDelta.y, dragDelta.x - dragDelta.startX, dragDelta.startY - dragDelta.y);
+                } else if (dragDelta.x < dragDelta.startX && dragDelta.y > dragDelta.startY) {
+                    setSelectionRectangleDimensions(dragDelta.x, dragDelta.startY, dragDelta.startX - dragDelta.x, dragDelta.y - dragDelta.startY);
+                } else if (dragDelta.x < dragDelta.startX && dragDelta.y < dragDelta.startY) {
+                    setSelectionRectangleDimensions(dragDelta.x, dragDelta.y, dragDelta.startX - dragDelta.x, dragDelta.startY - dragDelta.y);
+                }
+                nodes.add(selectionRectangle);
+                pane.getChildrenUnmodifiable().forEach(node -> {
+                    if (node instanceof SelectableFileLabel) {
+                        Bounds nodeBounds = node.localToScene(node.getBoundsInLocal());
+                        double nodeMinX = nodeBounds.getMinX();
+                        double nodeMaxX = nodeBounds.getMaxX();
+                        double nodeMaxY = nodeBounds.getMaxY();
+                        double nodeMinY = nodeBounds.getMinY();
+                        double selectionMinX = dragDelta.startX < dragDelta.x ? dragDelta.startX : dragDelta.x;
+                        double selectionMaxX = dragDelta.startX > dragDelta.x ? dragDelta.startX : dragDelta.x;
+                        double selectionMinY = dragDelta.startY < dragDelta.y ? dragDelta.startY : dragDelta.y;
+                        double selectionMaxY = dragDelta.startY > dragDelta.y ? dragDelta.startY : dragDelta.y;
+                        //check if node is in the selection rectangle
+                        if (selectionMinY <= nodeMaxY && selectionMaxY >= nodeMinY && selectionMinX <= nodeMaxX && selectionMaxX >= nodeMinX) {
+                            ((SelectableFileLabel) node).setSelected(true);
+                        } else {
+                            if (!nodesSelectedBeforeDrawing.contains(node)) {
+                                ((SelectableFileLabel) node).setSelected(false);
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
         });
         //after the mouse is released remove the rectangle and clear its position
         pane.setOnMouseReleased(event -> {
             //get the node that the mouse was pressed on
             SelectableFileLabel labelPressed = ((SelectableFileLabel) pane.getChildrenUnmodifiable().stream().filter(node ->
                     node instanceof SelectableFileLabel && ((SelectableFileLabel) node).areCoordinatesInsideNode(dragDelta.startX, dragDelta.startY)
-            ).findFirst().orElse(null));
+            ).findAny().orElse(null));
             //get the node that the mouse was released on
             SelectableFileLabel labelReleased = ((SelectableFileLabel) pane.getChildrenUnmodifiable().stream().filter(node ->
                     node instanceof SelectableFileLabel && ((SelectableFileLabel) node).areCoordinatesInsideNode(dragDelta.x, dragDelta.y)
-            ).findFirst().orElse(null));
+            ).findAny().orElse(null));
             //if it is the same node, we make the selection false
             //because the node will be selected by its own listener
             //otherwise the node would be selected twice, leading to directory change
