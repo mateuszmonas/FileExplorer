@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class View implements Initializable {
 
@@ -137,7 +138,7 @@ public class View implements Initializable {
                 nodesSelectedBeforeDrawing.addAll(pane.getChildrenUnmodifiable().stream().filter(node -> node instanceof SelectableFileLabel && ((SelectableFileLabel) node).isSelected()).collect(Collectors.toList()));
             } else {
                 pane.getChildrenUnmodifiable().forEach(node -> {
-                    if(node instanceof SelectableFileLabel && !((SelectableFileLabel)node).areCoordinatesInsideThenode(event.getSceneX(), event.getSceneY()))
+                    if(node instanceof SelectableFileLabel && !((SelectableFileLabel)node).areCoordinatesInsideNode(event.getSceneX(), event.getSceneY()))
                         ((SelectableFileLabel)node).setSelected(false);
                 });
             }
@@ -173,9 +174,7 @@ public class View implements Initializable {
                     double selectionMinY = dragDelta.startY < dragDelta.y ? dragDelta.startY : dragDelta.y;
                     double selectionMaxY = dragDelta.startY > dragDelta.y ? dragDelta.startY : dragDelta.y;
                     //check if node is in the selection rectangle
-                    // FIXME: 2018-05-19 sometimes this selects node, and then label onclick is called selecting the node again, effectively entering the directory after one click
-                    // FIXME: 2018-05-19 if the mouse is released before cursor leves the node it was pressed on it happens
-                    if (selectionMinY < nodeMaxY && selectionMaxY > nodeMinY && selectionMinX < nodeMaxX && selectionMaxX > nodeMinX) {
+                    if (selectionMinY <= nodeMaxY && selectionMaxY >= nodeMinY && selectionMinX <= nodeMaxX && selectionMaxX >= nodeMinX) {
                         ((SelectableFileLabel) node).setSelected(true);
                     } else {
                         if (!nodesSelectedBeforeDrawing.contains(node)) {
@@ -187,10 +186,23 @@ public class View implements Initializable {
         });
         //after the mouse is released remove the rectangle and clear its position
         pane.setOnMouseReleased(event -> {
-                drawingPane.getChildren().remove(selectionRectangle);
-                setSelectionRectangleDimensions(0,0,0,0);
+            //get the node that the mouse was pressed on
+            SelectableFileLabel labelPressed = ((SelectableFileLabel) pane.getChildrenUnmodifiable().stream().filter(node ->
+                    node instanceof SelectableFileLabel && ((SelectableFileLabel) node).areCoordinatesInsideNode(dragDelta.startX, dragDelta.startY)
+            ).findFirst().orElse(null));
+            //get the node that the mouse was released on
+            SelectableFileLabel labelReleased = ((SelectableFileLabel) pane.getChildrenUnmodifiable().stream().filter(node ->
+                    node instanceof SelectableFileLabel && ((SelectableFileLabel) node).areCoordinatesInsideNode(dragDelta.x, dragDelta.y)
+            ).findFirst().orElse(null));
+            //if it is the same node, we make the selection false
+            //because the node will be selected by its own listener
+            //otherwise the node would be selected twice, leading to directory change
+            if(labelPressed!=null && labelPressed==labelReleased && (dragDelta.startX!=dragDelta.x || dragDelta.startY!=dragDelta.y)){
+                labelPressed.setSelected(false);
             }
-        );
+            drawingPane.getChildren().remove(selectionRectangle);
+            setSelectionRectangleDimensions(0,0,0,0);
+        });
     }
 
     private void viewFiles(File[] files, int whichList){
