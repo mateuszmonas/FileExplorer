@@ -1,9 +1,6 @@
 package main;
 
-import javafx.application.Application;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Bounds;
@@ -14,12 +11,10 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Text;
-import javafx.stage.Stage;
+import nodes.SelectableLabel;
 
 import java.io.File;
 import java.net.URL;
@@ -109,11 +104,11 @@ public class View implements Initializable {
             //if control is pressed don't remove the selection from previously selected nodes
             if (event.isControlDown()) {
                 nodesSelectedBeforeDrawing.clear();
-                nodesSelectedBeforeDrawing.addAll(pane.getChildrenUnmodifiable().stream().filter(node -> node instanceof FileLabel && ((FileLabel) node).isSelected()).collect(Collectors.toList()));
+                nodesSelectedBeforeDrawing.addAll(pane.getChildrenUnmodifiable().stream().filter(node -> node instanceof SelectableLabel && ((SelectableLabel) node).isSelected()).collect(Collectors.toList()));
             } else {
                 pane.getChildrenUnmodifiable().forEach(node -> {
-                    if(node instanceof FileLabel && !((FileLabel)node).areCoordinatesInsideThenode(event.getSceneX(), event.getSceneY()))
-                        ((FileLabel)node).setSelected(false);
+                    if(node instanceof SelectableLabel && !((SelectableLabel)node).areCoordinatesInsideThenode(event.getSceneX(), event.getSceneY()))
+                        ((SelectableLabel)node).setSelected(false);
                 });
             }
             dragDelta.startX = event.getSceneX();
@@ -136,8 +131,8 @@ public class View implements Initializable {
                 setSelectionRectangleDimensions(dragDelta.x,dragDelta.y, dragDelta.startX-dragDelta.x, dragDelta.startY-dragDelta.y);
             }
             nodes.add(selectionRectangle);
-            pane.getChildren().forEach(node -> {
-                if(node instanceof FileLabel) {
+            pane.getChildrenUnmodifiable().forEach(node -> {
+                if(node instanceof SelectableLabel) {
                     Bounds nodeBounds = node.localToScene(node.getBoundsInLocal());
                     double nodeMinX = nodeBounds.getMinX();
                     double nodeMaxX = nodeBounds.getMaxX();
@@ -149,10 +144,10 @@ public class View implements Initializable {
                     double selectionMaxY = dragDelta.startY > dragDelta.y ? dragDelta.startY : dragDelta.y;
                     //check if node is in the selection rectangle
                     if (selectionMinY < nodeMaxY && selectionMaxY > nodeMinY && selectionMinX < nodeMaxX && selectionMaxX > nodeMinX) {
-                        ((FileLabel) node).setSelected(true);
+                        ((SelectableLabel) node).setSelected(true);
                     } else {
                         if (!nodesSelectedBeforeDrawing.contains(node)) {
-                            ((FileLabel) node).setSelected(false);
+                            ((SelectableLabel) node).setSelected(false);
                         }
                     }
                 }
@@ -168,7 +163,7 @@ public class View implements Initializable {
 
     private void viewFiles(File[] files, int whichList){
         for (File file : files) {
-            FileLabel label = new FileLabel();
+            SelectableLabel label = new SelectableLabel();
             label.setText(file.getName());
             label.setOnMouseClicked(event -> {
                 ObservableList<Node> nodes = label.getParent().getChildrenUnmodifiable();
@@ -186,14 +181,14 @@ public class View implements Initializable {
                     }
                     //get first selected item position
                     for (Node n : nodes) {
-                        if (n instanceof FileLabel && ((FileLabel)n).isSelected()) {
+                        if (n instanceof SelectableLabel && ((SelectableLabel)n).isSelected()) {
                             break;
                         }
                         firstSelectedItemPosition++;
                     }
                     //get last selected item position
                     while (lastSelectedItemPosition>firstSelectedItemPosition){
-                        if (nodes.get(lastSelectedItemPosition) instanceof FileLabel && ((FileLabel)nodes.get(lastSelectedItemPosition)).isSelected()) {
+                        if (nodes.get(lastSelectedItemPosition) instanceof SelectableLabel && ((SelectableLabel)nodes.get(lastSelectedItemPosition)).isSelected()) {
                             break;
                         }
                         lastSelectedItemPosition--;
@@ -201,21 +196,21 @@ public class View implements Initializable {
                     //if control is not pressed down then clear all selections
                     if(!event.isControlDown()) {
                         nodes.forEach(n -> {
-                            if (n instanceof FileLabel && !label.equals(n)) ((FileLabel) n).setSelected(false);
+                            if (n instanceof SelectableLabel && !label.equals(n)) ((SelectableLabel) n).setSelected(false);
                         });
                     }
                     //if clicked item is higher than both last and first selected item
                     //then select all items between clicked item and last selected item
                     if (clickedItemPosition < lastSelectedItemPosition && clickedItemPosition < firstSelectedItemPosition) {
                         for (int i = clickedItemPosition; i <= lastSelectedItemPosition; i++) {
-                            ((FileLabel) nodes.get(i)).setSelected(true);
+                            ((SelectableLabel) nodes.get(i)).setSelected(true);
                         }
                     }
                     //if clicked item is lower than first selected item
                     //then select all items between clicked item and first selected item
                     else{
                         for (int i = firstSelectedItemPosition; i <= clickedItemPosition; i++) {
-                            ((FileLabel) nodes.get(i)).setSelected(true);
+                            ((SelectableLabel) nodes.get(i)).setSelected(true);
                         }
                     }
 
@@ -225,7 +220,7 @@ public class View implements Initializable {
                     if(label.isSelected()) changeDirectory(file.getPath(), whichList);
                     else{
                         nodes.forEach(n -> {
-                            if (n instanceof FileLabel && !label.equals(n)) ((FileLabel) n).setSelected(false);
+                            if (n instanceof SelectableLabel && !label.equals(n)) ((SelectableLabel) n).setSelected(false);
                         });
                         label.setSelected(true);
                     }
