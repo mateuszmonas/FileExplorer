@@ -61,7 +61,7 @@ public class View implements Initializable {
                 copyFilesEvent(whichList);
             }
             if (new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_ANY).match(event)) {
-                System.out.println("paste");
+                pasteFilesEvent(whichList);
             }
             if (new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_ANY).match(event)) {
                 System.out.println("cut");
@@ -75,7 +75,7 @@ public class View implements Initializable {
     }
 
     private void pasteFilesEvent(int whichList){
-
+        controller.pasteFilesFromClipboard(whichList);
     }
 
     private void cutFilesEvent(int whichList){

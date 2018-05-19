@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * wrapper class required for copying files to teh clipboard
+ * wrapper class required for copying files to the clipboard
  */
 public class FileTransferable implements Transferable {
 

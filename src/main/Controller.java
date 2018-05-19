@@ -1,12 +1,14 @@
 package main;
 
 import file.FileTransferable;
+import org.apache.commons.io.FileUtils;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
-import java.io.File;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,6 +32,29 @@ class Controller {
     void start(){
         getFiles(0);
         getFiles(1);
+    }
+
+    @SuppressWarnings("unchecked")
+    void pasteFilesFromClipboard(int whichList){
+        Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+        Transferable t = c.getContents(this);
+        if (t == null)
+            return;
+        try {
+                if(Arrays.stream(t.getTransferDataFlavors()).anyMatch(dataFlavor -> dataFlavor.equals(DataFlavor.javaFileListFlavor))) {
+                    ((List<File>) t.getTransferData(DataFlavor.javaFileListFlavor)).forEach(file -> {
+                        File dest = new File(paths[whichList] + "\\" + file.getName());
+                        try {
+                            FileUtils.copyDirectory(file, dest);
+                        } catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    });
+                }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     void copyFilesToClipboard(List<File> files){
