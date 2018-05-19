@@ -8,11 +8,20 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 
-public class SelectableLabel extends Label {
-    private boolean isSelected = false;
+import java.io.File;
 
-    public SelectableLabel() {
+public class SelectableFileLabel extends Label {
+    private boolean isSelected = false;
+    private File file;
+
+    public SelectableFileLabel(File file) {
         super();
+        this.file=file;
+        setText(file.getName());
+    }
+
+    public File getFile() {
+        return file;
     }
 
     public boolean isSelected() {

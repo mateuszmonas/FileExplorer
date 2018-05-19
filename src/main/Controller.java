@@ -1,7 +1,15 @@
 package main;
 
+import file.FileTransferable;
+
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.Transferable;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 class Controller {
 
@@ -22,6 +30,11 @@ class Controller {
     void start(){
         getFiles(0);
         getFiles(1);
+    }
+
+    void copyFilesToClipboard(List<File> files){
+        FileTransferable ft = new FileTransferable(files);
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ft, (clipboard, contents) -> System.out.println("Lost ownership"));
     }
 
     /**

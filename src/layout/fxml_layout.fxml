@@ -13,8 +13,16 @@
           maxWidth="700" minWidth="700" prefWidth="700">
         <HBox  maxWidth="700" minWidth="700" prefWidth="700"
                 maxHeight="25" minHeight="25" prefHeight="25">
-            <Button>a</Button>
-            <Button>b</Button>
+            <HBox maxWidth="350" minWidth="350" prefWidth="350"
+                    maxHeight="25" minHeight="25" prefHeight="25">
+                <Button>go back</Button>
+                <Button fx:id="copyFilesA">copy files</Button>
+            </HBox>
+            <HBox maxWidth="350" minWidth="350" prefWidth="350"
+                  maxHeight="25" minHeight="25" prefHeight="25">
+                <Button>go back</Button>
+                <Button fx:id="copyFilesB">copy files</Button>
+            </HBox>
         </HBox>
         <HBox  maxWidth="700" minWidth="700" prefWidth="700"
                 maxHeight="25" minHeight="25" prefHeight="25">

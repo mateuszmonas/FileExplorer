@@ -6,7 +6,12 @@ import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
+import java.awt.*;
+import java.awt.datatransfer.*;
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main extends Application{
 
@@ -23,3 +28,4 @@ public class Main extends Application{
         launch(args);
     }
 }
+
