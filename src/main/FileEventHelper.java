@@ -15,6 +15,7 @@ public interface FileEventHelper {
 
     interface MoveFilesEvent {
         void moveFilesEvent(List<File> files, String path);
+        void moveFilesEvent(List<File> files, int whichList);
     }
 
     interface CopyFilesToCpilboardEvent {

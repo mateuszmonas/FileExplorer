@@ -20,15 +20,14 @@ import java.util.stream.Stream;
 class SelectionRectangleHelper {
 
     final private Pane drawingPane;
-    final private VBox fileListA;
-    final private VBox fileListB;
+    final private VBox fileLists[];
     final private Rectangle selectionRectangle = new Rectangle();
     final private Delta dragDelta = new Delta();
 
-    SelectionRectangleHelper(Pane drawingPane, VBox fileListA, VBox fileListB) {
+    SelectionRectangleHelper(Pane drawingPane, VBox fileLists[]) {
         this.drawingPane = drawingPane;
-        this.fileListA = fileListA;
-        this.fileListB = fileListB;
+        this.fileLists=fileLists;
+
     }
 
     private void setSelectionRectangleDimensions(double startX, double startY, double width, double height){
@@ -116,11 +115,18 @@ class SelectionRectangleHelper {
         //after the mouse is released remove the rectangle and clear its position
         pane.setOnMouseReleased(event -> {
             if(!draggedNodes.isEmpty()){
-                SelectableFileLabel currentNode = Stream.concat(fileListA.getChildrenUnmodifiable().stream(), fileListB.getChildrenUnmodifiable().stream())
+                SelectableFileLabel currentNode = Stream.concat(fileLists[0].getChildrenUnmodifiable().stream(), fileLists[1].getChildrenUnmodifiable().stream())
                         .filter(node -> node instanceof SelectableFileLabel && node.contains(event.getSceneX(), event.getSceneY()))
                         .map(node -> (SelectableFileLabel) node).findAny().orElse(null);
                 if (currentNode != null && !draggedNodes.contains(currentNode)) {
                     moveFilesEvent.moveFilesEvent(draggedNodes.stream().map(SelectableFileLabel::getFile).collect(Collectors.toList()), currentNode.getFile().getPath());
+                } else {
+                    for (int i = 0; i < 2; i++) {
+                        if(fileLists[i]!=pane && fileLists[i].contains(fileLists[i].sceneToLocal(event.getSceneX(), event.getSceneY()))){
+                            moveFilesEvent.moveFilesEvent(draggedNodes.stream().map(SelectableFileLabel::getFile).collect(Collectors.toList()), i);
+                            break;
+                        }
+                    }
                 }
             }
             drawingPane.getChildren().remove(selectionRectangle);

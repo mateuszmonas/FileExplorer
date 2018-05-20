@@ -72,11 +72,33 @@ class Controller {
     void moveFiles(List<File> files, String path){
         files.forEach(file -> {
             try {
-                FileUtils.moveDirectoryToDirectory(file, new File(path), false);
+                if(file.isDirectory()) {
+                    FileUtils.moveDirectoryToDirectory(file, new File(path), false);
+                }else if (file.isFile()){
+                    FileUtils.moveFileToDirectory(file, new File(path), false);
+                }
             }catch (Exception e){
                 e.printStackTrace();
             }
         });
+        getFiles(0);
+        getFiles(1);
+    }
+
+    void moveFiles(List<File> files, int whichList){
+        files.forEach(file -> {
+            try {
+                if(file.isDirectory()) {
+                    FileUtils.moveDirectoryToDirectory(file, new File(paths[whichList]), false);
+                }else if (file.isFile()){
+                    FileUtils.moveFileToDirectory(file, new File(paths[whichList]), false);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        });
+        getFiles(0);
+        getFiles(1);
     }
 
     /**

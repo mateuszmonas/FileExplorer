@@ -41,7 +41,7 @@ public class View implements Initializable {
         fileLists[1] = fileListB;
         filePaths[0]= filePathA;
         filePaths[1]= filePathB;
-        SelectionRectangleHelper helper = new SelectionRectangleHelper(drawingPane, fileListA, fileListB);
+        SelectionRectangleHelper helper = new SelectionRectangleHelper(drawingPane, fileLists);
         helper.handleSelectionRectangle(fileLists[0], move);
         helper.handleSelectionRectangle(fileLists[1], move);
         handleKeyEvents(scrollPaneA, 0);
@@ -76,7 +76,17 @@ public class View implements Initializable {
 
     private FileEventHelper.CutFilesEvent cut = whichList -> {};
 
-    private FileEventHelper.MoveFilesEvent move = (files, path) -> controller.moveFiles(files, path);
+    private FileEventHelper.MoveFilesEvent move = new FileEventHelper.MoveFilesEvent() {
+        @Override
+        public void moveFilesEvent(List<File> files, String path) {
+            controller.moveFiles(files, path);
+        }
+
+        @Override
+        public void moveFilesEvent(List<File> files, int whichList) {
+            controller.moveFiles(files, whichList);
+        }
+    };
 
     private FileEventHelper.CopyFilesToCpilboardEvent copy = whichList ->  {
             List<File> files = fileLists[whichList].getChildrenUnmodifiable().stream().filter(node ->
