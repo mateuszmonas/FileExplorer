@@ -47,8 +47,8 @@ public class View implements Initializable {
         fileLists[1] = filesB;
         filePaths[0]= filePathA;
         filePaths[1]= filePathB;
-        handleMouseEvents(fileLists[0]);
-        handleMouseEvents(fileLists[1]);
+        MouseEventHandler.handleMouseEvents(fileLists[0], drawingPane);
+        MouseEventHandler.handleMouseEvents(fileLists[1], drawingPane);
         handleKeyEvents(scrollPaneA, 0);
         handleKeyEvents(scrollPaneB, 1);
         filePathA.setOnKeyPressed(event -> { if(event.getCode()==KeyCode.ENTER) changeDirectory(filePaths[0].getText(), 0); });
@@ -137,6 +137,7 @@ public class View implements Initializable {
         selectionRectangle.setOpacity(0.5);
         selectionRectangle.setFill(Color.BLUE);
         final ArrayList<Node> nodesSelectedBeforeDrawing = new ArrayList<>();
+        final MousePosition pressedMousePosition = new MousePosition();
         pane.setOnMousePressed(event->{
             dragDelta.startX = event.getSceneX();
             dragDelta.startY = event.getSceneY();
@@ -212,25 +213,6 @@ public class View implements Initializable {
             dragDelta.reset();
             pane.getScene().setCursor(Cursor.DEFAULT);
         });
-    }
-
-    private class MousePosition {
-        double x;
-        double y;
-
-        void set(double x, double y){
-            this.x=x;
-            this.y=y;
-        }
-
-        boolean equals(double x, double y){
-            return this.x==x && this.y==y;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            return obj instanceof MousePosition && ((MousePosition) obj).x==x && ((MousePosition) obj).y==y;
-        }
     }
 
     private void viewFiles(File[] files, int whichList){
