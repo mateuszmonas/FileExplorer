@@ -37,12 +37,12 @@
             >
         <ScrollPane fx:id="scrollPaneA" maxWidth="350" minWidth="350" prefWidth="350"
                     maxHeight="450" minHeight="450" prefHeight="450">
-            <VBox fx:id="filesA" minWidth="348"
+            <VBox fx:id="fileListA" minWidth="348"
                   minHeight="448"/>
         </ScrollPane>
         <ScrollPane fx:id="scrollPaneB" maxWidth="350" minWidth="350" prefWidth="350"
                     maxHeight="450" minHeight="450" prefHeight="450">
-            <VBox fx:id="filesB" minWidth="348"
+            <VBox fx:id="fileListB" minWidth="348"
                   minHeight="448"/>
         </ScrollPane>
     </HBox>

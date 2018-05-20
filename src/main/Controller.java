@@ -62,6 +62,10 @@ class Controller {
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ft, (clipboard, contents) -> System.out.println("Lost ownership"));
     }
 
+    void moveFiles(List<File> files, String path){
+        files.forEach(file -> System.out.println(file.getName()));
+    }
+
     /**
      * Gets all files in the given paths
      * and updates the view

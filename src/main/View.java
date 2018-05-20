@@ -24,8 +24,8 @@ public class View implements Initializable {
     @FXML private ScrollPane scrollPaneA;
     @FXML private ScrollPane scrollPaneB;
     private Controller controller;
-    @FXML private VBox filesA;
-    @FXML private VBox filesB;
+    @FXML private VBox fileListA;
+    @FXML private VBox fileListB;
     @FXML private TextField filePathA;
     @FXML private TextField filePathB;
     @FXML private Button copyFilesA;
@@ -37,31 +37,32 @@ public class View implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         controller = new Controller(this);
-        fileLists[0] = filesA;
-        fileLists[1] = filesB;
+        fileLists[0] = fileListA;
+        fileLists[1] = fileListB;
         filePaths[0]= filePathA;
         filePaths[1]= filePathB;
-        SelectionRectangleHelper.handleSelectionRectangle(fileLists[0], drawingPane);
-        SelectionRectangleHelper.handleSelectionRectangle(fileLists[1], drawingPane);
+        SelectionRectangleHelper helper = new SelectionRectangleHelper(drawingPane, fileListA, fileListB);
+        helper.handleSelectionRectangle(fileLists[0], move);
+        helper.handleSelectionRectangle(fileLists[1], move);
         handleKeyEvents(scrollPaneA, 0);
         handleKeyEvents(scrollPaneB, 1);
         filePathA.setOnKeyPressed(event -> { if(event.getCode()==KeyCode.ENTER) changeDirectory(filePaths[0].getText(), 0); });
         filePathB.setOnKeyPressed(event -> { if(event.getCode()==KeyCode.ENTER) changeDirectory(filePaths[1].getText(), 1); });
-        copyFilesA.setOnMouseClicked(event -> copyFilesEvent(0));
-        copyFilesB.setOnMouseClicked(event -> copyFilesEvent(1));
+        copyFilesA.setOnMouseClicked(event -> copy.copyFilesToClipboardEvent(0));
+        copyFilesB.setOnMouseClicked(event -> copy.copyFilesToClipboardEvent(1));
         controller.start();
     }
 
     private void handleKeyEvents(Control pane, int whichList){
         pane.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY).match(event)) {
-                copyFilesEvent(whichList);
+                copy.copyFilesToClipboardEvent(whichList);
             }
             if (new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_ANY).match(event)) {
-                pasteFilesEvent(whichList);
+                paste.pasteFilesFromClipboardEvent(0);
             }
             if (new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_ANY).match(event)) {
-                cutFilesEvent(whichList);
+                cut.cutFilesEvent(whichList);
             }
             if (new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_ANY).match(event)) {
                 fileLists[whichList].getChildrenUnmodifiable().forEach(node -> {
@@ -71,21 +72,19 @@ public class View implements Initializable {
         });
     }
 
-    private void pasteFilesEvent(int whichList){
-        controller.pasteFilesFromClipboard(whichList);
-    }
+    private FileEventHelper.PasteFilesFromClipboardEvent paste = whichList -> controller.pasteFilesFromClipboard(whichList);
 
-    private void cutFilesEvent(int whichList){
+    private FileEventHelper.CutFilesEvent cut = whichList -> {};
 
-    }
+    private FileEventHelper.MoveFilesEvent move = (files, path) -> controller.moveFiles(files, path);
 
-    private void copyFilesEvent(int whichList){
-        List<File> files = fileLists[whichList].getChildrenUnmodifiable().stream().filter(node ->
-            node instanceof SelectableFileLabel && ((SelectableFileLabel) node).isSelected()
-        ).map(node -> ((SelectableFileLabel)node).getFile()
-        ).collect(Collectors.toList());
-        controller.copyFilesToClipboard(files);
-    }
+    private FileEventHelper.CopyFilesToCpilboardEvent copy = whichList ->  {
+            List<File> files = fileLists[whichList].getChildrenUnmodifiable().stream().filter(node ->
+                    node instanceof SelectableFileLabel && ((SelectableFileLabel) node).isSelected()
+            ).map(node -> ((SelectableFileLabel)node).getFile()
+            ).collect(Collectors.toList());
+            controller.copyFilesToClipboard(files);
+    };
 
     void displayPath(String path, int whichList){
         filePaths[whichList].setText(path);
@@ -100,7 +99,7 @@ public class View implements Initializable {
             TextField textField = new TextField();
             textField.setText(file.getName());
             textField.setPadding(new Insets(0,0,0,0));
-            filesA.getChildren().add(textField);
+            fileListA.getChildren().add(textField);
         }
     }
 

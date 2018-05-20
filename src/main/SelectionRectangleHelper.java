@@ -5,22 +5,33 @@ import javafx.geometry.Bounds;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import nodes.SelectableFileLabel;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * sole purpose of this class is containing all the code responsible for the selection rectangle
  */
-abstract class SelectionRectangleHelper {
+class SelectionRectangleHelper {
 
-    final private static Rectangle selectionRectangle = new Rectangle();
-    final private static Delta dragDelta = new Delta();
+    final private Pane drawingPane;
+    final private VBox fileListA;
+    final private VBox fileListB;
+    final private Rectangle selectionRectangle = new Rectangle();
+    final private Delta dragDelta = new Delta();
 
-    private static void setSelectionRectangleDimensions(double startX, double startY, double width, double height){
+    SelectionRectangleHelper(Pane drawingPane, VBox fileListA, VBox fileListB) {
+        this.drawingPane = drawingPane;
+        this.fileListA = fileListA;
+        this.fileListB = fileListB;
+    }
+
+    private void setSelectionRectangleDimensions(double startX, double startY, double width, double height){
         selectionRectangle.setX(startX);
         selectionRectangle.setY(startY);
         selectionRectangle.setWidth(width);
@@ -30,33 +41,31 @@ abstract class SelectionRectangleHelper {
     /**
      *
      * @param pane pane to which events should be added
-     * @param drawingPane pane on which drawing will be happening
      */
-    static void handleSelectionRectangle(Pane pane, Pane drawingPane){
+    void handleSelectionRectangle(Pane pane, FileEventHelper.MoveFilesEvent moveFilesEvent){
         selectionRectangle.setOpacity(0.5);
         selectionRectangle.setFill(Color.BLUE);
-        final ArrayList<Node> nodesSelectedBeforeDrawing = new ArrayList<>();
-        final ArrayList<Node> draggedNodes = new ArrayList<>();
+        final ArrayList<SelectableFileLabel> nodesSelectedBeforeDrawing = new ArrayList<>();
+        final ArrayList<SelectableFileLabel> draggedNodes = new ArrayList<>();
+        final ArrayList<SelectableFileLabel> onePaneChildNodes = new ArrayList<>();
+        final ArrayList<SelectableFileLabel> allNodes = new ArrayList<>();
         pane.setOnMousePressed(event->{
             dragDelta.startX = event.getSceneX();
             dragDelta.startY = event.getSceneY();
-            nodesSelectedBeforeDrawing.clear();
-            draggedNodes.clear();
-            boolean selectedNodeWasClicked = pane.getChildrenUnmodifiable().stream().anyMatch(
-                    node -> node instanceof SelectableFileLabel &&
-                            node.contains(dragDelta.startX, dragDelta.startY) &&
-                            ((SelectableFileLabel) node).isSelected());
+            onePaneChildNodes.addAll(pane.getChildrenUnmodifiable().stream().filter(node -> node instanceof SelectableFileLabel).map(node -> (SelectableFileLabel)node).collect(Collectors.toList()));
+            boolean selectedNodeWasClicked = onePaneChildNodes.stream().anyMatch(
+                    node -> node.contains(dragDelta.startX, dragDelta.startY) && node.isSelected());
             //if control is pressed or if clicked node was already selected
             //don't remove the selection from previously selected nodes
             if (event.isControlDown() || event.isShiftDown() || selectedNodeWasClicked) {
-                nodesSelectedBeforeDrawing.addAll(pane.getChildrenUnmodifiable().stream().filter(node -> node instanceof SelectableFileLabel && ((SelectableFileLabel) node).isSelected()).collect(Collectors.toList()));
+                nodesSelectedBeforeDrawing.addAll(onePaneChildNodes.stream().filter(SelectableFileLabel::isSelected).collect(Collectors.toList()));
                 if(selectedNodeWasClicked){
                     draggedNodes.addAll(nodesSelectedBeforeDrawing);
                 }
             } else {
-                pane.getChildrenUnmodifiable().forEach(node -> {
-                    if(node instanceof SelectableFileLabel && node.contains(event.getSceneX(), event.getSceneY()))
-                        ((SelectableFileLabel)node).setSelected(false);
+                onePaneChildNodes.forEach(node -> {
+                    if(node.contains(event.getSceneX(), event.getSceneY()))
+                        node.setSelected(false);
                 });
             }
         });
@@ -64,7 +73,7 @@ abstract class SelectionRectangleHelper {
             //check if first node clicked was not already selected
             //drawing selection grid and selecting nodes
             if(nodesSelectedBeforeDrawing.stream().noneMatch(
-                    node -> node instanceof SelectableFileLabel && node.contains(dragDelta.startX, dragDelta.startY))) {
+                    node -> node.contains(dragDelta.startX, dragDelta.startY))) {
                 ObservableList<Node> nodes = drawingPane.getChildren();
                 nodes.remove(selectionRectangle);
                 dragDelta.x = event.getSceneX();
@@ -81,8 +90,7 @@ abstract class SelectionRectangleHelper {
                     setSelectionRectangleDimensions(dragDelta.x, dragDelta.y, dragDelta.startX - dragDelta.x, dragDelta.startY - dragDelta.y);
                 }
                 nodes.add(selectionRectangle);
-                pane.getChildrenUnmodifiable().forEach(node -> {
-                    if (node instanceof SelectableFileLabel) {
+                onePaneChildNodes.forEach(node -> {
                         Bounds nodeBounds = node.localToScene(node.getBoundsInLocal());
                         double nodeMinX = nodeBounds.getMinX();
                         double nodeMaxX = nodeBounds.getMaxX();
@@ -94,13 +102,10 @@ abstract class SelectionRectangleHelper {
                         double selectionMaxY = dragDelta.startY > dragDelta.y ? dragDelta.startY : dragDelta.y;
                         //check if node is in the selection rectangle
                         if (selectionMinY <= nodeMaxY && selectionMaxY >= nodeMinY && selectionMinX <= nodeMaxX && selectionMaxX >= nodeMinX) {
-                            ((SelectableFileLabel) node).setSelected(true);
-                        } else {
-                            if (!nodesSelectedBeforeDrawing.contains(node)) {
-                                ((SelectableFileLabel) node).setSelected(false);
-                            }
+                            node.setSelected(true);
+                        } else if (!nodesSelectedBeforeDrawing.contains(node)) {
+                            node.setSelected(false);
                         }
-                    }
                 });
             }
             //dragging nodes around
@@ -110,14 +115,25 @@ abstract class SelectionRectangleHelper {
         });
         //after the mouse is released remove the rectangle and clear its position
         pane.setOnMouseReleased(event -> {
+            if(!draggedNodes.isEmpty()){
+                SelectableFileLabel currentNode = Stream.concat(fileListA.getChildrenUnmodifiable().stream(), fileListB.getChildrenUnmodifiable().stream())
+                        .filter(node -> node instanceof SelectableFileLabel && node.contains(event.getSceneX(), event.getSceneY()))
+                        .map(node -> (SelectableFileLabel) node).findAny().orElse(null);
+                if (currentNode != null && !draggedNodes.contains(currentNode)) {
+                    moveFilesEvent.moveFilesEvent(draggedNodes.stream().map(SelectableFileLabel::getFile).collect(Collectors.toList()), currentNode.getFile().getPath());
+                }
+            }
             drawingPane.getChildren().remove(selectionRectangle);
             setSelectionRectangleDimensions(0,0,0,0);
             dragDelta.reset();
+            nodesSelectedBeforeDrawing.clear();
+            draggedNodes.clear();
+            onePaneChildNodes.clear();
             pane.getScene().setCursor(Cursor.DEFAULT);
         });
     }
 
-    private static class Delta{
+    private class Delta{
         double startX = 0;
         double startY = 0;
         double x = 0;
