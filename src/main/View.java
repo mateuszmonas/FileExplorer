@@ -46,8 +46,14 @@ public class View implements Initializable {
         helper.handleSelectionRectangle(fileLists[1], move);
         handleKeyEvents(scrollPaneA, 0);
         handleKeyEvents(scrollPaneB, 1);
-        filePathA.setOnKeyPressed(event -> { if(event.getCode()==KeyCode.ENTER) changeDirectory(filePaths[0].getText(), 0); });
-        filePathB.setOnKeyPressed(event -> { if(event.getCode()==KeyCode.ENTER) changeDirectory(filePaths[1].getText(), 1); });
+        filePathA.setOnKeyPressed(event -> { if(event.getCode()==KeyCode.ENTER){
+            changeDirectory(filePaths[0].getText(), 0);
+            fileLists[0].requestFocus();
+        } });
+        filePathB.setOnKeyPressed(event -> { if(event.getCode()==KeyCode.ENTER) {
+            changeDirectory(filePaths[1].getText(), 1);
+            fileLists[1].requestFocus();
+        } });
         copyFilesA.setOnMouseClicked(event -> copy.copyFilesToClipboardEvent(0));
         copyFilesB.setOnMouseClicked(event -> copy.copyFilesToClipboardEvent(1));
         controller.start();
