@@ -34,7 +34,8 @@ public class SelectableFileLabel extends Label {
         isSelected = selected;
     }
 
-    public boolean areCoordinatesInsideNode(double x, double y){
+    @Override
+    public boolean contains(double x, double y){
         Bounds Bounds = localToScene(getBoundsInLocal());
         double minX = Bounds.getMinX();
         double maxX = Bounds.getMaxX();

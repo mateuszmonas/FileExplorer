@@ -109,8 +109,8 @@ public class View implements Initializable {
             SelectableFileLabel label = new SelectableFileLabel(file);
             label.setMinWidth(200);
             //class used to check if mouse position while released is same as while pressed
-            final MousePosition pressedMousePosition = new MousePosition();
-            label.setOnMousePressed(event -> pressedMousePosition.set(event.getSceneX(), event.getSceneY()));
+            final MousePosition pressedMousePosition = MousePosition.ZERO;
+            label.setOnMousePressed(event -> pressedMousePosition.setPosition(event.getSceneX(), event.getSceneY()));
             label.setOnMouseClicked(event -> {
                 ObservableList<Node> nodes = label.getParent().getChildrenUnmodifiable();
                 if(pressedMousePosition.equals(event.getSceneX(), event.getSceneY())) {

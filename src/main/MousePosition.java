@@ -2,12 +2,19 @@ package main;
 
 public class MousePosition {
 
-    double x;
-    double y;
+    static final MousePosition ZERO = new MousePosition(0,0);
 
-    void set(double x, double y){
+    private double x;
+    private double y;
+
+    void setPosition(double x, double y){
         this.x=x;
         this.y=y;
+    }
+
+    private MousePosition(double x, double y) {
+        this.x = x;
+        this.y = y;
     }
 
     boolean equals(double x, double y){

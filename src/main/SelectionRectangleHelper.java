@@ -44,7 +44,7 @@ abstract class SelectionRectangleHelper {
             draggedNodes.clear();
             boolean selectedNodeWasClicked = pane.getChildrenUnmodifiable().stream().anyMatch(
                     node -> node instanceof SelectableFileLabel &&
-                            ((SelectableFileLabel) node).areCoordinatesInsideNode(dragDelta.startX, dragDelta.startY) &&
+                            node.contains(dragDelta.startX, dragDelta.startY) &&
                             ((SelectableFileLabel) node).isSelected());
             //if control is pressed or if clicked node was already selected
             //don't remove the selection from previously selected nodes
@@ -55,7 +55,7 @@ abstract class SelectionRectangleHelper {
                 }
             } else {
                 pane.getChildrenUnmodifiable().forEach(node -> {
-                    if(node instanceof SelectableFileLabel && !((SelectableFileLabel)node).areCoordinatesInsideNode(event.getSceneX(), event.getSceneY()))
+                    if(node instanceof SelectableFileLabel && node.contains(event.getSceneX(), event.getSceneY()))
                         ((SelectableFileLabel)node).setSelected(false);
                 });
             }
@@ -64,7 +64,7 @@ abstract class SelectionRectangleHelper {
             //check if first node clicked was not already selected
             //drawing selection grid and selecting nodes
             if(nodesSelectedBeforeDrawing.stream().noneMatch(
-                    node -> node instanceof SelectableFileLabel && ((SelectableFileLabel) node).areCoordinatesInsideNode(dragDelta.startX, dragDelta.startY))) {
+                    node -> node instanceof SelectableFileLabel && node.contains(dragDelta.startX, dragDelta.startY))) {
                 ObservableList<Node> nodes = drawingPane.getChildren();
                 nodes.remove(selectionRectangle);
                 dragDelta.x = event.getSceneX();
