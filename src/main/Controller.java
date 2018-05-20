@@ -42,10 +42,16 @@ class Controller {
             return;
         try {
                 if(Arrays.stream(t.getTransferDataFlavors()).anyMatch(dataFlavor -> dataFlavor.equals(DataFlavor.javaFileListFlavor))) {
+                    File dest = new File(paths[whichList]);
                     ((List<File>) t.getTransferData(DataFlavor.javaFileListFlavor)).forEach(file -> {
-                        File dest = new File(paths[whichList] + "\\" + file.getName());
                         try {
-                            FileUtils.copyDirectory(file, dest);
+                            System.out.println(dest.getPath());
+                            System.out.println(file.getPath());
+                            if(file.isFile()){
+                                FileUtils.copyFileToDirectory(file,dest);
+                            }else if (file.isDirectory()) {
+                                FileUtils.copyDirectoryToDirectory(file, dest);
+                            }
                         } catch (Exception e){
                             e.printStackTrace();
                         }
@@ -55,6 +61,7 @@ class Controller {
         catch (Exception e){
             e.printStackTrace();
         }
+        getFiles(whichList);
     }
 
     void copyFilesToClipboard(List<File> files){
@@ -63,7 +70,13 @@ class Controller {
     }
 
     void moveFiles(List<File> files, String path){
-        files.forEach(file -> System.out.println(file.getName()));
+        files.forEach(file -> {
+            try {
+                FileUtils.moveDirectoryToDirectory(file, new File(path), false);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        });
     }
 
     /**
