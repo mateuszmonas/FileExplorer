@@ -43,7 +43,7 @@ abstract class SelectionRectangleHelper {
             nodesSelectedBeforeDrawing.clear();
             //if control is pressed or if clicked node was already selected
             //don't remove the selection from previously selected nodes
-            if (event.isControlDown() ||
+            if (event.isControlDown() || event.isShiftDown() ||
                     pane.getChildrenUnmodifiable().stream().anyMatch(
                             node -> node instanceof SelectableFileLabel &&
                                     ((SelectableFileLabel) node).areCoordinatesInsideNode(dragDelta.startX, dragDelta.startY) &&

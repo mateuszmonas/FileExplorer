@@ -11,7 +11,6 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
-import javafx.scene.shape.Rectangle;
 import nodes.SelectableFileLabel;
 
 import java.io.File;
@@ -62,7 +61,7 @@ public class View implements Initializable {
                 pasteFilesEvent(whichList);
             }
             if (new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_ANY).match(event)) {
-                System.out.println("cut");
+                cutFilesEvent(whichList);
             }
             if (new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_ANY).match(event)) {
                 fileLists[whichList].getChildrenUnmodifiable().forEach(node -> {
