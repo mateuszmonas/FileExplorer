@@ -36,19 +36,23 @@ abstract class SelectionRectangleHelper {
         selectionRectangle.setOpacity(0.5);
         selectionRectangle.setFill(Color.BLUE);
         final ArrayList<Node> nodesSelectedBeforeDrawing = new ArrayList<>();
-        final MousePosition pressedMousePosition = new MousePosition();
+        final ArrayList<Node> draggedNodes = new ArrayList<>();
         pane.setOnMousePressed(event->{
             dragDelta.startX = event.getSceneX();
             dragDelta.startY = event.getSceneY();
             nodesSelectedBeforeDrawing.clear();
+            draggedNodes.clear();
+            boolean selectedNodeWasClicked = pane.getChildrenUnmodifiable().stream().anyMatch(
+                    node -> node instanceof SelectableFileLabel &&
+                            ((SelectableFileLabel) node).areCoordinatesInsideNode(dragDelta.startX, dragDelta.startY) &&
+                            ((SelectableFileLabel) node).isSelected());
             //if control is pressed or if clicked node was already selected
             //don't remove the selection from previously selected nodes
-            if (event.isControlDown() || event.isShiftDown() ||
-                    pane.getChildrenUnmodifiable().stream().anyMatch(
-                            node -> node instanceof SelectableFileLabel &&
-                                    ((SelectableFileLabel) node).areCoordinatesInsideNode(dragDelta.startX, dragDelta.startY) &&
-                                    ((SelectableFileLabel) node).isSelected())) {
+            if (event.isControlDown() || event.isShiftDown() || selectedNodeWasClicked) {
                 nodesSelectedBeforeDrawing.addAll(pane.getChildrenUnmodifiable().stream().filter(node -> node instanceof SelectableFileLabel && ((SelectableFileLabel) node).isSelected()).collect(Collectors.toList()));
+                if(selectedNodeWasClicked){
+                    draggedNodes.addAll(nodesSelectedBeforeDrawing);
+                }
             } else {
                 pane.getChildrenUnmodifiable().forEach(node -> {
                     if(node instanceof SelectableFileLabel && !((SelectableFileLabel)node).areCoordinatesInsideNode(event.getSceneX(), event.getSceneY()))
@@ -101,7 +105,6 @@ abstract class SelectionRectangleHelper {
             }
             //dragging nodes around
             else{
-
                 pane.getScene().setCursor(Cursor.CLOSED_HAND);
             }
         });
