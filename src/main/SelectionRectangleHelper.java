@@ -12,7 +12,10 @@ import nodes.SelectableFileLabel;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-abstract class MouseEventHandler {
+/**
+ * sole purpose of this class is containing all the code responsible for the selection rectangle
+ */
+abstract class SelectionRectangleHelper {
 
     final private static Rectangle selectionRectangle = new Rectangle();
     final private static Delta dragDelta = new Delta();
@@ -29,7 +32,7 @@ abstract class MouseEventHandler {
      * @param pane pane to which events should be added
      * @param drawingPane pane on which drawing will be happening
      */
-    static void handleMouseEvents(Pane pane, Pane drawingPane){
+    static void handleSelectionRectangle(Pane pane, Pane drawingPane){
         selectionRectangle.setOpacity(0.5);
         selectionRectangle.setFill(Color.BLUE);
         final ArrayList<Node> nodesSelectedBeforeDrawing = new ArrayList<>();

@@ -3,9 +3,7 @@ package main;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
-import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
@@ -13,13 +11,11 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import nodes.SelectableFileLabel;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -38,7 +34,6 @@ public class View implements Initializable {
     @FXML private Pane drawingPane;
     private TextField[] filePaths = new TextField[2];
     private VBox[] fileLists= new VBox[2];
-    private Rectangle selectionRectangle;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -47,8 +42,8 @@ public class View implements Initializable {
         fileLists[1] = filesB;
         filePaths[0]= filePathA;
         filePaths[1]= filePathB;
-        MouseEventHandler.handleMouseEvents(fileLists[0], drawingPane);
-        MouseEventHandler.handleMouseEvents(fileLists[1], drawingPane);
+        SelectionRectangleHelper.handleSelectionRectangle(fileLists[0], drawingPane);
+        SelectionRectangleHelper.handleSelectionRectangle(fileLists[1], drawingPane);
         handleKeyEvents(scrollPaneA, 0);
         handleKeyEvents(scrollPaneB, 1);
         filePathA.setOnKeyPressed(event -> { if(event.getCode()==KeyCode.ENTER) changeDirectory(filePaths[0].getText(), 0); });
@@ -108,111 +103,6 @@ public class View implements Initializable {
             textField.setPadding(new Insets(0,0,0,0));
             filesA.getChildren().add(textField);
         }
-    }
-
-    private class Delta{
-        double startX = 0;
-        double startY = 0;
-        double x = 0;
-        double y = 0;
-        void reset(){
-            startY=0;
-            startX=0;
-            x=0;
-            y=0;
-        }
-    }
-
-    private void setSelectionRectangleDimensions(double startX, double startY, double width, double height){
-        selectionRectangle.setX(startX);
-        selectionRectangle.setY(startY);
-        selectionRectangle.setWidth(width);
-        selectionRectangle.setHeight(height);
-    }
-
-    //function responsible for drawing a selection rectangle and selecting files with it
-    private void handleMouseEvents(Pane pane){
-        final Delta dragDelta = new Delta();
-        selectionRectangle = new Rectangle();
-        selectionRectangle.setOpacity(0.5);
-        selectionRectangle.setFill(Color.BLUE);
-        final ArrayList<Node> nodesSelectedBeforeDrawing = new ArrayList<>();
-        final MousePosition pressedMousePosition = new MousePosition();
-        pane.setOnMousePressed(event->{
-            dragDelta.startX = event.getSceneX();
-            dragDelta.startY = event.getSceneY();
-            nodesSelectedBeforeDrawing.clear();
-            //if control is pressed or if clicked node was already selected
-            //don't remove the selection from previously selected nodes
-            if (event.isControlDown() ||
-                    pane.getChildrenUnmodifiable().stream().anyMatch(
-                            node -> node instanceof SelectableFileLabel &&
-                            ((SelectableFileLabel) node).areCoordinatesInsideNode(dragDelta.startX, dragDelta.startY) &&
-                            ((SelectableFileLabel) node).isSelected())) {
-                nodesSelectedBeforeDrawing.addAll(pane.getChildrenUnmodifiable().stream().filter(node -> node instanceof SelectableFileLabel && ((SelectableFileLabel) node).isSelected()).collect(Collectors.toList()));
-            } else {
-                pane.getChildrenUnmodifiable().forEach(node -> {
-                    if(node instanceof SelectableFileLabel && !((SelectableFileLabel)node).areCoordinatesInsideNode(event.getSceneX(), event.getSceneY()))
-                        ((SelectableFileLabel)node).setSelected(false);
-                });
-            }
-        });
-        pane.setOnMouseDragged(event-> {
-            //check if first node clicked was not already selected
-            //drawing selection grid and selecting nodes
-            if(nodesSelectedBeforeDrawing.stream().noneMatch(
-                    node -> node instanceof SelectableFileLabel && ((SelectableFileLabel) node).areCoordinatesInsideNode(dragDelta.startX, dragDelta.startY))) {
-                ObservableList<Node> nodes = drawingPane.getChildren();
-                nodes.remove(selectionRectangle);
-                dragDelta.x = event.getSceneX();
-                dragDelta.y = event.getSceneY();
-                //we have to calculate where the current position of the cursor
-                //is relative to where it was clicked
-                if (dragDelta.x > dragDelta.startX && dragDelta.y > dragDelta.startY) {
-                    setSelectionRectangleDimensions(dragDelta.startX, dragDelta.startY, dragDelta.x - dragDelta.startX, dragDelta.y - dragDelta.startY);
-                } else if (dragDelta.x > dragDelta.startX && dragDelta.y < dragDelta.startY) {
-                    setSelectionRectangleDimensions(dragDelta.startX, dragDelta.y, dragDelta.x - dragDelta.startX, dragDelta.startY - dragDelta.y);
-                } else if (dragDelta.x < dragDelta.startX && dragDelta.y > dragDelta.startY) {
-                    setSelectionRectangleDimensions(dragDelta.x, dragDelta.startY, dragDelta.startX - dragDelta.x, dragDelta.y - dragDelta.startY);
-                } else if (dragDelta.x < dragDelta.startX && dragDelta.y < dragDelta.startY) {
-                    setSelectionRectangleDimensions(dragDelta.x, dragDelta.y, dragDelta.startX - dragDelta.x, dragDelta.startY - dragDelta.y);
-                }
-                nodes.add(selectionRectangle);
-                pane.getChildrenUnmodifiable().forEach(node -> {
-                    if (node instanceof SelectableFileLabel) {
-                        Bounds nodeBounds = node.localToScene(node.getBoundsInLocal());
-                        double nodeMinX = nodeBounds.getMinX();
-                        double nodeMaxX = nodeBounds.getMaxX();
-                        double nodeMaxY = nodeBounds.getMaxY();
-                        double nodeMinY = nodeBounds.getMinY();
-                        double selectionMinX = dragDelta.startX < dragDelta.x ? dragDelta.startX : dragDelta.x;
-                        double selectionMaxX = dragDelta.startX > dragDelta.x ? dragDelta.startX : dragDelta.x;
-                        double selectionMinY = dragDelta.startY < dragDelta.y ? dragDelta.startY : dragDelta.y;
-                        double selectionMaxY = dragDelta.startY > dragDelta.y ? dragDelta.startY : dragDelta.y;
-                        //check if node is in the selection rectangle
-                        if (selectionMinY <= nodeMaxY && selectionMaxY >= nodeMinY && selectionMinX <= nodeMaxX && selectionMaxX >= nodeMinX) {
-                            ((SelectableFileLabel) node).setSelected(true);
-                        } else {
-                            if (!nodesSelectedBeforeDrawing.contains(node)) {
-                                ((SelectableFileLabel) node).setSelected(false);
-                            }
-                        }
-                    }
-                });
-            }
-            //dragging nodes around
-            else{
-
-                pane.getScene().setCursor(Cursor.CLOSED_HAND);
-            }
-        });
-        //after the mouse is released remove the rectangle and clear its position
-        pane.setOnMouseReleased(event -> {
-            drawingPane.getChildren().remove(selectionRectangle);
-            setSelectionRectangleDimensions(0,0,0,0);
-            dragDelta.reset();
-            pane.getScene().setCursor(Cursor.DEFAULT);
-        });
     }
 
     private void viewFiles(File[] files, int whichList){
