@@ -64,7 +64,7 @@ public class View implements Initializable {
                 copy.copyFilesToClipboardEvent(whichList);
             }
             if (new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_ANY).match(event)) {
-                paste.pasteFilesFromClipboardEvent(0);
+                paste.pasteFilesFromClipboardEvent(whichList);
             }
             if (new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_ANY).match(event)) {
                 cut.cutFilesEvent(whichList);

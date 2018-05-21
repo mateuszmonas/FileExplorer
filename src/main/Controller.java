@@ -38,11 +38,11 @@ class Controller {
     void pasteFilesFromClipboard(int whichList){
         Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
         Transferable t = c.getContents(this);
-        if (t == null)
+        File dest = new File(paths[whichList]);
+        if (t == null || !checkDestDirectory(dest))
             return;
         try {
                 if(Arrays.stream(t.getTransferDataFlavors()).anyMatch(dataFlavor -> dataFlavor.equals(DataFlavor.javaFileListFlavor))) {
-                    File dest = new File(paths[whichList]);
                     ((List<File>) t.getTransferData(DataFlavor.javaFileListFlavor)).forEach(file -> {
                         try {
                             System.out.println(dest.getPath());
@@ -69,34 +69,48 @@ class Controller {
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ft, (clipboard, contents) -> System.out.println("Lost ownership"));
     }
 
+    private boolean checkDestDirectory(File dest){
+        if (dest.exists()) return true;
+        else {
+            System.out.println("Destination directory does not exist");
+            return false;
+        }
+    }
+
     void moveFiles(List<File> files, String path){
-        files.forEach(file -> {
-            try {
-                if(file.isDirectory()) {
-                    FileUtils.moveDirectoryToDirectory(file, new File(path), false);
-                }else if (file.isFile()){
-                    FileUtils.moveFileToDirectory(file, new File(path), false);
+        File dest = new File(path);
+        if(checkDestDirectory(dest)) {
+            files.forEach(file -> {
+                try {
+                    if (file.isDirectory()) {
+                        FileUtils.moveDirectoryToDirectory(file, new File(path), false);
+                    } else if (file.isFile()) {
+                        FileUtils.moveFileToDirectory(file, new File(path), false);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        });
+            });
+        }
         getFiles(0);
         getFiles(1);
     }
 
     void moveFiles(List<File> files, int whichList){
-        files.forEach(file -> {
-            try {
-                if(file.isDirectory()) {
-                    FileUtils.moveDirectoryToDirectory(file, new File(paths[whichList]), false);
-                }else if (file.isFile()){
-                    FileUtils.moveFileToDirectory(file, new File(paths[whichList]), false);
+        File dest = new File(paths[whichList]);
+        if(checkDestDirectory(dest)) {
+            files.forEach(file -> {
+                try {
+                    if (file.isDirectory()) {
+                        FileUtils.moveDirectoryToDirectory(file, dest, false);
+                    } else if (file.isFile()) {
+                        FileUtils.moveFileToDirectory(file, dest, false);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        });
+            });
+        }
         getFiles(0);
         getFiles(1);
     }
