@@ -3,21 +3,21 @@ package nodes;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
 import java.io.File;
 
-public class SelectableFileLabel extends Label {
+public class FileLabelSelectable extends Label {
     private boolean isSelected = false;
     private File file;
 
-    public SelectableFileLabel(File file) {
+    public FileLabelSelectable(File file) {
         super();
         this.file=file;
         setText(file.getName());
+        setBorder(new Border(new BorderStroke(Color.TRANSPARENT, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+        setMinWidth(200);
     }
 
     public File getFile() {
@@ -29,8 +29,14 @@ public class SelectableFileLabel extends Label {
     }
 
     public void setSelected(boolean selected) {
-        if(selected) setBackground(new Background(new BackgroundFill(Color.LIGHTBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
-        else setBackground(null);
+        if(selected) {
+            setBackground(new Background(new BackgroundFill(Color.LIGHTBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
+            setBorder(new Border(new BorderStroke(Color.BLUE, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+        }
+        else {
+            setBackground(null);
+            setBorder(new Border(new BorderStroke(Color.TRANSPARENT, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+        }
         isSelected = selected;
     }
 

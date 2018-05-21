@@ -1,17 +1,16 @@
 package main;
 
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.*;
-import nodes.SelectableFileLabel;
+import javafx.scene.paint.Color;
+import nodes.FileLabelSelectable;
 
 import java.io.File;
 import java.net.URL;
@@ -72,7 +71,7 @@ public class View implements Initializable {
             }
             if (new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_ANY).match(event)) {
                 fileLists[whichList].getChildrenUnmodifiable().forEach(node -> {
-                    if(node instanceof SelectableFileLabel) ((SelectableFileLabel) node).setSelected(true);
+                    if(node instanceof FileLabelSelectable) ((FileLabelSelectable) node).setSelected(true);
                 });
             }
         });
@@ -96,8 +95,8 @@ public class View implements Initializable {
 
     private FileEventHelper.CopyFilesToCpilboardEvent copy = whichList ->  {
             List<File> files = fileLists[whichList].getChildrenUnmodifiable().stream().filter(node ->
-                    node instanceof SelectableFileLabel && ((SelectableFileLabel) node).isSelected()
-            ).map(node -> ((SelectableFileLabel)node).getFile()
+                    node instanceof FileLabelSelectable && ((FileLabelSelectable) node).isSelected()
+            ).map(node -> ((FileLabelSelectable)node).getFile()
             ).collect(Collectors.toList());
             controller.copyFilesToClipboard(files);
     };
@@ -121,8 +120,7 @@ public class View implements Initializable {
 
     private void viewFiles(File[] files, int whichList){
         for (File file : files) {
-            SelectableFileLabel label = new SelectableFileLabel(file);
-            label.setMinWidth(200);
+            FileLabelSelectable label = new FileLabelSelectable(file);
             //class used to check if mouse position while released is same as while pressed
             final MousePosition pressedMousePosition = MousePosition.ZERO;
             label.setOnMousePressed(event -> pressedMousePosition.setPosition(event.getSceneX(), event.getSceneY()));
@@ -142,14 +140,14 @@ public class View implements Initializable {
                         }
                         //get first selected item position
                         for (Node n : nodes) {
-                            if (n instanceof SelectableFileLabel && ((SelectableFileLabel) n).isSelected()) {
+                            if (n instanceof FileLabelSelectable && ((FileLabelSelectable) n).isSelected()) {
                                 break;
                             }
                             firstSelectedItemPosition++;
                         }
                         //get last selected item position
                         while (lastSelectedItemPosition > firstSelectedItemPosition) {
-                            if (nodes.get(lastSelectedItemPosition) instanceof SelectableFileLabel && ((SelectableFileLabel) nodes.get(lastSelectedItemPosition)).isSelected()) {
+                            if (nodes.get(lastSelectedItemPosition) instanceof FileLabelSelectable && ((FileLabelSelectable) nodes.get(lastSelectedItemPosition)).isSelected()) {
                                 break;
                             }
                             lastSelectedItemPosition--;
@@ -157,22 +155,22 @@ public class View implements Initializable {
                         //if control is not pressed down then clear all selections
                         if (!event.isControlDown()) {
                             nodes.forEach(n -> {
-                                if (n instanceof SelectableFileLabel && !label.equals(n))
-                                    ((SelectableFileLabel) n).setSelected(false);
+                                if (n instanceof FileLabelSelectable && !label.equals(n))
+                                    ((FileLabelSelectable) n).setSelected(false);
                             });
                         }
                         //if clicked item is higher than both last and first selected item
                         //then select all items between clicked item and last selected item
                         if (clickedItemPosition < lastSelectedItemPosition && clickedItemPosition < firstSelectedItemPosition) {
                             for (int i = clickedItemPosition; i <= lastSelectedItemPosition; i++) {
-                                ((SelectableFileLabel) nodes.get(i)).setSelected(true);
+                                ((FileLabelSelectable) nodes.get(i)).setSelected(true);
                             }
                         }
                         //if clicked item is lower than first selected item
                         //then select all items between clicked item and first selected item
                         else {
                             for (int i = firstSelectedItemPosition; i <= clickedItemPosition; i++) {
-                                ((SelectableFileLabel) nodes.get(i)).setSelected(true);
+                                ((FileLabelSelectable) nodes.get(i)).setSelected(true);
                             }
                         }
                     } else if (event.isControlDown()) {
@@ -182,12 +180,22 @@ public class View implements Initializable {
                             changeDirectory(label.getFile().getPath(), whichList);
                         } else {
                             nodes.forEach(n -> {
-                                if (n instanceof SelectableFileLabel && !label.equals(n))
-                                    ((SelectableFileLabel) n).setSelected(false);
+                                if (n instanceof FileLabelSelectable && !label.equals(n))
+                                    ((FileLabelSelectable) n).setSelected(false);
                             });
                             label.setSelected(true);
                         }
                     }
+                }
+            });
+            label.setOnMouseEntered(event ->  {
+                    if(!label.isSelected()){
+                        label.setBackground(new Background(new BackgroundFill(Color.LIGHTBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
+                    }
+            });
+            label.setOnMouseExited(event -> {
+                if(!label.isSelected()){
+                    label.setBackground(null);
                 }
             });
             fileLists[whichList].getChildren().add(label);

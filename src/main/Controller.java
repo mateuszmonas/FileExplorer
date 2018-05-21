@@ -19,8 +19,8 @@ class Controller {
     private String[] paths = new String[2];
 
     Controller(View view) {
-        paths[0] = "C:\\";
-        paths[1] = "D:\\";
+        paths[0] = "D:\\tests";
+        paths[1] = "D:\\tests";
         this.view = view;
     }
 

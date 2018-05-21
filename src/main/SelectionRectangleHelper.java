@@ -2,13 +2,13 @@ package main;
 
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import nodes.SelectableFileLabel;
+import nodes.FileLabelSelectable;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -44,28 +44,38 @@ class SelectionRectangleHelper {
     void handleSelectionRectangle(Pane pane, FileEventHelper.MoveFilesEvent moveFilesEvent){
         selectionRectangle.setOpacity(0.5);
         selectionRectangle.setFill(Color.BLUE);
-        final ArrayList<SelectableFileLabel> nodesSelectedBeforeDrawing = new ArrayList<>();
-        final ArrayList<SelectableFileLabel> draggedNodes = new ArrayList<>();
-        final ArrayList<SelectableFileLabel> onePaneChildNodes = new ArrayList<>();
-        final ArrayList<SelectableFileLabel> allNodes = new ArrayList<>();
+        final ArrayList<FileLabelSelectable> nodesSelectedBeforeDrawing = new ArrayList<>();
+        final ArrayList<FileLabelSelectable> draggedNodes = new ArrayList<>();
+        final ArrayList<FileLabelSelectable> onePaneChildNodes = new ArrayList<>();
+        final ArrayList<FileLabelSelectable> allNodes = new ArrayList<>();
         pane.setOnMousePressed(event->{
             dragDelta.startX = event.getSceneX();
             dragDelta.startY = event.getSceneY();
-            onePaneChildNodes.addAll(pane.getChildrenUnmodifiable().stream().filter(node -> node instanceof SelectableFileLabel).map(node -> (SelectableFileLabel)node).collect(Collectors.toList()));
+            onePaneChildNodes.addAll(pane.getChildrenUnmodifiable().stream().filter(node -> node instanceof FileLabelSelectable).map(node -> (FileLabelSelectable)node).collect(Collectors.toList()));
             boolean selectedNodeWasClicked = onePaneChildNodes.stream().anyMatch(
                     node -> node.contains(dragDelta.startX, dragDelta.startY) && node.isSelected());
+            FileLabelSelectable clickedNode = onePaneChildNodes.stream().filter(node -> node.contains(event.getSceneX(), event.getSceneY())).findAny().orElse(null);
             //if control is pressed or if clicked node was already selected
             //don't remove the selection from previously selected nodes
-            if (event.isControlDown() || event.isShiftDown() || selectedNodeWasClicked) {
-                nodesSelectedBeforeDrawing.addAll(onePaneChildNodes.stream().filter(SelectableFileLabel::isSelected).collect(Collectors.toList()));
-                if(selectedNodeWasClicked){
-                    draggedNodes.addAll(nodesSelectedBeforeDrawing);
+            if(clickedNode!=null) {
+                if (event.isControlDown() || event.isShiftDown() || clickedNode.isSelected()) {
+                    nodesSelectedBeforeDrawing.addAll(onePaneChildNodes.stream().filter(FileLabelSelectable::isSelected).collect(Collectors.toList()));
+                    if (selectedNodeWasClicked) {
+                        allNodes.addAll(Stream.concat(fileLists[0].getChildrenUnmodifiable().stream(), fileLists[1].getChildrenUnmodifiable().stream())
+                                .filter(node -> node instanceof FileLabelSelectable)
+                                .map(node -> (FileLabelSelectable) node)
+                                .collect(Collectors.toList()));
+                        draggedNodes.addAll(nodesSelectedBeforeDrawing);
+                    }
+                } else {
+                    onePaneChildNodes.forEach(node -> {
+                        if(node!=clickedNode){
+                            node.setSelected(false);
+                        }
+                    });
                 }
-            } else {
-                onePaneChildNodes.forEach(node -> {
-                    if(node.contains(event.getSceneX(), event.getSceneY()))
-                        node.setSelected(false);
-                });
+            }else {
+                onePaneChildNodes.forEach(node -> node.setSelected(false));
             }
         });
         pane.setOnMouseDragged(event-> {
@@ -115,15 +125,15 @@ class SelectionRectangleHelper {
         //after the mouse is released remove the rectangle and clear its position
         pane.setOnMouseReleased(event -> {
             if(!draggedNodes.isEmpty()){
-                SelectableFileLabel currentNode = Stream.concat(fileLists[0].getChildrenUnmodifiable().stream(), fileLists[1].getChildrenUnmodifiable().stream())
-                        .filter(node -> node instanceof SelectableFileLabel && node.contains(event.getSceneX(), event.getSceneY()))
-                        .map(node -> (SelectableFileLabel) node).findAny().orElse(null);
+                FileLabelSelectable currentNode = allNodes.stream()
+                        .filter(node -> node.contains(event.getSceneX(), event.getSceneY()))
+                        .findAny().orElse(null);
                 if (currentNode != null && !draggedNodes.contains(currentNode)) {
-                    moveFilesEvent.moveFilesEvent(draggedNodes.stream().map(SelectableFileLabel::getFile).collect(Collectors.toList()), currentNode.getFile().getPath());
+                    moveFilesEvent.moveFilesEvent(draggedNodes.stream().map(FileLabelSelectable::getFile).collect(Collectors.toList()), currentNode.getFile().getPath());
                 } else {
                     for (int i = 0; i < 2; i++) {
                         if(fileLists[i]!=pane && fileLists[i].contains(fileLists[i].sceneToLocal(event.getSceneX(), event.getSceneY()))){
-                            moveFilesEvent.moveFilesEvent(draggedNodes.stream().map(SelectableFileLabel::getFile).collect(Collectors.toList()), i);
+                            moveFilesEvent.moveFilesEvent(draggedNodes.stream().map(FileLabelSelectable::getFile).collect(Collectors.toList()), i);
                             break;
                         }
                     }
@@ -135,6 +145,7 @@ class SelectionRectangleHelper {
             nodesSelectedBeforeDrawing.clear();
             draggedNodes.clear();
             onePaneChildNodes.clear();
+            allNodes.clear();
             pane.getScene().setCursor(Cursor.DEFAULT);
         });
     }
