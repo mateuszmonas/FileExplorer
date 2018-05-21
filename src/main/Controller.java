@@ -34,6 +34,16 @@ class Controller {
         getFiles(1);
     }
 
+    void moveFilesToTrash(List<File> files){
+        if(com.sun.jna.platform.FileUtils.getInstance().hasTrash()){
+            try {
+                com.sun.jna.platform.FileUtils.getInstance().moveToTrash(files.toArray(new File[0]));
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+
     @SuppressWarnings("unchecked")
     void pasteFilesFromClipboard(int whichList){
         Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -61,7 +71,6 @@ class Controller {
         catch (Exception e){
             e.printStackTrace();
         }
-        getFiles(whichList);
     }
 
     void copyFilesToClipboard(List<File> files){
