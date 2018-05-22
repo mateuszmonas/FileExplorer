@@ -74,6 +74,13 @@ public class View implements Initializable {
                     if(node instanceof FileLabelSelectable) ((FileLabelSelectable) node).setSelected(true);
                 });
             }
+            if (event.getCode()==KeyCode.DELETE){
+                controller.moveFilesToTrash(
+                        fileLists[whichList].getChildrenUnmodifiable().stream()
+                            .filter(file -> file instanceof FileLabelSelectable && ((FileLabelSelectable) file).isSelected())
+                            .map(file -> ((FileLabelSelectable) file).getFile()).collect(Collectors.toList())
+                );
+            }
         });
     }
 

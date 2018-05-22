@@ -25,11 +25,23 @@ class Controller {
     }
 
     void changeDirectory(String path, int whichList){
-        paths[whichList] = path;
+        if(new File(path).isDirectory()) {
+            paths[whichList] = path;
+        }
         getFiles(whichList);
     }
 
     void start(){
+        getFiles(0);
+        getFiles(1);
+    }
+
+    void deleteFiles(List<File> files){
+        files.forEach(
+                file -> {
+                    if(!file.delete()) System.out.println("no delete");
+                }
+        );
         getFiles(0);
         getFiles(1);
     }
@@ -42,6 +54,8 @@ class Controller {
                 e.printStackTrace();
             }
         }
+        getFiles(0);
+        getFiles(1);
     }
 
     @SuppressWarnings("unchecked")
