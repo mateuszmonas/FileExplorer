@@ -16,7 +16,7 @@ public class Controller implements ViewContract.Presenter {
     private ViewContract.View view;
     private String[] paths = new String[2];
 
-    public Controller(View view) {
+    public Controller(ViewContract.View view) {
         paths[0] = "D:\\tests";
         paths[1] = "D:\\tests";
         this.view = view;
