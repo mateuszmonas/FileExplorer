@@ -1,14 +1,13 @@
-package main;
+package FileNameEditor.main;
 
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
-import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import nodes.FileLabelSelectable;
+import FileNameEditor.nodes.FileLabelSelectable;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -56,7 +55,7 @@ class SelectionRectangleHelper {
                     node -> node.contains(dragDelta.startX, dragDelta.startY) && node.isSelected());
             FileLabelSelectable clickedNode = onePaneChildNodes.stream().filter(node -> node.contains(event.getSceneX(), event.getSceneY())).findAny().orElse(null);
             //if control is pressed or if clicked node was already selected
-            //don't remove the selection from previously selected nodes
+            //don't remove the selection from previously selected FileNameEditor.nodes
             if(clickedNode!=null) {
                 if (event.isControlDown() || event.isShiftDown() || clickedNode.isSelected()) {
                     nodesSelectedBeforeDrawing.addAll(onePaneChildNodes.stream().filter(FileLabelSelectable::isSelected).collect(Collectors.toList()));
@@ -80,7 +79,7 @@ class SelectionRectangleHelper {
         });
         pane.setOnMouseDragged(event-> {
             //check if first node clicked was not already selected
-            //drawing selection grid and selecting nodes
+            //drawing selection grid and selecting FileNameEditor.nodes
             if(nodesSelectedBeforeDrawing.stream().noneMatch(
                     node -> node.contains(dragDelta.startX, dragDelta.startY))) {
                 ObservableList<Node> nodes = drawingPane.getChildren();
@@ -117,7 +116,7 @@ class SelectionRectangleHelper {
                         }
                 });
             }
-            //dragging nodes around
+            //dragging FileNameEditor.nodes around
             else{
                 pane.getScene().setCursor(Cursor.CLOSED_HAND);
             }

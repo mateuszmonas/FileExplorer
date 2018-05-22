@@ -1,4 +1,4 @@
-package main;
+package FileNameEditor.main;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -6,13 +6,9 @@ import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-import java.awt.*;
-import java.awt.datatransfer.*;
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
+// TODO: 2018-05-22 creating new files
 public class Main extends Application{
 
     @Override

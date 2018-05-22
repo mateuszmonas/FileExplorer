@@ -1,7 +1,6 @@
-package main;
+package FileNameEditor.main;
 
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -10,7 +9,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import nodes.FileLabelSelectable;
+import FileNameEditor.nodes.FileLabelSelectable;
 
 import java.io.File;
 import java.net.URL;

@@ -1,15 +1,13 @@
-package main;
+package FileNameEditor.main;
 
-import file.FileTransferable;
+import FileNameEditor.file.FileTransferable;
 import org.apache.commons.io.FileUtils;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package main;
+package FileNameEditor.main;
 
 public class MousePosition {
 
