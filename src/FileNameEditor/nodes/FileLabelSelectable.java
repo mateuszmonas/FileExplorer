@@ -3,12 +3,13 @@ package FileNameEditor.nodes;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
 import java.io.File;
 
-public class FileLabelSelectable extends Label {
+public class FileLabelSelectable extends Label implements FileNodeSelectable {
     private boolean isSelected = false;
     private File file;
 

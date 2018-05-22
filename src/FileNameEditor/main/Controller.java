@@ -119,7 +119,7 @@ class Controller {
 
     void moveFiles(List<File> files, int whichList){
         File dest = new File(paths[whichList]);
-        if(checkDestDirectory(dest)) {
+        if(checkDestDirectory(dest) && !paths[0].equals(paths[1])) {
             files.forEach(file -> {
                 try {
                     if (file.isDirectory()) {
