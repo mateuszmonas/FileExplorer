@@ -60,21 +60,28 @@ public class View implements Initializable {
 
     private void handleKeyEvents(Control pane, int whichList){
         pane.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY).match(event)) {
+            if (new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN).match(event)) {
                 copy.copyFilesToClipboardEvent(whichList);
             }
-            if (new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_ANY).match(event)) {
+            else if (new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_DOWN).match(event)) {
                 paste.pasteFilesFromClipboardEvent(whichList);
             }
-            if (new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_ANY).match(event)) {
+            else if (new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN).match(event)) {
                 cut.cutFilesEvent(whichList);
             }
-            if (new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_ANY).match(event)) {
+            else if (new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN).match(event)) {
                 fileLists[whichList].getChildrenUnmodifiable().forEach(node -> {
                     if(node instanceof FileLabelSelectable) ((FileLabelSelectable) node).setSelected(true);
                 });
             }
-            if (event.getCode()==KeyCode.DELETE){
+            else if (new KeyCodeCombination(KeyCode.DELETE, KeyCombination.SHIFT_DOWN).match(event)){
+                controller.deleteFiles(
+                        fileLists[whichList].getChildrenUnmodifiable().stream()
+                                .filter(file -> file instanceof FileLabelSelectable && ((FileLabelSelectable) file).isSelected())
+                                .map(file -> ((FileLabelSelectable) file).getFile()).collect(Collectors.toList())
+                );
+            }
+            else if (event.getCode()==KeyCode.DELETE){
                 controller.moveFilesToTrash(
                         fileLists[whichList].getChildrenUnmodifiable().stream()
                             .filter(file -> file instanceof FileLabelSelectable && ((FileLabelSelectable) file).isSelected())
