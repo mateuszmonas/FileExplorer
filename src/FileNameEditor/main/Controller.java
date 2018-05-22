@@ -11,30 +11,33 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 
-class Controller {
+public class Controller implements ViewContract.Presenter {
 
-    private View view;
+    private ViewContract.View view;
     private String[] paths = new String[2];
 
-    Controller(View view) {
+    public Controller(View view) {
         paths[0] = "D:\\tests";
         paths[1] = "D:\\tests";
         this.view = view;
     }
 
-    void changeDirectory(String path, int whichList){
+    @Override
+    public void changeDirectory(String path, int whichList){
         if(new File(path).isDirectory()) {
             paths[whichList] = path;
         }
         getFiles(whichList);
     }
 
-    void start(){
+    @Override
+    public void start(){
         getFiles(0);
         getFiles(1);
     }
 
-    void deleteFiles(List<File> files){
+    @Override
+    public void deleteFiles(List<File> files){
         files.forEach(
                 file -> {
                     if(!file.delete()) System.out.println("no delete");
@@ -44,7 +47,8 @@ class Controller {
         getFiles(1);
     }
 
-    void moveFilesToTrash(List<File> files){
+    @Override
+    public void moveFilesToTrash(List<File> files){
         if(com.sun.jna.platform.FileUtils.getInstance().hasTrash()){
             try {
                 com.sun.jna.platform.FileUtils.getInstance().moveToTrash(files.toArray(new File[0]));
@@ -57,7 +61,8 @@ class Controller {
     }
 
     @SuppressWarnings("unchecked")
-    void pasteFilesFromClipboard(int whichList){
+    @Override
+    public void pasteFilesFromClipboard(int whichList){
         Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
         Transferable t = c.getContents(this);
         File dest = new File(paths[whichList]);
@@ -85,7 +90,9 @@ class Controller {
         }
     }
 
-    void copyFilesToClipboard(List<File> files){
+
+    @Override
+    public void copyFilesToClipboard(List<File> files){
         FileTransferable ft = new FileTransferable(files);
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ft, (clipboard, contents) -> System.out.println("Lost ownership"));
     }
@@ -98,7 +105,9 @@ class Controller {
         }
     }
 
-    void moveFiles(List<File> files, String path){
+
+    @Override
+    public void moveFiles(List<File> files, String path){
         File dest = new File(path);
         if(checkDestDirectory(dest)) {
             files.forEach(file -> {
@@ -117,7 +126,9 @@ class Controller {
         getFiles(1);
     }
 
-    void moveFiles(List<File> files, int whichList){
+
+    @Override
+    public void moveFiles(List<File> files, int whichList){
         File dest = new File(paths[whichList]);
         if(checkDestDirectory(dest) && !paths[0].equals(paths[1])) {
             files.forEach(file -> {

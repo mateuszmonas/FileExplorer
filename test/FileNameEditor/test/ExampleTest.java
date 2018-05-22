@@ -1,11 +1,26 @@
 package FileNameEditor.test;
 
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
+import java.io.File;
+import java.io.IOException;
+
+import FileNameEditor.main.*;
 
 public class ExampleTest {
+    @Rule
+    public TemporaryFolder folder= new TemporaryFolder();
+
     @Test
-    public void test(){
-        Assert.assertTrue(true);
+    public void checkIfFilesMoved() throws IOException {
+        Controller c = new Controller(new View());
+        File source = folder.newFolder("source");
+        File dest = folder.newFolder("dest");
+        File subFolder = new File(source, "subFolder");
+        new File(source, "test.txt");
+        new File(subFolder, "test2.txt");
     }
 }

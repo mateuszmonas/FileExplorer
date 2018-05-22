@@ -17,11 +17,11 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-public class View implements Initializable {
+public class View implements Initializable, ViewContract.View{
 
     @FXML private ScrollPane scrollPaneA;
     @FXML private ScrollPane scrollPaneB;
-    private Controller controller;
+    private ViewContract.Presenter controller;
     @FXML private VBox fileListA;
     @FXML private VBox fileListB;
     @FXML private TextField filePathA;
@@ -114,7 +114,8 @@ public class View implements Initializable {
             controller.copyFilesToClipboard(files);
     };
 
-    void displayPath(String path, int whichList){
+    @Override
+    public void displayPath(String path, int whichList){
         filePaths[whichList].setText(path);
     }
 
@@ -220,7 +221,8 @@ public class View implements Initializable {
      * displays the names of all the files in the given path
      * @param files array of files to display
      */
-    void displayFiles(File[] files, int whichList){
+    @Override
+    public void displayFiles(File[] files, int whichList){
         fileLists[whichList].getChildren().clear();
         if(files!=null) {
             viewFiles(files, whichList);
