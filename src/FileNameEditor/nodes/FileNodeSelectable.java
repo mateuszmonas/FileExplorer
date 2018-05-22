@@ -17,4 +17,6 @@ public interface FileNodeSelectable {
     boolean contains(double x, double y);
     Bounds localToScene(Bounds bounds);
     Bounds getBoundsInLocal();
+    void onMouseHoverEnter();
+    void onMouseHoverLeave();
 }

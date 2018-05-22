@@ -3,14 +3,13 @@ package FileNameEditor.nodes;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
 import java.io.File;
 
 public class FileLabelSelectable extends Label implements FileNodeSelectable {
-    private boolean isSelected = false;
+    private boolean selected = false;
     private File file;
 
     public FileLabelSelectable(File file) {
@@ -21,12 +20,26 @@ public class FileLabelSelectable extends Label implements FileNodeSelectable {
         setMinWidth(200);
     }
 
+    @Override
+    public void onMouseHoverEnter() {
+        if(!selected){
+            setBackground(new Background(new BackgroundFill(Color.LIGHTBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
+        }
+    }
+
+    @Override
+    public void onMouseHoverLeave() {
+        if(!selected){
+            setBackground(null);
+        }
+    }
+
     public File getFile() {
         return file;
     }
 
     public boolean isSelected() {
-        return isSelected;
+        return selected;
     }
 
     public void setSelected(boolean selected) {
@@ -38,7 +51,7 @@ public class FileLabelSelectable extends Label implements FileNodeSelectable {
             setBackground(null);
             setBorder(new Border(new BorderStroke(Color.TRANSPARENT, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
         }
-        isSelected = selected;
+        this.selected = selected;
     }
 
     @Override

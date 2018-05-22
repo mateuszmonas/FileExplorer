@@ -202,16 +202,13 @@ public class View implements Initializable, ViewContract.View{
                     }
                 }
             });
-            label.setOnMouseEntered(event ->  {
-                    if(!label.isSelected()){
-                        label.setBackground(new Background(new BackgroundFill(Color.LIGHTBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
-                    }
-            });
-            label.setOnMouseExited(event -> {
-                if(!label.isSelected()){
-                    label.setBackground(null);
+            fileLists[whichList].addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
+                if (event.getPickResult().getIntersectedNode().equals(label) && label.isSelected()) {
+                    label.setBackground(new Background(new BackgroundFill(Color.LIGHTBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
                 }
             });
+            label.setOnMouseEntered(event -> label.onMouseHoverEnter());
+            label.setOnMouseExited(event -> label.onMouseHoverLeave());
             fileLists[whichList].getChildren().add(label);
         }
     }

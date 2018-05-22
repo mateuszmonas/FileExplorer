@@ -3,6 +3,7 @@ package FileNameEditor.main;
 import FileNameEditor.nodes.FileNodeSelectable;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.layout.*;
@@ -66,7 +67,6 @@ class SelectionRectangleHelper {
                                 .map(node -> (FileNodeSelectable) node)
                                 .collect(Collectors.toList()));
                         draggedNodes.addAll(nodesSelectedBeforeDrawing);
-                        pane.getScene().setCursor(Cursor.CLOSED_HAND);
                     }
                 } else {
                     onePaneChildNodes.forEach(node -> {
@@ -79,6 +79,13 @@ class SelectionRectangleHelper {
                 onePaneChildNodes.forEach(node -> node.setSelected(false));
             }
         });
+        pane.setOnDragDetected(event -> {
+            if(!draggedNodes.isEmpty()){
+                pane.getScene().setCursor(Cursor.CLOSED_HAND);
+            }
+        });
+        //dirty hack used to around lambda's need for final variables
+        FileNodeSelectable[] f = new FileLabelSelectable[1];
         pane.setOnMouseDragged(event-> {
             //check if first node clicked was not already selected
             //drawing selection grid and selecting FileNameEditor.nodes
@@ -117,6 +124,21 @@ class SelectionRectangleHelper {
                             node.setSelected(false);
                         }
                 });
+            }else {
+                //code responsible for highlighting nodes hovered over
+                //it is pretty ugly, but it works
+                Object fa = event.getPickResult().getIntersectedNode();
+                if(fa instanceof FileNodeSelectable){
+                    if(fa!=f[0]){
+                        ((FileNodeSelectable) fa).onMouseHoverEnter();
+                        if(f[0]!=null) {
+                            f[0].onMouseHoverLeave();
+                        }
+                        f[0]=(FileNodeSelectable) fa;
+                    }
+                } else if(f[0]!=null) {
+                    f[0].onMouseHoverLeave();
+                }
             }
         });
         //after the mouse is released remove the rectangle and clear its position

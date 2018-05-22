@@ -5,10 +5,12 @@ import java.util.List;
 
 public interface FileEventHelper {
 
+    @FunctionalInterface
     interface PasteFilesFromClipboardEvent {
         void pasteFilesFromClipboardEvent(int whichList);
     }
 
+    @FunctionalInterface
     interface CutFilesEvent {
         void cutFilesEvent(int whichList);
     }
@@ -18,6 +20,7 @@ public interface FileEventHelper {
         void moveFilesEvent(List<File> files, int whichList);
     }
 
+    @FunctionalInterface
     interface CopyFilesToCpilboardEvent {
         void copyFilesToClipboardEvent(int whichList);
     }
