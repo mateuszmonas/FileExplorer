@@ -62,10 +62,11 @@ class SelectionRectangleHelper {
                     nodesSelectedBeforeDrawing.addAll(onePaneChildNodes.stream().filter(FileNodeSelectable::isSelected).collect(Collectors.toList()));
                     if (selectedNodeWasClicked) {
                         allNodes.addAll(Stream.concat(fileLists[0].getChildrenUnmodifiable().stream(), fileLists[1].getChildrenUnmodifiable().stream())
-                                .filter(node -> node instanceof FileLabelSelectable)
-                                .map(node -> (FileLabelSelectable) node)
+                                .filter(node -> node instanceof FileNodeSelectable)
+                                .map(node -> (FileNodeSelectable) node)
                                 .collect(Collectors.toList()));
                         draggedNodes.addAll(nodesSelectedBeforeDrawing);
+                        pane.getScene().setCursor(Cursor.CLOSED_HAND);
                     }
                 } else {
                     onePaneChildNodes.forEach(node -> {
@@ -116,10 +117,6 @@ class SelectionRectangleHelper {
                             node.setSelected(false);
                         }
                 });
-            }
-            //dragging FileNameEditor.nodes around
-            else{
-                pane.getScene().setCursor(Cursor.CLOSED_HAND);
             }
         });
         //after the mouse is released remove the rectangle and clear its position

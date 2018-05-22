@@ -34,10 +34,11 @@ public class ExampleTest {
         File source = folder.newFolder("source");
         File dest = folder.newFolder("dest");
         File subFolder = new File(source, "subFolder");
-        new File(source, "test.txt");
-        new File(subFolder, "test2.txt");
+        File one = new File(source, "test.txt");
+        File two = new File(subFolder, "test2.txt");
         c.moveFiles(Collections.singletonList(source), dest.getPath());
         Assert.assertFalse(source.exists());
         Assert.assertTrue(new File(dest.getPath() + "\\" + source.getName()).exists());
+        Assert.assertTrue(new File(dest.getPath() + "\\" + source.getName() + "\\" + subFolder.getName()).exists());
     }
 }
