@@ -6,6 +6,16 @@ import java.util.List;
 public interface FileEventHelper {
 
     @FunctionalInterface
+    interface DeleteFilesEvent{
+        void  deleteFilesEvent(int whichList);
+    }
+
+    @FunctionalInterface
+    interface MoveFilesToTrash {
+        void moveFilesToTrash(int whichList);
+    }
+
+    @FunctionalInterface
     interface PasteFilesFromClipboardEvent {
         void pasteFilesFromClipboardEvent(int whichList);
     }

@@ -74,21 +74,23 @@ public class View implements Initializable, ViewContract.View{
                 });
             }
             else if (new KeyCodeCombination(KeyCode.DELETE, KeyCombination.SHIFT_DOWN).match(event)){
-                controller.deleteFiles(
-                        fileLists[whichList].getChildrenUnmodifiable().stream()
-                                .filter(file -> file instanceof FileLabelSelectable && ((FileLabelSelectable) file).isSelected())
-                                .map(file -> ((FileLabelSelectable) file).getFile()).collect(Collectors.toList())
-                );
+                moveToTrash.moveFilesToTrash(whichList);
             }
             else if (event.getCode()==KeyCode.DELETE){
-                controller.moveFilesToTrash(
-                        fileLists[whichList].getChildrenUnmodifiable().stream()
-                            .filter(file -> file instanceof FileLabelSelectable && ((FileLabelSelectable) file).isSelected())
-                            .map(file -> ((FileLabelSelectable) file).getFile()).collect(Collectors.toList())
-                );
+                delete.deleteFilesEvent(whichList);
             }
         });
     }
+
+    private FileEventHelper.DeleteFilesEvent delete = whichList -> controller.deleteFiles(fileLists[whichList].getChildrenUnmodifiable().stream()
+            .filter(file -> file instanceof FileLabelSelectable && ((FileLabelSelectable) file).isSelected())
+            .map(file -> ((FileLabelSelectable) file).getFile()).collect(Collectors.toList()));
+
+    private FileEventHelper.MoveFilesToTrash moveToTrash = whichList -> controller.deleteFiles(
+            fileLists[whichList].getChildrenUnmodifiable().stream()
+                    .filter(file -> file instanceof FileLabelSelectable && ((FileLabelSelectable) file).isSelected())
+                    .map(file -> ((FileLabelSelectable) file).getFile()).collect(Collectors.toList())
+    );
 
     private FileEventHelper.PasteFilesFromClipboardEvent paste = whichList -> controller.pasteFilesFromClipboard(whichList);
 
@@ -132,9 +134,28 @@ public class View implements Initializable, ViewContract.View{
         }
     }
 
+    private void createLabelContextMenu(Label label, int whichList){
+        final ContextMenu contextMenu = new ContextMenu();
+        MenuItem cutContextItem = new MenuItem("Cut");
+        cutContextItem.setOnAction(event -> cut.cutFilesEvent(0));
+        MenuItem copyContextItem = new MenuItem("Copy");
+        copyContextItem.setOnAction(event -> copy.copyFilesToClipboardEvent(whichList));
+        MenuItem pasteContextItem = new MenuItem("Paste");
+        pasteContextItem.setOnAction(event -> paste.pasteFilesFromClipboardEvent(whichList));
+        MenuItem deleteContextItem = new MenuItem("Delete");
+        deleteContextItem.setOnAction(event -> moveToTrash.moveFilesToTrash(whichList));
+        MenuItem renameContextItem = new MenuItem("Rename");
+        renameContextItem.setOnAction(event -> {});
+        MenuItem aNewContextItem = new MenuItem("New");
+        aNewContextItem.setOnAction(event -> {});
+        contextMenu.getItems().addAll(cutContextItem, copyContextItem, pasteContextItem, deleteContextItem, renameContextItem, aNewContextItem);
+        label.setContextMenu(contextMenu);
+    }
+
     private void viewFiles(File[] files, int whichList){
         for (File file : files) {
             FileLabelSelectable label = new FileLabelSelectable(file);
+            createLabelContextMenu(label, whichList);
             //class used to check if mouse position while released is same as while pressed
             final MousePosition pressedMousePosition = MousePosition.ZERO;
             label.setOnMousePressed(event -> pressedMousePosition.setPosition(event.getSceneX(), event.getSceneY()));

@@ -72,8 +72,6 @@ public class Controller implements ViewContract.Presenter {
                 if(Arrays.stream(t.getTransferDataFlavors()).anyMatch(dataFlavor -> dataFlavor.equals(DataFlavor.javaFileListFlavor))) {
                     ((List<File>) t.getTransferData(DataFlavor.javaFileListFlavor)).forEach(file -> {
                         try {
-                            System.out.println(dest.getPath());
-                            System.out.println(file.getPath());
                             if(file.isFile()){
                                 FileUtils.copyFileToDirectory(file,dest);
                             }else if (file.isDirectory()) {
@@ -88,6 +86,8 @@ public class Controller implements ViewContract.Presenter {
         catch (Exception e){
             e.printStackTrace();
         }
+        getFiles(0);
+        getFiles(1);
     }
 
 
