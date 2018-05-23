@@ -146,9 +146,15 @@ public class View implements Initializable, ViewContract.View{
         deleteContextItem.setOnAction(event -> moveToTrash.moveFilesToTrash(whichList));
         MenuItem renameContextItem = new MenuItem("Rename");
         renameContextItem.setOnAction(event -> {});
-        MenuItem aNewContextItem = new MenuItem("New");
-        aNewContextItem.setOnAction(event -> {});
-        contextMenu.getItems().addAll(cutContextItem, copyContextItem, pasteContextItem, deleteContextItem, renameContextItem, aNewContextItem);
+        Menu newItemMenu = new Menu("New");
+
+        MenuItem folder = new MenuItem("folder");
+        newItemMenu.getItems().addAll(folder);
+
+        MenuItem txt = new MenuItem(".txt");
+        newItemMenu.getItems().addAll(txt);
+
+        contextMenu.getItems().addAll(cutContextItem, copyContextItem, pasteContextItem, deleteContextItem, renameContextItem, newItemMenu);
         label.setContextMenu(contextMenu);
     }
 
