@@ -35,6 +35,11 @@ public interface FileEventHelper {
         void copyFilesToClipboardEvent(int whichList);
     }
 
+    @FunctionalInterface
+    interface CreateNewFile{
+        void createNewFile(String fileName, int whichList);
+    }
+
 }
 
 

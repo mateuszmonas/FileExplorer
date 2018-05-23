@@ -92,6 +92,8 @@ public class View implements Initializable, ViewContract.View{
                     .map(file -> ((FileLabelSelectable) file).getFile()).collect(Collectors.toList())
     );
 
+    private FileEventHelper.CreateNewFile create = (fileName, whichList) -> controller.createFiles(fileName, whichList);
+
     private FileEventHelper.PasteFilesFromClipboardEvent paste = whichList -> controller.pasteFilesFromClipboard(whichList);
 
     private FileEventHelper.CutFilesEvent cut = whichList -> {};
@@ -149,9 +151,11 @@ public class View implements Initializable, ViewContract.View{
         Menu newItemMenu = new Menu("New");
 
         MenuItem folder = new MenuItem("folder");
+        folder.setOnAction(event -> create.createNewFile("new folder", whichList));
         newItemMenu.getItems().addAll(folder);
 
         MenuItem txt = new MenuItem(".txt");
+        txt.setOnAction(event -> create.createNewFile("new file.txt", whichList));
         newItemMenu.getItems().addAll(txt);
 
         contextMenu.getItems().addAll(cutContextItem, copyContextItem, pasteContextItem, deleteContextItem, renameContextItem, newItemMenu);

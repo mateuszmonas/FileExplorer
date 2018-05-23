@@ -66,6 +66,8 @@ public class Controller implements ViewContract.Presenter {
         if(!newFile.mkdir()){
             System.out.println("file was not created");
         }
+        getFiles(0);
+        getFiles(1);
     }
 
     @SuppressWarnings("unchecked")
