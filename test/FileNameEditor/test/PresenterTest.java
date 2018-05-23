@@ -17,13 +17,14 @@ import java.util.List;
 
 import FileNameEditor.main.*;
 
-public class ExampleTest {
+public class PresenterTest {
     @Rule
     public TemporaryFolder folder= new TemporaryFolder();
 
-    @Test
-    public void checkIfFilesMoved() throws IOException {
-        Controller c = new Controller(new ViewContract.View() {
+    private ViewContract.Presenter presenter;
+
+    public PresenterTest() {
+        presenter=new Controller(new ViewContract.View() {
             @Override
             public void displayPath(String path, int whichList) {
 
@@ -34,6 +35,10 @@ public class ExampleTest {
 
             }
         });
+    }
+
+    @Test
+    public void checkIfFilesMoved() throws IOException {
         File source = folder.newFolder("source");
         File dest = folder.newFolder("dest");
         File subFolder = new File(source, "subFolder");
@@ -42,11 +47,20 @@ public class ExampleTest {
         Assert.assertTrue(subFolder.mkdir());
         Assert.assertTrue(fileOne.mkdir());
         Assert.assertTrue(fileTwo.mkdir());
-        c.moveFiles(Collections.singletonList(source), dest.getPath());
+        presenter.moveFiles(Collections.singletonList(source), dest.getPath());
         Assert.assertTrue(new File(dest.getPath() + File.separator + source.getName()).exists());
         Assert.assertTrue(new File(dest.getPath() + File.separator + source.getName() + File.separator + subFolder.getName()).exists());
         Assert.assertTrue(new File(dest.getPath() + File.separator + source.getName() + File.separator + subFolder.getName()).exists());
         Assert.assertTrue(new File(dest.getPath() + File.separator + source.getName() + File.separator + fileOne.getName()).exists());
         Assert.assertTrue(new File(dest.getPath() + File.separator + source.getName() + File.separator + subFolder.getName() + File.separator + fileTwo.getName()).exists());
+    }
+
+    @Test
+    public void checkIfFileCreated(){
+        String fileName = "Created Test File";
+        String path = folder.getRoot().getPath();
+        presenter.changeDirectory(path, 0);
+        presenter.createFiles(fileName, 0);
+        Assert.assertTrue(new File(path + File.separator + fileName).exists());
     }
 }

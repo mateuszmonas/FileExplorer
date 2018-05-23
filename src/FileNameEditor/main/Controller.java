@@ -60,6 +60,14 @@ public class Controller implements ViewContract.Presenter {
         getFiles(1);
     }
 
+    @Override
+    public void createFiles(String name, int whichList){
+        File newFile = new File(paths[whichList] + File.separator + name);
+        if(!newFile.mkdir()){
+            System.out.println("file was not created");
+        }
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public void pasteFilesFromClipboard(int whichList){
