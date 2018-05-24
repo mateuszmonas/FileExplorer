@@ -89,7 +89,7 @@ class SelectionRectangleHelper {
         final ArrayList<FileNodeSelectable> draggedNodes = new ArrayList<>();
         final ArrayList<FileNodeSelectable> onePaneChildNodes = new ArrayList<>();
         final ArrayList<FileNodeSelectable> allNodes = new ArrayList<>();
-        fileLists[whichList].setOnMousePressed(event->{
+        fileLists[whichList].addEventHandler(MouseEvent.MOUSE_PRESSED, event->{
             dragDelta.startX = event.getSceneX();
             dragDelta.startY = event.getSceneY();
             onePaneChildNodes.addAll(fileLists[whichList].getChildrenUnmodifiable().stream().filter(node -> node instanceof FileNodeSelectable).map(node -> (FileNodeSelectable)node).collect(Collectors.toList()));
@@ -108,14 +108,14 @@ class SelectionRectangleHelper {
                                 .collect(Collectors.toList()));
                         draggedNodes.addAll(nodesSelectedBeforeDrawing);
                     }
-                } else {
+                } else if(event.getButton()==MouseButton.SECONDARY) {
                     onePaneChildNodes.forEach(node -> {
                         if(node!=clickedNode){
                             node.setSelected(false);
                         }
                     });
                 }
-            }else if(!event.isSecondaryButtonDown()){
+            }else if(event.getButton()==MouseButton.SECONDARY){
                 onePaneChildNodes.forEach(node -> node.setSelected(false));
             }
         });

@@ -226,10 +226,12 @@ public class View implements Initializable, ViewContract.View{
                         if (event.getButton()==MouseButton.PRIMARY && label.isSelected()) {
                             changeDirectory(label.getFile().getPath(), whichList);
                         } else {
-                            nodes.forEach(n -> {
-                                if (n instanceof FileLabelSelectable && !label.equals(n))
-                                    ((FileLabelSelectable) n).setSelected(false);
-                            });
+                            if(event.getButton()!=MouseButton.SECONDARY) {
+                                nodes.forEach(n -> {
+                                    if (n instanceof FileLabelSelectable && !label.equals(n))
+                                        ((FileLabelSelectable) n).setSelected(false);
+                                });
+                            }
                             label.setSelected(true);
                         }
                     }
