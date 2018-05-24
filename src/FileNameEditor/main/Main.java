@@ -9,7 +9,6 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-// TODO: 2018-05-22 creating new files
 public class Main extends Application{
 
     @Override

@@ -63,4 +63,16 @@ public class PresenterTest {
         presenter.createFiles(fileName, 0);
         Assert.assertTrue(new File(path + File.separator + fileName).exists());
     }
+
+    @Test
+    public void checkIfFileDeleted() throws IOException{
+        File fileToDelete = folder.newFolder("fileToDelete");
+        File fileToDelete2 = folder.newFolder("fileToDelete2");
+        Assert.assertTrue(fileToDelete.exists());
+        Assert.assertTrue(fileToDelete2.exists());
+        presenter.deleteFiles(Arrays.asList(fileToDelete, fileToDelete2));
+        Assert.assertFalse(fileToDelete.exists());
+        Assert.assertFalse(fileToDelete2.exists());
+    }
+
 }

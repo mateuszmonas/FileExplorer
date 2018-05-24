@@ -88,7 +88,7 @@ public class View implements Initializable, ViewContract.View{
             .filter(file -> file instanceof FileLabelSelectable && ((FileLabelSelectable) file).isSelected())
             .map(file -> ((FileLabelSelectable) file).getFile()).collect(Collectors.toList()));
 
-    private FileEventHelper.MoveFilesToTrashEvent moveToTrash = whichList -> controller.deleteFiles(
+    private FileEventHelper.MoveFilesToTrashEvent moveToTrash = whichList -> controller.moveFilesToTrash(
             fileLists[whichList].getChildrenUnmodifiable().stream()
                     .filter(file -> file instanceof FileLabelSelectable && ((FileLabelSelectable) file).isSelected())
                     .map(file -> ((FileLabelSelectable) file).getFile()).collect(Collectors.toList())
