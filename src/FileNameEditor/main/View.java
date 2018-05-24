@@ -40,8 +40,10 @@ public class View implements Initializable, ViewContract.View{
         filePaths[0]= filePathA;
         filePaths[1]= filePathB;
         SelectionRectangleHelper helper = new SelectionRectangleHelper(drawingPane, fileLists);
-        helper.handleSelectionRectangle(fileLists[0], move);
-        helper.handleSelectionRectangle(fileLists[1], move);
+        helper.handleSelectionRectangle(move, 0);
+        helper.handleSelectionRectangle(move, 1);
+        helper.handleContextMenu(copy, cut ,paste, moveToTrash, create, 0);
+        helper.handleContextMenu(copy, cut ,paste, moveToTrash, create, 1);
         handleKeyEvents(scrollPaneA, 0);
         handleKeyEvents(scrollPaneB, 1);
         filePathA.setOnKeyPressed(event -> { if(event.getCode()==KeyCode.ENTER){
@@ -86,7 +88,7 @@ public class View implements Initializable, ViewContract.View{
             .filter(file -> file instanceof FileLabelSelectable && ((FileLabelSelectable) file).isSelected())
             .map(file -> ((FileLabelSelectable) file).getFile()).collect(Collectors.toList()));
 
-    private FileEventHelper.MoveFilesToTrash moveToTrash = whichList -> controller.deleteFiles(
+    private FileEventHelper.MoveFilesToTrashEvent moveToTrash = whichList -> controller.deleteFiles(
             fileLists[whichList].getChildrenUnmodifiable().stream()
                     .filter(file -> file instanceof FileLabelSelectable && ((FileLabelSelectable) file).isSelected())
                     .map(file -> ((FileLabelSelectable) file).getFile()).collect(Collectors.toList())
@@ -165,11 +167,11 @@ public class View implements Initializable, ViewContract.View{
     private void viewFiles(File[] files, int whichList){
         for (File file : files) {
             FileLabelSelectable label = new FileLabelSelectable(file);
-            createLabelContextMenu(label, whichList);
+            //createLabelContextMenu(label, whichList);
             //class used to check if mouse position while released is same as while pressed
             final MousePosition pressedMousePosition = MousePosition.ZERO;
-            label.setOnMousePressed(event -> pressedMousePosition.setPosition(event.getSceneX(), event.getSceneY()));
-            label.setOnMouseClicked(event -> {
+            label.addEventHandler(MouseEvent.MOUSE_PRESSED ,event -> pressedMousePosition.setPosition(event.getSceneX(), event.getSceneY()));
+            label.addEventHandler(MouseEvent.MOUSE_CLICKED ,event -> {
                 ObservableList<Node> nodes = label.getParent().getChildrenUnmodifiable();
                 if(pressedMousePosition.equals(event.getSceneX(), event.getSceneY())) {
                     if (event.isShiftDown()) {
@@ -221,7 +223,7 @@ public class View implements Initializable, ViewContract.View{
                     } else if (event.isControlDown()) {
                         label.setSelected(!label.isSelected());
                     } else {
-                        if (label.isSelected()) {
+                        if (event.getButton()==MouseButton.PRIMARY && label.isSelected()) {
                             changeDirectory(label.getFile().getPath(), whichList);
                         } else {
                             nodes.forEach(n -> {

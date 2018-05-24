@@ -11,7 +11,7 @@ public interface FileEventHelper {
     }
 
     @FunctionalInterface
-    interface MoveFilesToTrash {
+    interface MoveFilesToTrashEvent {
         void moveFilesToTrash(int whichList);
     }
 

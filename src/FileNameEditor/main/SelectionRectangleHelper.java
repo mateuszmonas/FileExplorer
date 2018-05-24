@@ -2,10 +2,15 @@ package FileNameEditor.main;
 
 import FileNameEditor.nodes.FileNodeSelectable;
 import javafx.collections.ObservableList;
+import javafx.event.EventType;
 import javafx.geometry.Bounds;
-import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -38,21 +43,56 @@ class SelectionRectangleHelper {
         selectionRectangle.setHeight(height);
     }
 
-    /**
-     *
-     * @param pane pane to which events should be added
-     */
-    void handleSelectionRectangle(Pane pane, FileEventHelper.MoveFilesEvent moveFilesEvent){
+    void handleContextMenu(FileEventHelper.CopyFilesToCpilboardEvent copy, FileEventHelper.CutFilesEvent cut, FileEventHelper.PasteFilesFromClipboardEvent paste,
+                           FileEventHelper.MoveFilesToTrashEvent moveToTrash, FileEventHelper.CreateNewFile create, int whichList){
+        final ContextMenu contextMenu = new ContextMenu();
+        MenuItem cutContextItem = new MenuItem("Cut");
+        cutContextItem.setOnAction(event -> cut.cutFilesEvent(0));
+        MenuItem copyContextItem = new MenuItem("Copy");
+        copyContextItem.setOnAction(event -> copy.copyFilesToClipboardEvent(whichList));
+        MenuItem pasteContextItem = new MenuItem("Paste");
+        pasteContextItem.setOnAction(event -> paste.pasteFilesFromClipboardEvent(whichList));
+        MenuItem deleteContextItem = new MenuItem("Delete");
+        deleteContextItem.setOnAction(event -> moveToTrash.moveFilesToTrash(whichList));
+        MenuItem renameContextItem = new MenuItem("Rename");
+        renameContextItem.setOnAction(event -> {});
+        Menu newItemMenu = new Menu("New");
+
+        MenuItem folder = new MenuItem("folder");
+        folder.setOnAction(event -> create.createNewFile("new folder", whichList));
+        newItemMenu.getItems().addAll(folder);
+
+        MenuItem txt = new MenuItem(".txt");
+        txt.setOnAction(event -> create.createNewFile("new file.txt", whichList));
+        newItemMenu.getItems().addAll(txt);
+
+        contextMenu.getItems().addAll(cutContextItem, copyContextItem, pasteContextItem, deleteContextItem, renameContextItem, newItemMenu);
+
+        MousePosition pressedMousePosition = MousePosition.ZERO;
+        fileLists[whichList].addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
+            pressedMousePosition.setPosition(event.getSceneX(), event.getSceneY());
+            if(contextMenu.isShowing()){
+                contextMenu.hide();
+            }
+        });
+        fileLists[whichList].addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            if(pressedMousePosition.equals(event.getSceneX(), event.getSceneY()) && event.getButton()==MouseButton.SECONDARY){
+                contextMenu.show(fileLists[whichList], event.getScreenX(), event.getScreenY());
+            }
+        });
+    }
+
+    void handleSelectionRectangle(FileEventHelper.MoveFilesEvent moveFilesEvent, int whichList){
         selectionRectangle.setOpacity(0.5);
         selectionRectangle.setFill(Color.BLUE);
         final ArrayList<FileNodeSelectable> nodesSelectedBeforeDrawing = new ArrayList<>();
         final ArrayList<FileNodeSelectable> draggedNodes = new ArrayList<>();
         final ArrayList<FileNodeSelectable> onePaneChildNodes = new ArrayList<>();
         final ArrayList<FileNodeSelectable> allNodes = new ArrayList<>();
-        pane.setOnMousePressed(event->{
+        fileLists[whichList].setOnMousePressed(event->{
             dragDelta.startX = event.getSceneX();
             dragDelta.startY = event.getSceneY();
-            onePaneChildNodes.addAll(pane.getChildrenUnmodifiable().stream().filter(node -> node instanceof FileNodeSelectable).map(node -> (FileNodeSelectable)node).collect(Collectors.toList()));
+            onePaneChildNodes.addAll(fileLists[whichList].getChildrenUnmodifiable().stream().filter(node -> node instanceof FileNodeSelectable).map(node -> (FileNodeSelectable)node).collect(Collectors.toList()));
             boolean selectedNodeWasClicked = onePaneChildNodes.stream().anyMatch(
                     node -> node.contains(dragDelta.startX, dragDelta.startY) && node.isSelected());
             FileNodeSelectable clickedNode = onePaneChildNodes.stream().filter(node -> node.contains(event.getSceneX(), event.getSceneY())).findAny().orElse(null);
@@ -79,18 +119,18 @@ class SelectionRectangleHelper {
                 onePaneChildNodes.forEach(node -> node.setSelected(false));
             }
         });
-        pane.setOnDragDetected(event -> {
-            if(!draggedNodes.isEmpty()){
-                pane.getScene().setCursor(Cursor.CLOSED_HAND);
+        fileLists[whichList].addEventHandler(MouseEvent.DRAG_DETECTED, event -> {
+            if(event.getButton()==MouseButton.PRIMARY && !draggedNodes.isEmpty()){
+                fileLists[whichList].getScene().setCursor(Cursor.CLOSED_HAND);
             }
         });
         //dirty hack used to around lambda's need for final variables
         FileNodeSelectable[] f = new FileLabelSelectable[1];
-        pane.setOnMouseDragged(event-> {
+        fileLists[whichList].addEventHandler(MouseEvent.MOUSE_DRAGGED, event-> {
             //check if first node clicked was not already selected
             //drawing selection grid and selecting FileNameEditor.nodes
             if(nodesSelectedBeforeDrawing.stream().noneMatch(
-                    node -> node.contains(dragDelta.startX, dragDelta.startY))) {
+                    node -> node.contains(dragDelta.startX, dragDelta.startY)) && event.getButton()==MouseButton.PRIMARY) {
                 ObservableList<Node> nodes = drawingPane.getChildren();
                 nodes.remove(selectionRectangle);
                 dragDelta.x = event.getSceneX();
@@ -142,7 +182,7 @@ class SelectionRectangleHelper {
             }
         });
         //after the mouse is released remove the rectangle and clear its position
-        pane.setOnMouseReleased(event -> {
+        fileLists[whichList].setOnMouseReleased(event -> {
             if(!draggedNodes.isEmpty()){
                 FileNodeSelectable currentNode = allNodes.stream()
                         .filter(node -> node.contains(event.getSceneX(), event.getSceneY()))
@@ -151,7 +191,7 @@ class SelectionRectangleHelper {
                     moveFilesEvent.moveFilesEvent(draggedNodes.stream().map(FileNodeSelectable::getFile).collect(Collectors.toList()), currentNode.getFile().getPath());
                 } else {
                     for (int i = 0; i < 2; i++) {
-                        if(fileLists[i]!=pane && fileLists[i].contains(fileLists[i].sceneToLocal(event.getSceneX(), event.getSceneY()))){
+                        if(fileLists[i]!=fileLists[whichList] && fileLists[i].contains(fileLists[i].sceneToLocal(event.getSceneX(), event.getSceneY()))){
                             moveFilesEvent.moveFilesEvent(draggedNodes.stream().map(FileNodeSelectable::getFile).collect(Collectors.toList()), i);
                             break;
                         }
@@ -165,7 +205,7 @@ class SelectionRectangleHelper {
             draggedNodes.clear();
             onePaneChildNodes.clear();
             allNodes.clear();
-            pane.getScene().setCursor(Cursor.DEFAULT);
+            fileLists[whichList].getScene().setCursor(Cursor.DEFAULT);
         });
     }
 
