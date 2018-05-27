@@ -5,6 +5,7 @@ import org.apache.commons.io.FileUtils;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.io.*;
@@ -16,7 +17,7 @@ public class Controller implements ViewContract.Presenter {
 
     private ViewContract.View view;
     private String[] paths = new String[2];
-    private List<File> cutFiles = new ArrayList<>();
+    private boolean cuttingFiles = false;
 
     public Controller(ViewContract.View view) {
         paths[0] = "D:\\tests";
@@ -39,10 +40,11 @@ public class Controller implements ViewContract.Presenter {
 
     @Override
     public void cutFiles(List<File> files){
-        cutFiles.clear();
-        //add cut files to the list of cut files
-        cutFiles.addAll(files);
-
+        //set cutting files to true
+        cuttingFiles = true;
+        //add files to clipboard
+        FileTransferable ft = new FileTransferable(files);
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ft, lostOwnership);
     }
 
     @Override
@@ -76,6 +78,8 @@ public class Controller implements ViewContract.Presenter {
         getFiles();
     }
 
+
+
     @SuppressWarnings("unchecked")
     @Override
     public void pasteFilesFromClipboard(int whichList){
@@ -108,8 +112,9 @@ public class Controller implements ViewContract.Presenter {
 
     @Override
     public void copyFilesToClipboard(List<File> files){
+        cuttingFiles=false;
         FileTransferable ft = new FileTransferable(files);
-        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ft, (clipboard, contents) -> System.out.println("Lost ownership"));
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ft, lostOwnership);
     }
 
     private boolean checkDestDirectory(File dest){
@@ -175,4 +180,10 @@ public class Controller implements ViewContract.Presenter {
             view.displayFiles(fileList, whichList);
         }
     }
+
+    private ClipboardOwner lostOwnership = (clipboard, contents) -> {
+            System.out.println("Lost ownership");
+            cuttingFiles = false;
+        };
+
 }
