@@ -5,8 +5,8 @@ import java.util.List;
 
 public interface ViewContract {
 
-    interface Presenter{
-        void start();
+    interface Model {
+        void start(Controller controller);
 
         void cutFiles(List<File> files);
 
@@ -20,7 +20,7 @@ public interface ViewContract {
         void createFile(String name, int whichList);
     }
 
-    interface View{
+    interface Controller {
         void displayPath(String path, int whichList);
         void displayFiles(File[] files, int whichList);
     }

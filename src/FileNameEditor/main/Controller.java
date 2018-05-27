@@ -1,193 +1,276 @@
 package FileNameEditor.main;
 
-import FileNameEditor.file.FileTransferable;
-import org.apache.commons.io.FileUtils;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
+import javafx.scene.control.*;
+import javafx.scene.input.*;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import FileNameEditor.nodes.FileLabelSelectable;
 
-import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.ClipboardOwner;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.io.File;
+import java.net.URL;
 import java.util.List;
+import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
-public class Controller implements ViewContract.Presenter {
+public class Controller implements Initializable, ViewContract.Controller {
 
-    private ViewContract.View view;
-    private String[] paths = new String[2];
-    private boolean cuttingFiles = false;
+    @FXML private ScrollPane scrollPaneA;
+    @FXML private ScrollPane scrollPaneB;
+    private ViewContract.Model model;
+    @FXML private VBox fileListA;
+    @FXML private VBox fileListB;
+    @FXML private TextField filePathA;
+    @FXML private TextField filePathB;
+    @FXML private Button copyFilesA;
+    @FXML private Button copyFilesB;
+    @FXML private Pane drawingPane;
+    private TextField[] filePaths = new TextField[2];
+    private VBox[] fileLists= new VBox[2];
 
-    public Controller(ViewContract.View view) {
-        paths[0] = "D:\\tests";
-        paths[1] = "D:\\tests";
-        this.view = view;
+    Controller(ViewContract.Model model) {
+        this.model = model;
     }
 
     @Override
-    public void changeDirectory(String path, int whichList){
-        if(new File(path).isDirectory()) {
-            paths[whichList] = path;
-        }
-        getFiles();
+    public void initialize(URL location, ResourceBundle resources) {
+        fileLists[0] = fileListA;
+        fileLists[1] = fileListB;
+        filePaths[0]= filePathA;
+        filePaths[1]= filePathB;
+        SelectionRectangleHelper helper = new SelectionRectangleHelper(drawingPane, fileLists);
+        helper.handleSelectionRectangle(move, 0);
+        helper.handleSelectionRectangle(move, 1);
+        helper.handleContextMenu(copy, cut ,paste, moveToTrash, create, 0);
+        helper.handleContextMenu(copy, cut ,paste, moveToTrash, create, 1);
+        handleKeyEvents(scrollPaneA, 0);
+        handleKeyEvents(scrollPaneB, 1);
+        filePathA.setOnKeyPressed(event -> { if(event.getCode()==KeyCode.ENTER){
+            changeDirectory(filePaths[0].getText(), 0);
+            fileLists[0].requestFocus();
+        } });
+        filePathB.setOnKeyPressed(event -> { if(event.getCode()==KeyCode.ENTER) {
+            changeDirectory(filePaths[1].getText(), 1);
+            fileLists[1].requestFocus();
+        } });
+        copyFilesA.setOnMouseClicked(event -> copy.copyFilesToClipboardEvent(0));
+        copyFilesB.setOnMouseClicked(event -> copy.copyFilesToClipboardEvent(1));
     }
 
-    @Override
-    public void start(){
-        getFiles();
-    }
-
-    @Override
-    public void cutFiles(List<File> files){
-        //set cutting files to true
-        cuttingFiles = true;
-        //add files to clipboard
-        FileTransferable ft = new FileTransferable(files);
-        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ft, lostOwnership);
-    }
-
-    @Override
-    public void deleteFiles(List<File> files){
-        files.forEach(
-                file -> {
-                    if(!file.delete()) System.out.println("no delete");
-                }
-        );
-        getFiles();
-    }
-
-    @Override
-    public void moveFilesToTrash(List<File> files){
-        if(com.sun.jna.platform.FileUtils.getInstance().hasTrash()){
-            try {
-                com.sun.jna.platform.FileUtils.getInstance().moveToTrash(files.toArray(new File[0]));
-            } catch (Exception e){
-                e.printStackTrace();
+    private void handleKeyEvents(Control pane, int whichList){
+        pane.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN).match(event)) {
+                copy.copyFilesToClipboardEvent(whichList);
             }
-        }
-        getFiles();
-    }
-
-    @Override
-    public void createFile(String name, int whichList){
-        File newFile = new File(paths[whichList] + File.separator + name);
-        if(!newFile.mkdir()){
-            System.out.println("file was not created");
-        }
-        getFiles();
-    }
-
-
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public void pasteFilesFromClipboard(int whichList){
-        Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-        Transferable t = c.getContents(this);
-        File dest = new File(paths[whichList]);
-        if (t == null || !checkDestDirectory(dest))
-            return;
-        try {
-            List<File> filesFromClipboard = new ArrayList<>();
-            if(Arrays.stream(t.getTransferDataFlavors()).anyMatch(dataFlavor -> dataFlavor.equals(DataFlavor.javaFileListFlavor))) {
-                filesFromClipboard.addAll((List<File>) t.getTransferData(DataFlavor.javaFileListFlavor));
+            else if (new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_DOWN).match(event)) {
+                paste.pasteFilesFromClipboardEvent(whichList);
             }
-            if(cuttingFiles){
-                moveFiles(filesFromClipboard, whichList);
-            } else {
-                filesFromClipboard.forEach(file -> {
-                    try {
-                        if (file.isDirectory()) {
-                            FileUtils.copyDirectoryToDirectory(file, dest);
-                        } else if (file.isFile()){
-                            FileUtils.copyFileToDirectory(file, dest);
-                        }
-                    }catch (Exception e){e.printStackTrace();}
+            else if (new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN).match(event)) {
+                cut.cutFilesEvent(whichList);
+            }
+            else if (new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN).match(event)) {
+                fileLists[whichList].getChildrenUnmodifiable().forEach(node -> {
+                    if(node instanceof FileLabelSelectable) ((FileLabelSelectable) node).setSelected(true);
                 });
             }
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-        getFiles();
+            else if (new KeyCodeCombination(KeyCode.DELETE, KeyCombination.SHIFT_DOWN).match(event)){
+                moveToTrash.moveFilesToTrash(whichList);
+            }
+            else if (event.getCode()==KeyCode.DELETE){
+                delete.deleteFilesEvent(whichList);
+            }
+        });
     }
 
+    private FileEventHelper.DeleteFilesEvent delete = whichList -> model.deleteFiles(fileLists[whichList].getChildrenUnmodifiable().stream()
+            .filter(file -> file instanceof FileLabelSelectable && ((FileLabelSelectable) file).isSelected())
+            .map(file -> ((FileLabelSelectable) file).getFile()).collect(Collectors.toList()));
+
+    private FileEventHelper.MoveFilesToTrashEvent moveToTrash = whichList -> model.moveFilesToTrash(
+            fileLists[whichList].getChildrenUnmodifiable().stream()
+                    .filter(file -> file instanceof FileLabelSelectable && ((FileLabelSelectable) file).isSelected())
+                    .map(file -> ((FileLabelSelectable) file).getFile()).collect(Collectors.toList())
+    );
+
+    private FileEventHelper.CreateNewFile create = (fileName, whichList) -> model.createFile(fileName, whichList);
+
+    private FileEventHelper.PasteFilesFromClipboardEvent paste = whichList -> model.pasteFilesFromClipboard(whichList);
+
+    private FileEventHelper.CutFilesEvent cut = whichList -> {
+        List<File> files = fileLists[whichList].getChildrenUnmodifiable().stream().filter(node ->
+                node instanceof FileLabelSelectable && ((FileLabelSelectable) node).isSelected()
+        ).map(node -> ((FileLabelSelectable)node).getFile()
+        ).collect(Collectors.toList());
+        model.cutFiles(files);
+    };
+
+    private FileEventHelper.MoveFilesEvent move = new FileEventHelper.MoveFilesEvent() {
+        @Override
+        public void moveFilesEvent(List<File> files, String path) {
+            model.moveFiles(files, path);
+        }
+
+        @Override
+        public void moveFilesEvent(List<File> files, int whichList) {
+            model.moveFiles(files, whichList);
+        }
+    };
+
+    private FileEventHelper.CopyFilesToCpilboardEvent copy = whichList ->  {
+            List<File> files = fileLists[whichList].getChildrenUnmodifiable().stream().filter(node ->
+                    node instanceof FileLabelSelectable && ((FileLabelSelectable) node).isSelected()
+            ).map(node -> ((FileLabelSelectable)node).getFile()
+            ).collect(Collectors.toList());
+            model.copyFilesToClipboard(files);
+    };
 
     @Override
-    public void copyFilesToClipboard(List<File> files){
-        cuttingFiles=false;
-        FileTransferable ft = new FileTransferable(files);
-        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ft, lostOwnership);
+    public void displayPath(String path, int whichList){
+        filePaths[whichList].setText(path);
     }
 
-    private boolean checkDestDirectory(File dest){
-        if (dest.exists()) return true;
-        else {
-            System.out.println("Destination directory does not exist");
-            return false;
+    private void changeDirectory(String path, int whichList){
+        model.changeDirectory(path, whichList);
+    }
+
+    private void editFiles(File[] files){
+        for (File file : files) {
+            TextField textField = new TextField();
+            textField.setText(file.getName());
+            textField.setPadding(new Insets(0,0,0,0));
+            fileListA.getChildren().add(textField);
         }
     }
 
+    private void createLabelContextMenu(Label label, int whichList){
+        final ContextMenu contextMenu = new ContextMenu();
+        MenuItem cutContextItem = new MenuItem("Cut");
+        cutContextItem.setOnAction(event -> cut.cutFilesEvent(0));
+        MenuItem copyContextItem = new MenuItem("Copy");
+        copyContextItem.setOnAction(event -> copy.copyFilesToClipboardEvent(whichList));
+        MenuItem pasteContextItem = new MenuItem("Paste");
+        pasteContextItem.setOnAction(event -> paste.pasteFilesFromClipboardEvent(whichList));
+        MenuItem deleteContextItem = new MenuItem("Delete");
+        deleteContextItem.setOnAction(event -> moveToTrash.moveFilesToTrash(whichList));
+        MenuItem renameContextItem = new MenuItem("Rename");
+        renameContextItem.setOnAction(event -> {});
+        Menu newItemMenu = new Menu("New");
 
-    @Override
-    public void moveFiles(List<File> files, String path){
-        File dest = new File(path);
-        if(checkDestDirectory(dest)) {
-            files.forEach(file -> {
-                try {
-                    if (file.isDirectory()) {
-                        FileUtils.moveDirectoryToDirectory(file, new File(path), false);
-                    } else if (file.isFile()) {
-                        FileUtils.moveFileToDirectory(file, new File(path), false);
+        MenuItem folder = new MenuItem("folder");
+        folder.setOnAction(event -> create.createNewFile("new folder", whichList));
+        newItemMenu.getItems().addAll(folder);
+
+        MenuItem txt = new MenuItem(".txt");
+        txt.setOnAction(event -> create.createNewFile("new file.txt", whichList));
+        newItemMenu.getItems().addAll(txt);
+
+        contextMenu.getItems().addAll(cutContextItem, copyContextItem, pasteContextItem, deleteContextItem, renameContextItem, newItemMenu);
+        label.setContextMenu(contextMenu);
+    }
+
+    private void viewFiles(File[] files, int whichList){
+        for (File file : files) {
+            FileLabelSelectable label = new FileLabelSelectable(file);
+            //createLabelContextMenu(label, whichList);
+            //class used to check if mouse position while released is same as while pressed
+            final MousePosition pressedMousePosition = MousePosition.ZERO;
+            label.addEventHandler(MouseEvent.MOUSE_PRESSED ,event -> pressedMousePosition.setPosition(event.getSceneX(), event.getSceneY()));
+            label.addEventHandler(MouseEvent.MOUSE_CLICKED ,event -> {
+                ObservableList<Node> nodes = label.getParent().getChildrenUnmodifiable();
+                if(pressedMousePosition.equals(event.getSceneX(), event.getSceneY())) {
+                    if (event.isShiftDown()) {
+                        int clickedItemPosition = 0;
+                        int firstSelectedItemPosition = 0;
+                        int lastSelectedItemPosition = nodes.size() - 1;
+                        //get clicked item position
+                        for (Node n : nodes) {
+                            if (label.equals(n)) {
+                                break;
+                            }
+                            clickedItemPosition++;
+                        }
+                        //get first selected item position
+                        for (Node n : nodes) {
+                            if (n instanceof FileLabelSelectable && ((FileLabelSelectable) n).isSelected()) {
+                                break;
+                            }
+                            firstSelectedItemPosition++;
+                        }
+                        //get last selected item position
+                        while (lastSelectedItemPosition > firstSelectedItemPosition) {
+                            if (nodes.get(lastSelectedItemPosition) instanceof FileLabelSelectable && ((FileLabelSelectable) nodes.get(lastSelectedItemPosition)).isSelected()) {
+                                break;
+                            }
+                            lastSelectedItemPosition--;
+                        }
+                        //if control is not pressed down then clear all selections
+                        if (!event.isControlDown()) {
+                            nodes.forEach(n -> {
+                                if (n instanceof FileLabelSelectable && !label.equals(n))
+                                    ((FileLabelSelectable) n).setSelected(false);
+                            });
+                        }
+                        //if clicked item is higher than both last and first selected item
+                        //then select all items between clicked item and last selected item
+                        if (clickedItemPosition < lastSelectedItemPosition && clickedItemPosition < firstSelectedItemPosition) {
+                            for (int i = clickedItemPosition; i <= lastSelectedItemPosition; i++) {
+                                ((FileLabelSelectable) nodes.get(i)).setSelected(true);
+                            }
+                        }
+                        //if clicked item is lower than first selected item
+                        //then select all items between clicked item and first selected item
+                        else {
+                            for (int i = firstSelectedItemPosition; i <= clickedItemPosition; i++) {
+                                ((FileLabelSelectable) nodes.get(i)).setSelected(true);
+                            }
+                        }
+                    } else if (event.isControlDown()) {
+                        label.setSelected(!label.isSelected());
+                    } else {
+                        if (event.getButton()==MouseButton.PRIMARY && label.isSelected()) {
+                            changeDirectory(label.getFile().getPath(), whichList);
+                        } else {
+                            if(event.getButton()!=MouseButton.SECONDARY) {
+                                nodes.forEach(n -> {
+                                    if (n instanceof FileLabelSelectable && !label.equals(n))
+                                        ((FileLabelSelectable) n).setSelected(false);
+                                });
+                            }
+                            label.setSelected(true);
+                        }
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
             });
-        }
-        getFiles();
-    }
-
-
-    @Override
-    public void moveFiles(List<File> files, int whichList){
-        File dest = new File(paths[whichList]);
-        if(checkDestDirectory(dest) && !paths[0].equals(paths[1])) {
-            files.forEach(file -> {
-                try {
-                    if (file.isDirectory()) {
-                        FileUtils.moveDirectoryToDirectory(file, dest, false);
-                    } else if (file.isFile()) {
-                        FileUtils.moveFileToDirectory(file, dest, false);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+            fileLists[whichList].addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
+                if (event.getPickResult().getIntersectedNode().equals(label) && label.isSelected()) {
+                    label.setBackground(new Background(new BackgroundFill(Color.LIGHTBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
                 }
             });
+            label.setOnMouseEntered(event -> label.onMouseHoverEnter());
+            label.setOnMouseExited(event -> label.onMouseHoverLeave());
+            fileLists[whichList].getChildren().add(label);
         }
-        getFiles();
     }
+
 
     /**
-     * Gets all files in the given paths
-     * and updates the view
+     * displays the names of all the files in the given path
+     * @param files array of files to display
      */
-    private void getFiles(){
-        for(int whichList = 0;whichList<2;whichList++) {
-            File folder = new File(paths[whichList]);
-            File[] fileList = folder.listFiles();
-            if (fileList != null) {
-                fileList = Arrays.stream(fileList).filter(file -> !file.isHidden()).toArray(File[]::new);
-            }
-            view.displayPath(paths[whichList], whichList);
-            view.displayFiles(fileList, whichList);
+    @Override
+    public void displayFiles(File[] files, int whichList){
+        fileLists[whichList].getChildren().clear();
+        if(files!=null) {
+            viewFiles(files, whichList);
+        } else {
+            Label label = new Label();
+            label.setText("directory does not exist");
+            fileLists[whichList].getChildren().add(label);
         }
     }
-
-    private ClipboardOwner lostOwnership = (clipboard, contents) -> {
-            System.out.println("Lost ownership");
-            cuttingFiles = false;
-        };
 
 }

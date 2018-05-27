@@ -12,21 +12,21 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import FileNameEditor.main.*;
 
-public class PresenterTest {
+public class ModelTest {
     @Rule
     public TemporaryFolder folder= new TemporaryFolder();
 
-    private ViewContract.Presenter presenter;
+    private ViewContract.Model model;
 
-    public PresenterTest() {
-        presenter=new Controller(new ViewContract.View() {
+    public ModelTest() {
+        model = new Model();
+        model.start(new ViewContract.Controller() {
             @Override
             public void displayPath(String path, int whichList) {
 
@@ -49,7 +49,7 @@ public class PresenterTest {
         Assert.assertTrue(subFolder.mkdir());
         Assert.assertTrue(fileOne.mkdir());
         Assert.assertTrue(fileTwo.mkdir());
-        presenter.moveFiles(Collections.singletonList(source), dest.getPath());
+        model.moveFiles(Collections.singletonList(source), dest.getPath());
         Assert.assertTrue(new File(dest.getPath() + File.separator + source.getName()).exists());
         Assert.assertTrue(new File(dest.getPath() + File.separator + source.getName() + File.separator + subFolder.getName()).exists());
         Assert.assertTrue(new File(dest.getPath() + File.separator + source.getName() + File.separator + subFolder.getName()).exists());
@@ -61,8 +61,8 @@ public class PresenterTest {
     public void checkIfFileCreated(){
         String fileName = "Created Test File";
         String path = folder.getRoot().getPath();
-        presenter.changeDirectory(path, 0);
-        presenter.createFile(fileName, 0);
+        model.changeDirectory(path, 0);
+        model.createFile(fileName, 0);
         Assert.assertTrue(new File(path + File.separator + fileName).exists());
     }
 
@@ -72,7 +72,7 @@ public class PresenterTest {
         File fileToDelete2 = folder.newFolder("fileToDelete2");
         Assert.assertTrue(fileToDelete.exists());
         Assert.assertTrue(fileToDelete2.exists());
-        presenter.deleteFiles(Arrays.asList(fileToDelete, fileToDelete2));
+        model.deleteFiles(Arrays.asList(fileToDelete, fileToDelete2));
         Assert.assertFalse(fileToDelete.exists());
         Assert.assertFalse(fileToDelete2.exists());
     }
@@ -85,7 +85,7 @@ public class PresenterTest {
         Assert.assertTrue(subFolder.mkdir());
         Assert.assertTrue(fileOne.mkdir());
         List<File> files = Arrays.asList(subFolder, fileOne);
-        presenter.copyFilesToClipboard(files);
+        model.copyFilesToClipboard(files);
         Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
         Transferable t = c.getContents(this);
         Assert.assertTrue(Arrays.stream(t.getTransferDataFlavors()).anyMatch(dataFlavor -> dataFlavor.equals(DataFlavor.javaFileListFlavor)));
