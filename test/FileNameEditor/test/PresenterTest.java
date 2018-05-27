@@ -1,8 +1,5 @@
 package FileNameEditor.test;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -10,10 +7,8 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import FileNameEditor.main.*;
 
@@ -60,7 +55,7 @@ public class PresenterTest {
         String fileName = "Created Test File";
         String path = folder.getRoot().getPath();
         presenter.changeDirectory(path, 0);
-        presenter.createFiles(fileName, 0);
+        presenter.createFile(fileName, 0);
         Assert.assertTrue(new File(path + File.separator + fileName).exists());
     }
 

@@ -70,7 +70,7 @@ public class Controller implements ViewContract.Presenter {
     }
 
     @Override
-    public void createFiles(String name, int whichList){
+    public void createFile(String name, int whichList){
         File newFile = new File(paths[whichList] + File.separator + name);
         if(!newFile.mkdir()){
             System.out.println("file was not created");
@@ -89,19 +89,23 @@ public class Controller implements ViewContract.Presenter {
         if (t == null || !checkDestDirectory(dest))
             return;
         try {
-                if(Arrays.stream(t.getTransferDataFlavors()).anyMatch(dataFlavor -> dataFlavor.equals(DataFlavor.javaFileListFlavor))) {
-                    ((List<File>) t.getTransferData(DataFlavor.javaFileListFlavor)).forEach(file -> {
-                        try {
-                            if(file.isFile()){
-                                FileUtils.copyFileToDirectory(file,dest);
-                            }else if (file.isDirectory()) {
-                                FileUtils.copyDirectoryToDirectory(file, dest);
-                            }
-                        } catch (Exception e){
-                            e.printStackTrace();
+            List<File> filesFromClipboard = new ArrayList<>();
+            if(Arrays.stream(t.getTransferDataFlavors()).anyMatch(dataFlavor -> dataFlavor.equals(DataFlavor.javaFileListFlavor))) {
+                filesFromClipboard.addAll((List<File>) t.getTransferData(DataFlavor.javaFileListFlavor));
+            }
+            if(cuttingFiles){
+                moveFiles(filesFromClipboard, whichList);
+            } else {
+                filesFromClipboard.forEach(file -> {
+                    try {
+                        if (file.isDirectory()) {
+                            FileUtils.copyDirectoryToDirectory(file, dest);
+                        } else if (file.isFile()){
+                            FileUtils.copyFileToDirectory(file, dest);
                         }
-                    });
-                }
+                    }catch (Exception e){e.printStackTrace();}
+                });
+            }
         }
         catch (Exception e){
             e.printStackTrace();

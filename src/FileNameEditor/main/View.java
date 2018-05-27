@@ -94,7 +94,7 @@ public class View implements Initializable, ViewContract.View{
                     .map(file -> ((FileLabelSelectable) file).getFile()).collect(Collectors.toList())
     );
 
-    private FileEventHelper.CreateNewFile create = (fileName, whichList) -> controller.createFiles(fileName, whichList);
+    private FileEventHelper.CreateNewFile create = (fileName, whichList) -> controller.createFile(fileName, whichList);
 
     private FileEventHelper.PasteFilesFromClipboardEvent paste = whichList -> controller.pasteFilesFromClipboard(whichList);
 
