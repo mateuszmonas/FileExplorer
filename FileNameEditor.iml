@@ -8,8 +8,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="commons-io:commons-io:2.6" level="project" />
-    <orderEntry type="library" scope="TEST" name="junit:junit:4.12" level="project" />
-    <orderEntry type="library" name="net.java.dev.jna:jna-platform:4.5.1" level="project" />
+    <orderEntry type="library" name="Maven: commons-io:commons-io:2.6" level="project" />
+    <orderEntry type="library" scope="Maven: TEST" name="junit:junit:4.12" level="project" />
+    <orderEntry type="library" name="Maven: net.java.dev.jna:jna-platform:4.5.1" level="project" />
   </component>
 </module>
