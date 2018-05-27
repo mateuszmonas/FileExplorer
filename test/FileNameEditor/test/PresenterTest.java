@@ -5,10 +5,17 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import FileNameEditor.main.*;
 
@@ -68,6 +75,21 @@ public class PresenterTest {
         presenter.deleteFiles(Arrays.asList(fileToDelete, fileToDelete2));
         Assert.assertFalse(fileToDelete.exists());
         Assert.assertFalse(fileToDelete2.exists());
+    }
+
+    @Test
+    public void checkIfFilesCopiedToClipboard() throws IOException, UnsupportedFlavorException {
+        File source = folder.newFolder("source");
+        File subFolder = new File(source, "subFolder");
+        File fileOne = new File(source, "test.txt");
+        Assert.assertTrue(subFolder.mkdir());
+        Assert.assertTrue(fileOne.mkdir());
+        List<File> files = Arrays.asList(subFolder, fileOne);
+        presenter.copyFilesToClipboard(files);
+        Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+        Transferable t = c.getContents(this);
+        Assert.assertTrue(Arrays.stream(t.getTransferDataFlavors()).anyMatch(dataFlavor -> dataFlavor.equals(DataFlavor.javaFileListFlavor)));
+        Assert.assertEquals(files, t.getTransferData(DataFlavor.javaFileListFlavor));
     }
 
 }
