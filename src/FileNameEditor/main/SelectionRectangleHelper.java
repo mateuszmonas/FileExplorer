@@ -2,7 +2,6 @@ package FileNameEditor.main;
 
 import FileNameEditor.nodes.FileNodeSelectable;
 import javafx.collections.ObservableList;
-import javafx.event.EventType;
 import javafx.geometry.Bounds;
 import javafx.scene.Cursor;
 import javafx.scene.Node;

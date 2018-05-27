@@ -8,6 +8,7 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,6 +16,7 @@ public class Controller implements ViewContract.Presenter {
 
     private ViewContract.View view;
     private String[] paths = new String[2];
+    private List<File> cutFiles = new ArrayList<>();
 
     public Controller(ViewContract.View view) {
         paths[0] = "D:\\tests";
@@ -27,13 +29,20 @@ public class Controller implements ViewContract.Presenter {
         if(new File(path).isDirectory()) {
             paths[whichList] = path;
         }
-        getFiles(whichList);
+        getFiles();
     }
 
     @Override
     public void start(){
-        getFiles(0);
-        getFiles(1);
+        getFiles();
+    }
+
+    @Override
+    public void cutFiles(List<File> files){
+        cutFiles.clear();
+        //add cut files to the list of cut files
+        cutFiles.addAll(files);
+
     }
 
     @Override
@@ -43,8 +52,7 @@ public class Controller implements ViewContract.Presenter {
                     if(!file.delete()) System.out.println("no delete");
                 }
         );
-        getFiles(0);
-        getFiles(1);
+        getFiles();
     }
 
     @Override
@@ -56,8 +64,7 @@ public class Controller implements ViewContract.Presenter {
                 e.printStackTrace();
             }
         }
-        getFiles(0);
-        getFiles(1);
+        getFiles();
     }
 
     @Override
@@ -66,8 +73,7 @@ public class Controller implements ViewContract.Presenter {
         if(!newFile.mkdir()){
             System.out.println("file was not created");
         }
-        getFiles(0);
-        getFiles(1);
+        getFiles();
     }
 
     @SuppressWarnings("unchecked")
@@ -96,8 +102,7 @@ public class Controller implements ViewContract.Presenter {
         catch (Exception e){
             e.printStackTrace();
         }
-        getFiles(0);
-        getFiles(1);
+        getFiles();
     }
 
 
@@ -132,8 +137,7 @@ public class Controller implements ViewContract.Presenter {
                 }
             });
         }
-        getFiles(0);
-        getFiles(1);
+        getFiles();
     }
 
 
@@ -153,21 +157,22 @@ public class Controller implements ViewContract.Presenter {
                 }
             });
         }
-        getFiles(0);
-        getFiles(1);
+        getFiles();
     }
 
     /**
      * Gets all files in the given paths
      * and updates the view
      */
-    private void getFiles(int whichList){
-        File folder = new File(paths[whichList]);
-        File[] fileList = folder.listFiles();
-        if(fileList!=null) {
-            fileList = Arrays.stream(fileList).filter(file -> !file.isHidden()).toArray(File[]::new);
+    private void getFiles(){
+        for(int whichList = 0;whichList<2;whichList++) {
+            File folder = new File(paths[whichList]);
+            File[] fileList = folder.listFiles();
+            if (fileList != null) {
+                fileList = Arrays.stream(fileList).filter(file -> !file.isHidden()).toArray(File[]::new);
+            }
+            view.displayPath(paths[whichList], whichList);
+            view.displayFiles(fileList, whichList);
         }
-        view.displayPath(paths[whichList], whichList);
-        view.displayFiles(fileList, whichList);
     }
 }

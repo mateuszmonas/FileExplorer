@@ -7,6 +7,9 @@ public interface ViewContract {
 
     interface Presenter{
         void start();
+
+        void cutFiles(List<File> files);
+
         void deleteFiles(List<File> files);
         void moveFiles(List<File> files, int whichList);
         void moveFiles(List<File> files, String path);

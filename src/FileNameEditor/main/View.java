@@ -98,7 +98,13 @@ public class View implements Initializable, ViewContract.View{
 
     private FileEventHelper.PasteFilesFromClipboardEvent paste = whichList -> controller.pasteFilesFromClipboard(whichList);
 
-    private FileEventHelper.CutFilesEvent cut = whichList -> {};
+    private FileEventHelper.CutFilesEvent cut = whichList -> {
+        List<File> files = fileLists[whichList].getChildrenUnmodifiable().stream().filter(node ->
+                node instanceof FileLabelSelectable && ((FileLabelSelectable) node).isSelected()
+        ).map(node -> ((FileLabelSelectable)node).getFile()
+        ).collect(Collectors.toList());
+        controller.cutFiles(files);
+    };
 
     private FileEventHelper.MoveFilesEvent move = new FileEventHelper.MoveFilesEvent() {
         @Override
