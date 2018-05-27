@@ -20,8 +20,8 @@ public class Model implements ViewContract.Model {
     private boolean cuttingFiles = false;
 
     public Model() {
-        paths[0] = "D:\\tests";
-        paths[1] = "D:\\tests";
+        paths[0] = "/";
+        paths[1] = "/";
     }
 
     @Override
