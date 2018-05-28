@@ -42,6 +42,11 @@ public class Controller implements Initializable, ViewContract.Controller {
         fileLists[1] = fileListB;
         filePaths[0]= filePathA;
         filePaths[1]= filePathB;
+        //on my distro the window is shifted to the left a bit and hides the names of the files
+        //so we add padding
+        if(System.getProperty("os.name").equals("Linux")){
+            fileListA.setPadding(new Insets(0,0,0,5));
+        }
         SelectionRectangleHelper helper = new SelectionRectangleHelper(drawingPane, fileLists);
         helper.handleSelectionRectangle(move, 0);
         helper.handleSelectionRectangle(move, 1);
