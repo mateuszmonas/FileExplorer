@@ -16,7 +16,8 @@ public interface ViewContract {
         void copyFilesToClipboard(List<File> files);
         void pasteFilesFromClipboard(int whichList);
         void moveFilesToTrash(List<File> files);
-        void changeDirectory(String path, int whichList);
+        void enterDirectory(String path, int whichList);
+        void goToParentDirectory(int whichList);
         void createFile(String name, int whichList);
     }
 

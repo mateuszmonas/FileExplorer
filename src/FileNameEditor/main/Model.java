@@ -29,12 +29,24 @@ public class Model implements ViewContract.Model {
         }
     }
 
-    @Override
-    public void changeDirectory(String path, int whichList){
-        if(new File(path).isDirectory()) {
-            paths[whichList] = path;
-        }
+    private void changePath(String path, int whichList){
+        paths[whichList] = path;
         getFiles();
+    }
+
+    @Override
+    public void goToParentDirectory(int whichList) {
+        String parentPath = new File(paths[whichList]).getParent();
+        if(parentPath!=null) {
+            changePath(parentPath, whichList);
+        }
+    }
+
+    @Override
+    public void enterDirectory(String path, int whichList){
+        if(new File(path).isDirectory()) {
+            changePath(path, whichList);
+        }
     }
 
     @Override

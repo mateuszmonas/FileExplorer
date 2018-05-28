@@ -26,8 +26,10 @@ public class Controller implements Initializable, ViewContract.Controller {
     @FXML private VBox fileListB;
     @FXML private TextField filePathA;
     @FXML private TextField filePathB;
-    @FXML private Button copyFilesA;
-    @FXML private Button copyFilesB;
+    @FXML private Button goToParentButtonA;
+    @FXML private Button goToParentButtonB;
+    @FXML private Button copyFilesButtonA;
+    @FXML private Button copyFilesButtonB;
     @FXML private Pane drawingPane;
     private TextField[] filePaths = new TextField[2];
     private VBox[] fileLists= new VBox[2];
@@ -55,15 +57,21 @@ public class Controller implements Initializable, ViewContract.Controller {
         handleKeyEvents(scrollPaneA, 0);
         handleKeyEvents(scrollPaneB, 1);
         filePathA.setOnKeyPressed(event -> { if(event.getCode()==KeyCode.ENTER){
-            changeDirectory(filePaths[0].getText(), 0);
+            FileClicked(filePaths[0].getText(), 0);
             fileLists[0].requestFocus();
         } });
         filePathB.setOnKeyPressed(event -> { if(event.getCode()==KeyCode.ENTER) {
-            changeDirectory(filePaths[1].getText(), 1);
+            FileClicked(filePaths[1].getText(), 1);
             fileLists[1].requestFocus();
         } });
-        copyFilesA.setOnMouseClicked(event -> copy.copyFilesToClipboardEvent(0));
-        copyFilesB.setOnMouseClicked(event -> copy.copyFilesToClipboardEvent(1));
+        copyFilesButtonA.setOnMouseClicked(event -> copy.copyFilesToClipboardEvent(0));
+        copyFilesButtonB.setOnMouseClicked(event -> copy.copyFilesToClipboardEvent(1));
+        goToParentButtonA.setOnMouseClicked(event -> goToParentDirectory(0));
+        goToParentButtonB.setOnMouseClicked(event -> goToParentDirectory(1));
+    }
+
+    private void goToParentDirectory(int whichList){
+        model.goToParentDirectory(whichList);
     }
 
     private void handleKeyEvents(Control pane, int whichList){
@@ -138,8 +146,8 @@ public class Controller implements Initializable, ViewContract.Controller {
         filePaths[whichList].setText(path);
     }
 
-    private void changeDirectory(String path, int whichList){
-        model.changeDirectory(path, whichList);
+    private void FileClicked(String path, int whichList){
+        model.enterDirectory(path, whichList);
     }
 
     private void editFiles(File[] files){
@@ -211,7 +219,7 @@ public class Controller implements Initializable, ViewContract.Controller {
                         label.setSelected(!label.isSelected());
                     } else {
                         if (event.getButton()==MouseButton.PRIMARY && label.isSelected()) {
-                            changeDirectory(label.getFile().getPath(), whichList);
+                            FileClicked(label.getFile().getPath(), whichList);
                         } else {
                             if(event.getButton()!=MouseButton.SECONDARY) {
                                 nodes.forEach(n -> {
