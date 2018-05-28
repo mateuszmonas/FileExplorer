@@ -23,7 +23,6 @@ public class Main extends Application{
         stage.setResizable(false);
         stage.show();
         model.start(controller);
-        System.out.println(System.getProperty("os.name"));
     }
 
     public static void main(String[] args) {

@@ -83,10 +83,10 @@ public class Controller implements Initializable, ViewContract.Controller {
                 });
             }
             else if (new KeyCodeCombination(KeyCode.DELETE, KeyCombination.SHIFT_DOWN).match(event)){
-                moveToTrash.moveFilesToTrash(whichList);
+                delete.deleteFilesEvent(whichList);
             }
             else if (event.getCode()==KeyCode.DELETE){
-                delete.deleteFilesEvent(whichList);
+                moveToTrash.moveFilesToTrash(whichList);
             }
         });
     }
@@ -149,32 +149,6 @@ public class Controller implements Initializable, ViewContract.Controller {
             textField.setPadding(new Insets(0,0,0,0));
             fileListA.getChildren().add(textField);
         }
-    }
-
-    private void createLabelContextMenu(Label label, int whichList){
-        final ContextMenu contextMenu = new ContextMenu();
-        MenuItem cutContextItem = new MenuItem("Cut");
-        cutContextItem.setOnAction(event -> cut.cutFilesEvent(0));
-        MenuItem copyContextItem = new MenuItem("Copy");
-        copyContextItem.setOnAction(event -> copy.copyFilesToClipboardEvent(whichList));
-        MenuItem pasteContextItem = new MenuItem("Paste");
-        pasteContextItem.setOnAction(event -> paste.pasteFilesFromClipboardEvent(whichList));
-        MenuItem deleteContextItem = new MenuItem("Delete");
-        deleteContextItem.setOnAction(event -> moveToTrash.moveFilesToTrash(whichList));
-        MenuItem renameContextItem = new MenuItem("Rename");
-        renameContextItem.setOnAction(event -> {});
-        Menu newItemMenu = new Menu("New");
-
-        MenuItem folder = new MenuItem("folder");
-        folder.setOnAction(event -> create.createNewFile("new folder", whichList));
-        newItemMenu.getItems().addAll(folder);
-
-        MenuItem txt = new MenuItem(".txt");
-        txt.setOnAction(event -> create.createNewFile("new file.txt", whichList));
-        newItemMenu.getItems().addAll(txt);
-
-        contextMenu.getItems().addAll(cutContextItem, copyContextItem, pasteContextItem, deleteContextItem, renameContextItem, newItemMenu);
-        label.setContextMenu(contextMenu);
     }
 
     private void viewFiles(File[] files, int whichList){
