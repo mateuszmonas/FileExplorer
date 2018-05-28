@@ -1,44 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.Pane?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <StackPane maxHeight="500" maxWidth="700" minHeight="500" minWidth="700" prefHeight="500" prefWidth="700" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1">
 <VBox maxHeight="500" maxWidth="700" minHeight="500" minWidth="700" prefHeight="500" prefWidth="700">
-    <VBox maxHeight="50" minHeight="50" prefHeight="50"
-          maxWidth="700" minWidth="700" prefWidth="700">
-        <HBox  maxWidth="700" minWidth="700" prefWidth="700"
+    <HBox  maxWidth="700" minWidth="700" prefWidth="700"
+            maxHeight="25" minHeight="25" prefHeight="25">
+        <HBox maxWidth="350" minWidth="350" prefWidth="350"
                 maxHeight="25" minHeight="25" prefHeight="25">
-            <HBox maxWidth="350" minWidth="350" prefWidth="350"
-                    maxHeight="25" minHeight="25" prefHeight="25">
-                <Button>go back</Button>
-                <Button fx:id="copyFilesA">copy files</Button>
-            </HBox>
-            <HBox maxWidth="350" minWidth="350" prefWidth="350"
-                  maxHeight="25" minHeight="25" prefHeight="25">
-                <Button>go back</Button>
-                <Button fx:id="copyFilesB">copy files</Button>
-            </HBox>
+            <Button>go back</Button>
+            <Button fx:id="copyFilesA">copy files</Button>
         </HBox>
-        <HBox  maxWidth="700" minWidth="700" prefWidth="700"
-                maxHeight="25" minHeight="25" prefHeight="25">
-            <TextField fx:id="filePathA" maxWidth="350" minWidth="350" prefWidth="350"
-                        maxHeight="25" minHeight="25" prefHeight="25"/>
-            <TextField fx:id="filePathB" maxWidth="350" minWidth="350" prefWidth="350"
-                       maxHeight="25" minHeight="25" prefHeight="25"/>
+        <HBox maxWidth="350" minWidth="350" prefWidth="350"
+              maxHeight="25" minHeight="25" prefHeight="25">
+            <Button>go back</Button>
+            <Button fx:id="copyFilesB">copy files</Button>
         </HBox>
-    </VBox>
+    </HBox>
+    <HBox  maxWidth="700" minWidth="700" prefWidth="700"
+            maxHeight="25" minHeight="25" prefHeight="25">
+        <TextField fx:id="filePathA" maxWidth="350" minWidth="350" prefWidth="350"
+                    maxHeight="25" minHeight="25" prefHeight="25"/>
+        <TextField fx:id="filePathB" maxWidth="350" minWidth="350" prefWidth="350"
+                   maxHeight="25" minHeight="25" prefHeight="25"/>
+    </HBox>
     <HBox maxWidth="700" minWidth="700" prefWidth="700"
           maxHeight="450" minHeight="450" prefHeight="450"
             >
         <ScrollPane fx:id="scrollPaneA" maxWidth="350" minWidth="350" prefWidth="350"
                     maxHeight="450" minHeight="450" prefHeight="450">
             <VBox fx:id="fileListA" minWidth="348"
-                  minHeight="448"/>
+                  minHeight="448">
+            </VBox>
         </ScrollPane>
         <ScrollPane fx:id="scrollPaneB" maxWidth="350" minWidth="350" prefWidth="350"
                     maxHeight="450" minHeight="450" prefHeight="450">

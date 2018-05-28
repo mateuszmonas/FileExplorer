@@ -20,8 +20,13 @@ public class Model implements ViewContract.Model {
     private boolean cuttingFiles = false;
 
     public Model() {
-        paths[0] = "/media/storage/tests";
-        paths[1] = "/media/storage/tests";
+        if(System.getProperty("os.name").equals("Linux")){
+            paths[0] = "/media/storage/tests";
+            paths[1] = "/media/storage/tests";
+        } else if(System.getProperty("os.name").startsWith("Windows")){
+            paths[0] = "D:\\";
+            paths[1] = "D:\\";
+        }
     }
 
     @Override
@@ -51,7 +56,12 @@ public class Model implements ViewContract.Model {
     public void deleteFiles(List<File> files){
         files.forEach(
                 file -> {
-                    if(!file.delete()) System.out.println("no delete");
+                    try {
+                        FileUtils.forceDelete(file);
+                    }catch (IOException e){
+                        e.printStackTrace();
+                        System.out.println("could not delete file");
+                    }
                 }
         );
         getFiles();
@@ -65,6 +75,8 @@ public class Model implements ViewContract.Model {
             } catch (Exception e){
                 e.printStackTrace();
             }
+        } else {
+            System.out.println("could not move files to trash");
         }
         getFiles();
     }
