@@ -31,10 +31,12 @@ class MoustEventsHelper {
     final private VBox fileLists[];
     final private Rectangle selectionRectangle = new Rectangle();
     final private Delta dragDelta = new Delta();
+    final private FileEventHelper fileEventHelper;
 
-    MoustEventsHelper(Pane drawingPane, VBox fileLists[]) {
+    MoustEventsHelper(Pane drawingPane, VBox fileLists[], FileEventHelper fileEventHelper) {
         this.drawingPane = drawingPane;
         this.fileLists=fileLists;
+        this.fileEventHelper=fileEventHelper;
 
     }
 
@@ -45,17 +47,16 @@ class MoustEventsHelper {
         selectionRectangle.setHeight(height);
     }
 
-    void handleContextMenu(FileEventHelper.CopyFilesToCpilboardEvent copy, FileEventHelper.CutFilesEvent cut, FileEventHelper.PasteFilesFromClipboardEvent paste,
-                           FileEventHelper.MoveFilesToTrashEvent moveToTrash, FileEventHelper.CreateNewFile create, int whichList){
+    void handleContextMenu(int whichList){
         final ContextMenu contextMenu = new ContextMenu();
         MenuItem cutContextItem = new MenuItem("Cut");
-        cutContextItem.setOnAction(event -> cut.cutFilesEvent(0));
+        cutContextItem.setOnAction(event -> fileEventHelper.cutFilesEvent(0));
         MenuItem copyContextItem = new MenuItem("Copy");
-        copyContextItem.setOnAction(event -> copy.copyFilesToClipboardEvent(whichList));
+        copyContextItem.setOnAction(event -> fileEventHelper.copyFilesToClipboardEvent(whichList));
         MenuItem pasteContextItem = new MenuItem("Paste");
-        pasteContextItem.setOnAction(event -> paste.pasteFilesFromClipboardEvent(whichList));
+        pasteContextItem.setOnAction(event -> fileEventHelper.pasteFilesFromClipboardEvent(whichList));
         MenuItem deleteContextItem = new MenuItem("Delete");
-        deleteContextItem.setOnAction(event -> moveToTrash.moveFilesToTrash(whichList));
+        deleteContextItem.setOnAction(event -> fileEventHelper.moveFilesToTrash(whichList));
         MenuItem renameContextItem = new MenuItem("Rename");
         renameContextItem.setOnAction(event -> {
             FileNodeSelectable clickedNode = fileLists[whichList].getChildrenUnmodifiable().stream()
@@ -66,11 +67,11 @@ class MoustEventsHelper {
         Menu newItemMenu = new Menu("New");
 
         MenuItem folder = new MenuItem("folder");
-        folder.setOnAction(event -> create.createNewFile("new folder", whichList));
+        folder.setOnAction(event -> fileEventHelper.createNewFile("new folder", whichList));
         newItemMenu.getItems().addAll(folder);
 
         MenuItem txt = new MenuItem(".txt");
-        txt.setOnAction(event -> create.createNewFile("new file.txt", whichList));
+        txt.setOnAction(event -> fileEventHelper.createNewFile("new file.txt", whichList));
         newItemMenu.getItems().addAll(txt);
 
         contextMenu.getItems().addAll(cutContextItem, copyContextItem, pasteContextItem, deleteContextItem, renameContextItem, newItemMenu);
@@ -89,7 +90,7 @@ class MoustEventsHelper {
         });
     }
 
-    void handleSelectionRectangle(FileEventHelper.MoveFilesEvent moveFilesEvent, int whichList){
+    void handleSelectionRectangle(int whichList){
         selectionRectangle.setOpacity(0.5);
         selectionRectangle.setFill(Color.BLUE);
         final ArrayList<FileNodeSelectable> nodesSelectedBeforeDrawing = new ArrayList<>();
@@ -195,11 +196,11 @@ class MoustEventsHelper {
                         .filter(node -> node.contains(event.getSceneX(), event.getSceneY()))
                         .findAny().orElse(null);
                 if (currentNode != null && !draggedNodes.contains(currentNode)) {
-                    moveFilesEvent.moveFilesEvent(draggedNodes.stream().map(FileNodeSelectable::getFile).collect(Collectors.toList()), currentNode.getFile().getPath());
+                    fileEventHelper.moveFilesEvent(draggedNodes.stream().map(FileNodeSelectable::getFile).collect(Collectors.toList()), currentNode.getFile().getPath());
                 } else {
                     for (int i = 0; i < 2; i++) {
                         if(fileLists[i]!=fileLists[whichList] && fileLists[i].contains(fileLists[i].sceneToLocal(event.getSceneX(), event.getSceneY()))){
-                            moveFilesEvent.moveFilesEvent(draggedNodes.stream().map(FileNodeSelectable::getFile).collect(Collectors.toList()), i);
+                            fileEventHelper.moveFilesEvent(draggedNodes.stream().map(FileNodeSelectable::getFile).collect(Collectors.toList()), i);
                             break;
                         }
                     }

@@ -1,5 +1,6 @@
 package FileNameEditor.main;
 
+import FileNameEditor.nodes.FileNodeSelectable;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -49,11 +50,11 @@ public class Controller implements Initializable, ViewContract.Controller {
         if(System.getProperty("os.name").equals("Linux")){
             fileListA.setPadding(new Insets(0,0,0,5));
         }
-        MoustEventsHelper helper = new MoustEventsHelper(drawingPane, fileLists);
-        helper.handleSelectionRectangle(move, 0);
-        helper.handleSelectionRectangle(move, 1);
-        helper.handleContextMenu(copy, cut ,paste, moveToTrash, create, 0);
-        helper.handleContextMenu(copy, cut ,paste, moveToTrash, create, 1);
+        MoustEventsHelper helper = new MoustEventsHelper(drawingPane, fileLists, fileEventHelper);
+        helper.handleSelectionRectangle(0);
+        helper.handleSelectionRectangle(1);
+        helper.handleContextMenu(0);
+        helper.handleContextMenu(1);
         handleKeyEvents(scrollPaneA, 0);
         handleKeyEvents(scrollPaneB, 1);
         filePathA.setOnKeyPressed(event -> { if(event.getCode()==KeyCode.ENTER){
@@ -64,8 +65,8 @@ public class Controller implements Initializable, ViewContract.Controller {
             FileClicked(filePaths[1].getText(), 1);
             fileLists[1].requestFocus();
         } });
-        copyFilesButtonA.setOnMouseClicked(event -> copy.copyFilesToClipboardEvent(0));
-        copyFilesButtonB.setOnMouseClicked(event -> copy.copyFilesToClipboardEvent(1));
+        copyFilesButtonA.setOnMouseClicked(event -> fileEventHelper.copyFilesToClipboardEvent(0));
+        copyFilesButtonB.setOnMouseClicked(event -> fileEventHelper.copyFilesToClipboardEvent(1));
         goToParentButtonA.setOnMouseClicked(event -> goToParentDirectory(0));
         goToParentButtonB.setOnMouseClicked(event -> goToParentDirectory(1));
     }
@@ -77,13 +78,13 @@ public class Controller implements Initializable, ViewContract.Controller {
     private void handleKeyEvents(Control pane, int whichList){
         pane.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN).match(event)) {
-                copy.copyFilesToClipboardEvent(whichList);
+                fileEventHelper.copyFilesToClipboardEvent(whichList);
             }
             else if (new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_DOWN).match(event)) {
-                paste.pasteFilesFromClipboardEvent(whichList);
+                fileEventHelper.pasteFilesFromClipboardEvent(whichList);
             }
             else if (new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN).match(event)) {
-                cut.cutFilesEvent(whichList);
+                fileEventHelper.cutFilesEvent(whichList);
             }
             else if (new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN).match(event)) {
                 fileLists[whichList].getChildrenUnmodifiable().forEach(node -> {
@@ -91,37 +92,44 @@ public class Controller implements Initializable, ViewContract.Controller {
                 });
             }
             else if (new KeyCodeCombination(KeyCode.DELETE, KeyCombination.SHIFT_DOWN).match(event)){
-                delete.deleteFilesEvent(whichList);
+                fileEventHelper.deleteFilesEvent(whichList);
             }
             else if (event.getCode()==KeyCode.DELETE){
-                moveToTrash.moveFilesToTrash(whichList);
+                fileEventHelper.moveFilesToTrash(whichList);
             }
         });
     }
 
-    private FileEventHelper.DeleteFilesEvent delete = whichList -> model.deleteFiles(fileLists[whichList].getChildrenUnmodifiable().stream()
-            .filter(file -> file instanceof FileLabelSelectable && ((FileLabelSelectable) file).isSelected())
-            .map(file -> ((FileLabelSelectable) file).getFile()).collect(Collectors.toList()));
-
-    private FileEventHelper.MoveFilesToTrashEvent moveToTrash = whichList -> model.moveFilesToTrash(
-            fileLists[whichList].getChildrenUnmodifiable().stream()
+    private FileEventHelper fileEventHelper = new FileEventHelper() {
+        @Override
+        public void deleteFilesEvent(int whichList) {
+            model.deleteFiles(fileLists[whichList].getChildrenUnmodifiable().stream()
                     .filter(file -> file instanceof FileLabelSelectable && ((FileLabelSelectable) file).isSelected())
-                    .map(file -> ((FileLabelSelectable) file).getFile()).collect(Collectors.toList())
-    );
+                    .map(file -> ((FileLabelSelectable) file).getFile()).collect(Collectors.toList()));
+        }
 
-    private FileEventHelper.CreateNewFile create = (fileName, whichList) -> model.createFile(fileName, whichList);
+        @Override
+        public void moveFilesToTrash(int whichList) {
+            model.moveFilesToTrash(
+                    fileLists[whichList].getChildrenUnmodifiable().stream()
+                            .filter(file -> file instanceof FileLabelSelectable && ((FileLabelSelectable) file).isSelected())
+                            .map(file -> ((FileLabelSelectable) file).getFile()).collect(Collectors.toList()));
+        }
 
-    private FileEventHelper.PasteFilesFromClipboardEvent paste = whichList -> model.pasteFilesFromClipboard(whichList);
+        @Override
+        public void pasteFilesFromClipboardEvent(int whichList) {
+            model.pasteFilesFromClipboard(whichList);
+        }
 
-    private FileEventHelper.CutFilesEvent cut = whichList -> {
-        List<File> files = fileLists[whichList].getChildrenUnmodifiable().stream().filter(node ->
-                node instanceof FileLabelSelectable && ((FileLabelSelectable) node).isSelected()
-        ).map(node -> ((FileLabelSelectable)node).getFile()
-        ).collect(Collectors.toList());
-        model.cutFiles(files);
-    };
+        @Override
+        public void cutFilesEvent(int whichList) {
+            List<File> files = fileLists[whichList].getChildrenUnmodifiable().stream().filter(node ->
+                    node instanceof FileLabelSelectable && ((FileLabelSelectable) node).isSelected()
+            ).map(node -> ((FileLabelSelectable)node).getFile()
+            ).collect(Collectors.toList());
+            model.cutFiles(files);
+        }
 
-    private FileEventHelper.MoveFilesEvent move = new FileEventHelper.MoveFilesEvent() {
         @Override
         public void moveFilesEvent(List<File> files, String path) {
             model.moveFiles(files, path);
@@ -131,14 +139,25 @@ public class Controller implements Initializable, ViewContract.Controller {
         public void moveFilesEvent(List<File> files, int whichList) {
             model.moveFiles(files, whichList);
         }
-    };
 
-    private FileEventHelper.CopyFilesToCpilboardEvent copy = whichList ->  {
+        @Override
+        public void copyFilesToClipboardEvent(int whichList) {
             List<File> files = fileLists[whichList].getChildrenUnmodifiable().stream().filter(node ->
                     node instanceof FileLabelSelectable && ((FileLabelSelectable) node).isSelected()
             ).map(node -> ((FileLabelSelectable)node).getFile()
             ).collect(Collectors.toList());
             model.copyFilesToClipboard(files);
+        }
+
+        @Override
+        public void createNewFile(String fileName, int whichList) {
+            model.createFile(fileName, whichList);
+        }
+
+        @Override
+        public void renameFile(FileNodeSelectable node, int whichList) {
+
+        }
     };
 
     @Override
