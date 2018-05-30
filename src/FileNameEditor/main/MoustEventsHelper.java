@@ -28,12 +28,12 @@ import java.util.stream.Stream;
 class MoustEventsHelper {
 
     final private Pane drawingPane;
-    final private VBox fileLists[];
+    final private Pane fileLists[];
     final private Rectangle selectionRectangle = new Rectangle();
     final private Delta dragDelta = new Delta();
     final private FileEventHelper fileEventHelper;
 
-    MoustEventsHelper(Pane drawingPane, VBox fileLists[], FileEventHelper fileEventHelper) {
+    MoustEventsHelper(Pane drawingPane, Pane fileLists[], FileEventHelper fileEventHelper) {
         this.drawingPane = drawingPane;
         this.fileLists=fileLists;
         this.fileEventHelper=fileEventHelper;
