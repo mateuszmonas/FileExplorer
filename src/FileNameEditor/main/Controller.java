@@ -14,6 +14,7 @@ import FileNameEditor.nodes.FileLabelSelectable;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -58,11 +59,11 @@ public class Controller implements Initializable, ViewContract.Controller {
         handleKeyEvents(scrollPaneA, 0);
         handleKeyEvents(scrollPaneB, 1);
         filePathA.setOnKeyPressed(event -> { if(event.getCode()==KeyCode.ENTER){
-            FileClicked(filePaths[0].getText(), 0);
+            directoryClickedTwice(filePaths[0].getText(), 0);
             fileLists[0].requestFocus();
         } });
         filePathB.setOnKeyPressed(event -> { if(event.getCode()==KeyCode.ENTER) {
-            FileClicked(filePaths[1].getText(), 1);
+            directoryClickedTwice(filePaths[1].getText(), 1);
             fileLists[1].requestFocus();
         } });
         copyFilesButtonA.setOnMouseClicked(event -> fileEventHelper.copyFilesToClipboardEvent(0));
@@ -155,27 +156,28 @@ public class Controller implements Initializable, ViewContract.Controller {
         }
 
         @Override
-        public void renameFile(FileNodeSelectable node, int whichList) {
-
+        public void renameFile(FileNodeSelectable nodeToRename, int whichList) {
+            replaceNode(nodeToRename, new TextField(nodeToRename.getFile().getName()), whichList);
         }
     };
+
+    private void replaceNode(Object nodeToReplace, Node nodeToReplaceWith, int whichList){
+        ObservableList<Node> nodes = fileLists[whichList].getChildren();
+        for(int i = 0;i<nodes.size();i++){
+            if(nodes.get(i)==nodeToReplace){
+                nodes.set(i, nodeToReplaceWith);
+                break;
+            }
+        }
+    }
 
     @Override
     public void displayPath(String path, int whichList){
         filePaths[whichList].setText(path);
     }
 
-    private void FileClicked(String path, int whichList){
+    private void directoryClickedTwice(String path, int whichList){
         model.enterDirectory(path, whichList);
-    }
-
-    private void editFiles(File[] files){
-        for (File file : files) {
-            TextField textField = new TextField();
-            textField.setText(file.getName());
-            textField.setPadding(new Insets(0,0,0,0));
-            fileListA.getChildren().add(textField);
-        }
     }
 
     private void viewFiles(File[] files, int whichList){
@@ -238,7 +240,7 @@ public class Controller implements Initializable, ViewContract.Controller {
                         label.setSelected(!label.isSelected());
                     } else {
                         if (event.getButton()==MouseButton.PRIMARY && label.isSelected()) {
-                            FileClicked(label.getFile().getPath(), whichList);
+                            directoryClickedTwice(label.getFile().getPath(), whichList);
                         } else {
                             if(event.getButton()!=MouseButton.SECONDARY) {
                                 nodes.forEach(n -> {

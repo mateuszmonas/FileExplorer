@@ -63,6 +63,7 @@ class MoustEventsHelper {
                     .filter(node -> node instanceof FileNodeSelectable && node.localToScreen(node.getBoundsInLocal()).contains(contextMenu.getAnchorX(), contextMenu.getAnchorY()))
                     .map(node -> (FileNodeSelectable)node)
                     .findAny().orElse(null);
+            fileEventHelper.renameFile(clickedNode, whichList);
         });
         Menu newItemMenu = new Menu("New");
 
