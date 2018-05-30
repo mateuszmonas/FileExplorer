@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <StackPane maxHeight="500" maxWidth="700" minHeight="500" minWidth="700" prefHeight="500" prefWidth="700" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1">
@@ -9,13 +8,13 @@
             maxHeight="25" minHeight="25" prefHeight="25">
         <HBox maxWidth="350" minWidth="350" prefWidth="350"
                 maxHeight="25" minHeight="25" prefHeight="25">
-            <Button>go back</Button>
-            <Button fx:id="copyFilesA">copy files</Button>
+            <Button fx:id="goToParentButtonA">go back</Button>
+            <Button fx:id="copyFilesButtonA">copy files</Button>
         </HBox>
         <HBox maxWidth="350" minWidth="350" prefWidth="350"
               maxHeight="25" minHeight="25" prefHeight="25">
-            <Button>go back</Button>
-            <Button fx:id="copyFilesB">copy files</Button>
+            <Button fx:id="goToParentButtonB">go back</Button>
+            <Button fx:id="copyFilesButtonB">copy files</Button>
         </HBox>
     </HBox>
     <HBox  maxWidth="700" minWidth="700" prefWidth="700"

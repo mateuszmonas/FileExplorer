@@ -8,6 +8,7 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,12 +30,24 @@ public class Model implements ViewContract.Model {
         }
     }
 
-    @Override
-    public void changeDirectory(String path, int whichList){
-        if(new File(path).isDirectory()) {
-            paths[whichList] = path;
-        }
+    private void changePath(String path, int whichList){
+        paths[whichList] = path;
         getFiles();
+    }
+
+    @Override
+    public void goToParentDirectory(int whichList) {
+        String parentPath = new File(paths[whichList]).getParent();
+        if(parentPath!=null) {
+            changePath(parentPath, whichList);
+        }
+    }
+
+    @Override
+    public void enterDirectory(String path, int whichList){
+        if(new File(path).isDirectory()) {
+            changePath(path, whichList);
+        }
     }
 
     @Override
@@ -72,7 +85,7 @@ public class Model implements ViewContract.Model {
         if(com.sun.jna.platform.FileUtils.getInstance().hasTrash()){
             try {
                 com.sun.jna.platform.FileUtils.getInstance().moveToTrash(files.toArray(new File[0]));
-            } catch (Exception e){
+            } catch (IOException e){
                 e.printStackTrace();
             }
         } else {
@@ -115,11 +128,11 @@ public class Model implements ViewContract.Model {
                         } else if (file.isFile()){
                             FileUtils.copyFileToDirectory(file, dest);
                         }
-                    }catch (Exception e){e.printStackTrace();}
+                    }catch (IOException e){e.printStackTrace();}
                 });
             }
         }
-        catch (Exception e){
+        catch (UnsupportedFlavorException | IOException e){
             e.printStackTrace();
         }
         getFiles();
@@ -153,7 +166,7 @@ public class Model implements ViewContract.Model {
                     } else if (file.isFile()) {
                         FileUtils.moveFileToDirectory(file, new File(path), false);
                     }
-                } catch (Exception e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             });
@@ -173,7 +186,7 @@ public class Model implements ViewContract.Model {
                     } else if (file.isFile()) {
                         FileUtils.moveFileToDirectory(file, dest, false);
                     }
-                } catch (Exception e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             });

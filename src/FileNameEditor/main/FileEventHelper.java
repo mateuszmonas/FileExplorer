@@ -3,42 +3,19 @@ package FileNameEditor.main;
 import java.io.File;
 import java.util.List;
 
+import FileNameEditor.nodes.FileNodeSelectable;
+
 public interface FileEventHelper {
 
-    @FunctionalInterface
-    interface DeleteFilesEvent{
-        void  deleteFilesEvent(int whichList);
-    }
-
-    @FunctionalInterface
-    interface MoveFilesToTrashEvent {
+        void deleteFilesEvent(int whichList);
         void moveFilesToTrash(int whichList);
-    }
-
-    @FunctionalInterface
-    interface PasteFilesFromClipboardEvent {
         void pasteFilesFromClipboardEvent(int whichList);
-    }
-
-    @FunctionalInterface
-    interface CutFilesEvent {
         void cutFilesEvent(int whichList);
-    }
-
-    interface MoveFilesEvent {
         void moveFilesEvent(List<File> files, String path);
         void moveFilesEvent(List<File> files, int whichList);
-    }
-
-    @FunctionalInterface
-    interface CopyFilesToCpilboardEvent {
         void copyFilesToClipboardEvent(int whichList);
-    }
-
-    @FunctionalInterface
-    interface CreateNewFile{
         void createNewFile(String fileName, int whichList);
-    }
+        void renameFile(FileNodeSelectable node, int whichList);
 
 }
 

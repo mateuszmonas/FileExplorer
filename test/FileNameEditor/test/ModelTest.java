@@ -61,7 +61,7 @@ public class ModelTest {
     public void checkIfFileCreated(){
         String fileName = "Created Test File";
         String path = folder.getRoot().getPath();
-        model.changeDirectory(path, 0);
+        model.enterDirectory(path, 0);
         model.createFile(fileName, 0);
         Assert.assertTrue(new File(path + File.separator + fileName).exists());
     }
