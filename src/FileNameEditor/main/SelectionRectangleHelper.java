@@ -114,7 +114,7 @@ class SelectionRectangleHelper {
                         }
                     });
                 }
-            }else if(event.getButton()==MouseButton.SECONDARY){
+            }else if(event.getButton()==MouseButton.PRIMARY){
                 onePaneChildNodes.forEach(node -> node.setSelected(false));
             }
         });
