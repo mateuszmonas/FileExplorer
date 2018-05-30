@@ -2,10 +2,13 @@ package FileNameEditor.main;
 
 import FileNameEditor.nodes.FileNodeSelectable;
 import javafx.collections.ObservableList;
+import javafx.event.EventType;
 import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseButton;
@@ -22,14 +25,14 @@ import java.util.stream.Stream;
 /**
  * sole purpose of this class is containing all the code responsible for the selection rectangle
  */
-class SelectionRectangleHelper {
+class MoustEventsHelper {
 
     final private Pane drawingPane;
     final private VBox fileLists[];
     final private Rectangle selectionRectangle = new Rectangle();
     final private Delta dragDelta = new Delta();
 
-    SelectionRectangleHelper(Pane drawingPane, VBox fileLists[]) {
+    MoustEventsHelper(Pane drawingPane, VBox fileLists[]) {
         this.drawingPane = drawingPane;
         this.fileLists=fileLists;
 
@@ -54,7 +57,12 @@ class SelectionRectangleHelper {
         MenuItem deleteContextItem = new MenuItem("Delete");
         deleteContextItem.setOnAction(event -> moveToTrash.moveFilesToTrash(whichList));
         MenuItem renameContextItem = new MenuItem("Rename");
-        renameContextItem.setOnAction(event -> {});
+        renameContextItem.setOnAction(event -> {
+            FileNodeSelectable clickedNode = fileLists[whichList].getChildrenUnmodifiable().stream()
+                    .filter(node -> node instanceof FileNodeSelectable && node.localToScreen(node.getBoundsInLocal()).contains(contextMenu.getAnchorX(), contextMenu.getAnchorY()))
+                    .map(node -> (FileNodeSelectable)node)
+                    .findAny().orElse(null);
+        });
         Menu newItemMenu = new Menu("New");
 
         MenuItem folder = new MenuItem("folder");

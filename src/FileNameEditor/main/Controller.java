@@ -49,7 +49,7 @@ public class Controller implements Initializable, ViewContract.Controller {
         if(System.getProperty("os.name").equals("Linux")){
             fileListA.setPadding(new Insets(0,0,0,5));
         }
-        SelectionRectangleHelper helper = new SelectionRectangleHelper(drawingPane, fileLists);
+        MoustEventsHelper helper = new MoustEventsHelper(drawingPane, fileLists);
         helper.handleSelectionRectangle(move, 0);
         helper.handleSelectionRectangle(move, 1);
         helper.handleContextMenu(copy, cut ,paste, moveToTrash, create, 0);
