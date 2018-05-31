@@ -153,9 +153,10 @@ public class Controller implements Initializable, ViewContract.Controller {
         public void createNewFile(int whichList, String extension) {
             //add new node to the list
             long l = fileLists[whichList].getChildrenUnmodifiable().stream()
-                    .filter(node -> node instanceof FileNodeSelectable && ((FileNodeSelectable) node).getFile().getName().startsWith("new File"))
+                    .filter(node -> node instanceof FileNodeSelectable && ((FileNodeSelectable) node).getFile().getName().startsWith("new File") &&
+                    ((FileNodeSelectable) node).getFile().getName().endsWith(extension))
                     .count();
-            TextField tf = new TextField("new File " + l + extension);
+            TextField tf = new TextField("new File " + ++l + extension);
             tf.setPadding(new Insets(0));
             tf.setOnKeyReleased(event -> {
                 if(event.getCode()==KeyCode.ENTER){
@@ -170,7 +171,7 @@ public class Controller implements Initializable, ViewContract.Controller {
             });
             fileLists[whichList].getChildren().add(tf);
             tf.requestFocus();
-            tf.selectAll();
+            tf.selectRange(0, tf.getText().length()-extension.length());
         }
 
         @Override
