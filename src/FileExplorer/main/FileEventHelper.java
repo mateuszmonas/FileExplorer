@@ -14,7 +14,7 @@ public interface FileEventHelper {
         void moveFilesEvent(List<File> files, String path);
         void moveFilesEvent(List<File> files, int whichList);
         void copyFilesToClipboardEvent(int whichList);
-        void createNewFile(String fileName, int whichList);
+        void createNewFile(int whichList);
         void renameFile(FileNodeSelectable node, int whichList);
 
 }

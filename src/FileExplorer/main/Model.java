@@ -81,6 +81,7 @@ public class Model implements ViewContract.Model {
         }else {
             System.out.println("file with the same name already exists");
         }
+        getFiles();
     }
 
     @Override

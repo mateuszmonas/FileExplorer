@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 /**
  * sole purpose of this class is containing all the code responsible for the selection rectangle
  */
-class MoustEventsHelper {
+class MouseEventsHelper {
 
     final private Pane drawingPane;
     final private Pane fileLists[];
@@ -30,7 +30,7 @@ class MoustEventsHelper {
     final private Delta dragDelta = new Delta();
     final private FileEventHelper fileEventHelper;
 
-    MoustEventsHelper(Pane drawingPane, Pane fileLists[], FileEventHelper fileEventHelper) {
+    MouseEventsHelper(Pane drawingPane, Pane fileLists[], FileEventHelper fileEventHelper) {
         this.drawingPane = drawingPane;
         this.fileLists=fileLists;
         this.fileEventHelper=fileEventHelper;
@@ -65,11 +65,11 @@ class MoustEventsHelper {
         Menu newItemMenu = new Menu("New");
 
         MenuItem folder = new MenuItem("folder");
-        folder.setOnAction(event -> fileEventHelper.createNewFile("new folder", whichList));
+        folder.setOnAction(event -> fileEventHelper.createNewFile(whichList));
         newItemMenu.getItems().addAll(folder);
 
         MenuItem txt = new MenuItem(".txt");
-        txt.setOnAction(event -> fileEventHelper.createNewFile("new file.txt", whichList));
+        txt.setOnAction(event -> fileEventHelper.createNewFile(whichList));
         newItemMenu.getItems().addAll(txt);
 
         contextMenu.getItems().addAll(cutContextItem, copyContextItem, pasteContextItem, deleteContextItem, renameContextItem, newItemMenu);

@@ -50,7 +50,7 @@ public class Controller implements Initializable, ViewContract.Controller {
         if(System.getProperty("os.name").equals("Linux")){
             fileListA.setPadding(new Insets(0,0,0,5));
         }
-        MoustEventsHelper helper = new MoustEventsHelper(drawingPane, fileLists, fileEventHelper);
+        MouseEventsHelper helper = new MouseEventsHelper(drawingPane, fileLists, fileEventHelper);
         helper.handleSelectionRectangle(0);
         helper.handleSelectionRectangle(1);
         helper.handleContextMenu(0);
@@ -150,19 +150,44 @@ public class Controller implements Initializable, ViewContract.Controller {
         }
 
         @Override
-        public void createNewFile(String fileName, int whichList) {
-            model.createFile(fileName, whichList);
+        public void createNewFile(int whichList) {
+            //add new node to the list
+            TextField tf = new TextField("new File");
+            tf.setPadding(new Insets(0));
+            tf.setOnKeyReleased(event -> {
+                if(event.getCode()==KeyCode.ENTER){
+                    model.createFile(tf.getText(), whichList);
+                }
+            });
+            tf.focusedProperty().addListener((observableValue, oldPropertyValue, newPropertyValue) -> {
+                if(!newPropertyValue){
+                    //whe field goes out of focus without clicking enter we restore the old label
+                    fileLists[whichList].getChildren().remove(tf);
+                }
+            });
+            fileLists[whichList].getChildren().add(tf);
+            tf.requestFocus();
+            tf.selectAll();
         }
 
         @Override
         public void renameFile(FileNodeSelectable nodeToRename, int whichList) {
             TextField tf = new TextField(nodeToRename.getFile().getName());
-            replaceNode(nodeToRename, tf, whichList);
+            tf.setPadding(new Insets(0));
             tf.setOnKeyReleased(event -> {
                 if(event.getCode()==KeyCode.ENTER){
                     model.renameFile(nodeToRename.getFile(), tf.getText());
                 }
             });
+            tf.focusedProperty().addListener((observableValue, oldPropertyValue, newPropertyValue) -> {
+                if(!newPropertyValue){
+                    //whe field goes out of focus without clicking enter we restore the old label
+                    replaceNode(tf, (Node) nodeToRename, whichList);
+                }
+            });
+            replaceNode(nodeToRename, tf, whichList);
+            tf.requestFocus();
+            tf.selectAll();
         }
     };
 
