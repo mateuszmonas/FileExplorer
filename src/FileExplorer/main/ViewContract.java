@@ -1,4 +1,4 @@
-package FileNameEditor.main;
+package FileExplorer.main;
 
 import java.io.File;
 import java.util.List;

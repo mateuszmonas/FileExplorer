@@ -1,9 +1,9 @@
-package FileNameEditor.main;
+package FileExplorer.main;
 
 import java.io.File;
 import java.util.List;
 
-import FileNameEditor.nodes.FileNodeSelectable;
+import FileExplorer.nodes.FileNodeSelectable;
 
 public interface FileEventHelper {
 

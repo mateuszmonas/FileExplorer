@@ -1,6 +1,6 @@
-package FileNameEditor.main;
+package FileExplorer.main;
 
-import FileNameEditor.nodes.FileNodeSelectable;
+import FileExplorer.nodes.FileNodeSelectable;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -10,11 +10,10 @@ import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import FileNameEditor.nodes.FileLabelSelectable;
+import FileExplorer.nodes.FileLabelSelectable;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;

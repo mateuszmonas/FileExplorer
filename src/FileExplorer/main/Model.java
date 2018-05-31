@@ -1,6 +1,6 @@
-package FileNameEditor.main;
+package FileExplorer.main;
 
-import FileNameEditor.file.FileTransferable;
+import FileExplorer.file.FileTransferable;
 import org.apache.commons.io.FileUtils;
 
 import java.awt.*;

@@ -1,14 +1,11 @@
-package FileNameEditor.main;
+package FileExplorer.main;
 
-import FileNameEditor.nodes.FileNodeSelectable;
+import FileExplorer.nodes.FileNodeSelectable;
 import javafx.collections.ObservableList;
-import javafx.event.EventType;
 import javafx.geometry.Bounds;
-import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseButton;
@@ -16,7 +13,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import FileNameEditor.nodes.FileLabelSelectable;
+import FileExplorer.nodes.FileLabelSelectable;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -106,7 +103,7 @@ class MoustEventsHelper {
                     node -> node.contains(dragDelta.startX, dragDelta.startY) && node.isSelected());
             FileNodeSelectable clickedNode = onePaneChildNodes.stream().filter(node -> node.contains(event.getSceneX(), event.getSceneY())).findAny().orElse(null);
             //if control is pressed or if clicked node was already selected
-            //don't remove the selection from previously selected FileNameEditor.nodes
+            //don't remove the selection from previously selected FileExplorer.nodes
             if(clickedNode!=null) {
                 if (event.isControlDown() || event.isShiftDown() || clickedNode.isSelected()) {
                     nodesSelectedBeforeDrawing.addAll(onePaneChildNodes.stream().filter(FileNodeSelectable::isSelected).collect(Collectors.toList()));
@@ -137,7 +134,7 @@ class MoustEventsHelper {
         FileNodeSelectable[] f = new FileLabelSelectable[1];
         fileLists[whichList].addEventHandler(MouseEvent.MOUSE_DRAGGED, event-> {
             //check if first node clicked was not already selected
-            //drawing selection grid and selecting FileNameEditor.nodes
+            //drawing selection grid and selecting FileExplorer.nodes
             if(nodesSelectedBeforeDrawing.stream().noneMatch(
                     node -> node.contains(dragDelta.startX, dragDelta.startY)) && event.getButton()==MouseButton.PRIMARY) {
                 ObservableList<Node> nodes = drawingPane.getChildren();

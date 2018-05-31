@@ -1,4 +1,4 @@
-package FileNameEditor.nodes;
+package FileExplorer.nodes;
 
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;

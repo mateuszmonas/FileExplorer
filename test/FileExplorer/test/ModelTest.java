@@ -1,4 +1,4 @@
-package FileNameEditor.test;
+package FileExplorer.test;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import FileNameEditor.main.*;
+import FileExplorer.main.*;
 
 public class ModelTest {
     @Rule

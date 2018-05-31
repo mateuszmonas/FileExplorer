@@ -1,4 +1,4 @@
-package FileNameEditor.file;
+package FileExplorer.file;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;

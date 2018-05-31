@@ -66,10 +66,10 @@ fabric.properties
 .idea/sonarlint
 
 ### Java ###
-# Compiled class FileNameEditor.file
+# Compiled class FileExplorer.file
 *.class
 
-# Log FileNameEditor.file
+# Log FileExplorer.file
 *.log
 
 # BlueJ files
