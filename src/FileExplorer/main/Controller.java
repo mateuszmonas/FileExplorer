@@ -150,12 +150,12 @@ public class Controller implements Initializable, ViewContract.Controller {
         }
 
         @Override
-        public void createNewFile(int whichList) {
+        public void createNewFile(int whichList, String extension) {
             //add new node to the list
             long l = fileLists[whichList].getChildrenUnmodifiable().stream()
                     .filter(node -> node instanceof FileNodeSelectable && ((FileNodeSelectable) node).getFile().getName().startsWith("new File"))
                     .count();
-            TextField tf = new TextField("new File " + l);
+            TextField tf = new TextField("new File " + l + extension);
             tf.setPadding(new Insets(0));
             tf.setOnKeyReleased(event -> {
                 if(event.getCode()==KeyCode.ENTER){

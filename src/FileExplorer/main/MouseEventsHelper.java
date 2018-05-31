@@ -65,11 +65,11 @@ class MouseEventsHelper {
         Menu newItemMenu = new Menu("New");
 
         MenuItem folder = new MenuItem("folder");
-        folder.setOnAction(event -> fileEventHelper.createNewFile(whichList));
+        folder.setOnAction(event -> fileEventHelper.createNewFile(whichList, ""));
         newItemMenu.getItems().addAll(folder);
 
         MenuItem txt = new MenuItem(".txt");
-        txt.setOnAction(event -> fileEventHelper.createNewFile(whichList));
+        txt.setOnAction(event -> fileEventHelper.createNewFile(whichList, ".txt"));
         newItemMenu.getItems().addAll(txt);
 
         contextMenu.getItems().addAll(cutContextItem, copyContextItem, pasteContextItem, deleteContextItem, renameContextItem, newItemMenu);
