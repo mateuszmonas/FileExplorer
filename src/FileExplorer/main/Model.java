@@ -125,7 +125,7 @@ public class Model implements ViewContract.Model {
         Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
         Transferable t = c.getContents(this);
         File dest = new File(paths[whichList]);
-        if (t == null || !checkDestDirectory(dest))
+        if (t == null || !dest.exists())
             return;
         try {
             List<File> filesFromClipboard = new ArrayList<>();
@@ -160,19 +160,18 @@ public class Model implements ViewContract.Model {
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ft, lostOwnership);
     }
 
-    private boolean checkDestDirectory(File dest){
-        if (dest.exists()) return true;
-        else {
-            System.out.println("Destination directory does not exist");
-            return false;
-        }
-    }
-
 
     @Override
     public void moveFiles(List<File> files, String path){
         File dest = new File(path);
-        if(checkDestDirectory(dest)) {
+
+        if(dest.exists()) {
+            for (File file : files) {
+                if(new File(dest.getPath()+File.separator+file.getName()).exists()){
+                    System.out.println("File with the same name already exists");
+                    return;
+                }
+            }
             files.forEach(file -> {
                 try {
                     if (file.isDirectory()) {
@@ -184,6 +183,8 @@ public class Model implements ViewContract.Model {
                     e.printStackTrace();
                 }
             });
+        }else {
+            System.out.println("destination directory does not exist");
         }
         getFiles();
     }
@@ -192,7 +193,7 @@ public class Model implements ViewContract.Model {
     @Override
     public void moveFiles(List<File> files, int whichList){
         File dest = new File(paths[whichList]);
-        if(checkDestDirectory(dest) && !paths[0].equals(paths[1])) {
+        if(dest.exists() && !paths[0].equals(paths[1])) {
             files.forEach(file -> {
                 try {
                     if (file.isDirectory()) {

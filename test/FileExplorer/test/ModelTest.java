@@ -41,7 +41,18 @@ public class ModelTest {
 
     @Test
     public void filesShouldNotBeMoved() throws IOException{
-
+        File source = folder.newFolder("source");
+        File dest = folder.newFolder("dest");
+        File subFolderSource = new File(source, "subFolder");
+        File fileOneSource = new File(source, "test.txt");
+        File subFolderDest = new File(dest, "subFolder");
+        Assert.assertTrue(subFolderSource.mkdir());
+        Assert.assertTrue(fileOneSource.mkdir());
+        Assert.assertTrue(subFolderDest.mkdir());
+        model.moveFiles(Arrays.asList(subFolderSource, fileOneSource), dest.getPath());
+        Assert.assertTrue(subFolderSource.exists());
+        Assert.assertTrue(fileOneSource.exists());
+        Assert.assertTrue(subFolderDest.exists());
     }
 
     @Test
