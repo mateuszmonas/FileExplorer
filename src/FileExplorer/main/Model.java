@@ -70,7 +70,11 @@ public class Model implements ViewContract.Model {
         File newFile = new File(oldFile.getParent()+File.separator+newName);
         if(!newFile.exists()) {
             try {
-                FileUtils.moveFile(oldFile, new File(oldFile.getParent() + File.separator + newName));
+                if(oldFile.isFile()) {
+                    FileUtils.moveFile(oldFile, new File(oldFile.getParent() + File.separator + newName));
+                }if(oldFile.isDirectory()){
+                    FileUtils.moveDirectory(oldFile, new File(oldFile.getParent() + File.separator + newName));
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
