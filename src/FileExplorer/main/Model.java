@@ -47,7 +47,10 @@ public class Model implements ViewContract.Model {
     public void enterDirectory(String path, int whichList){
         if(new File(path).isDirectory()) {
             changePath(path, whichList);
+        }else if(!new File(path).isFile()) {
+            DialogHelper.destinationDirectoryDoesNotExistDialog();
         }
+        getFiles();
     }
 
     @Override
@@ -76,10 +79,11 @@ public class Model implements ViewContract.Model {
                     FileUtils.moveDirectory(oldFile, new File(oldFile.getParent() + File.separator + newName));
                 }
             } catch (IOException e) {
+                DialogHelper.somethingWentWrongDialog();
                 e.printStackTrace();
             }
         }else {
-            System.out.println("file with the same name already exists");
+            DialogHelper.fileAlreadyExistsDialog();
         }
         getFiles();
     }
@@ -92,7 +96,7 @@ public class Model implements ViewContract.Model {
                         FileUtils.forceDelete(file);
                     }catch (IOException e){
                         e.printStackTrace();
-                        System.out.println("could not delete file");
+                        DialogHelper.fileCouldNotBeDeletedDialog();
                     }
                 }
         );
@@ -105,10 +109,11 @@ public class Model implements ViewContract.Model {
             try {
                 com.sun.jna.platform.FileUtils.getInstance().moveToTrash(files.toArray(new File[0]));
             } catch (IOException e){
+                DialogHelper.somethingWentWrongDialog();
                 e.printStackTrace();
             }
         } else {
-            System.out.println("could not move files to trash");
+            DialogHelper.fineCouldNotBeMovedToTrashDialog();
         }
         getFiles();
     }
@@ -116,8 +121,12 @@ public class Model implements ViewContract.Model {
     @Override
     public void createFile(String name, int whichList){
         File newFile = new File(paths[whichList] + File.separator + name);
-        if(!newFile.mkdir()){
-            System.out.println("file was not created");
+        if(!newFile.exists()){
+            if(!newFile.mkdir()){
+                DialogHelper.fileWasNotCreatedDialog();
+            }
+        }else {
+            DialogHelper.fileAlreadyExistsDialog();
         }
         getFiles();
     }
@@ -147,11 +156,15 @@ public class Model implements ViewContract.Model {
                         } else if (file.isFile()){
                             FileUtils.copyFileToDirectory(file, dest);
                         }
-                    }catch (IOException e){e.printStackTrace();}
+                    }catch (IOException e){
+                        DialogHelper.somethingWentWrongDialog();
+                        e.printStackTrace();
+                    }
                 });
             }
         }
         catch (UnsupportedFlavorException | IOException e){
+            DialogHelper.somethingWentWrongDialog();
             e.printStackTrace();
         }
         getFiles();
@@ -173,7 +186,7 @@ public class Model implements ViewContract.Model {
         if(dest.exists()) {
             for (File file : files) {
                 if(new File(dest.getPath()+File.separator+file.getName()).exists()){
-                    System.out.println("File with the same name already exists");
+                    DialogHelper.fileAlreadyExistsDialog();
                     return;
                 }
             }
@@ -185,11 +198,12 @@ public class Model implements ViewContract.Model {
                         FileUtils.moveFileToDirectory(file, new File(path), false);
                     }
                 } catch (IOException e) {
+                    DialogHelper.somethingWentWrongDialog();
                     e.printStackTrace();
                 }
             });
         }else {
-            System.out.println("destination directory does not exist");
+            DialogHelper.destinationDirectoryDoesNotExistDialog();
         }
         getFiles();
     }
@@ -207,6 +221,7 @@ public class Model implements ViewContract.Model {
                         FileUtils.moveFileToDirectory(file, dest, false);
                     }
                 } catch (IOException e) {
+                    DialogHelper.somethingWentWrongDialog();
                     e.printStackTrace();
                 }
             });
