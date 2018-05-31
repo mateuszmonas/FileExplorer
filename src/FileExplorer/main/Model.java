@@ -66,6 +66,20 @@ public class Model implements ViewContract.Model {
     }
 
     @Override
+    public void renameFile(File oldFile, String newName) {
+        File newFile = new File(oldFile.getParent()+File.separator+newName);
+        if(!newFile.exists()) {
+            try {
+                FileUtils.moveFile(oldFile, new File(oldFile.getParent() + File.separator + newName));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else {
+            System.out.println("file with the same name already exists");
+        }
+    }
+
+    @Override
     public void deleteFiles(List<File> files){
         files.forEach(
                 file -> {

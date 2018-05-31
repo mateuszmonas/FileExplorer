@@ -19,6 +19,7 @@ public interface ViewContract {
         void enterDirectory(String path, int whichList);
         void goToParentDirectory(int whichList);
         void createFile(String name, int whichList);
+        void renameFile(File oldFile, String newName);
     }
 
     interface Controller {

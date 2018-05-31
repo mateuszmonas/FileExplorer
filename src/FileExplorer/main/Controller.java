@@ -156,7 +156,13 @@ public class Controller implements Initializable, ViewContract.Controller {
 
         @Override
         public void renameFile(FileNodeSelectable nodeToRename, int whichList) {
-            replaceNode(nodeToRename, new TextField(nodeToRename.getFile().getName()), whichList);
+            TextField tf = new TextField(nodeToRename.getFile().getName());
+            replaceNode(nodeToRename, tf, whichList);
+            tf.setOnKeyReleased(event -> {
+                if(event.getCode()==KeyCode.ENTER){
+                    model.renameFile(nodeToRename.getFile(), tf.getText());
+                }
+            });
         }
     };
 

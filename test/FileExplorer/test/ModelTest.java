@@ -40,7 +40,12 @@ public class ModelTest {
     }
 
     @Test
-    public void checkIfFilesMoved() throws IOException {
+    public void filesShouldNotBeMoved() throws IOException{
+
+    }
+
+    @Test
+    public void filesShouldBeMoved() throws IOException {
         File source = folder.newFolder("source");
         File dest = folder.newFolder("dest");
         File subFolder = new File(source, "subFolder");
@@ -58,7 +63,7 @@ public class ModelTest {
     }
 
     @Test
-    public void checkIfFileCreated(){
+    public void fileShouldBeCreated(){
         String fileName = "Created Test File";
         String path = folder.getRoot().getPath();
         model.enterDirectory(path, 0);
@@ -67,7 +72,7 @@ public class ModelTest {
     }
 
     @Test
-    public void checkIfFileDeleted() throws IOException{
+    public void fileShouldBeDeleted() throws IOException{
         File fileToDelete = folder.newFolder("fileToDelete");
         File fileToDelete2 = folder.newFolder("fileToDelete2");
         Assert.assertTrue(fileToDelete.exists());
@@ -78,7 +83,7 @@ public class ModelTest {
     }
 
     @Test
-    public void checkIfFilesCopiedToClipboard() throws IOException, UnsupportedFlavorException {
+    public void filesShouldBeCopiedToClipboard() throws IOException, UnsupportedFlavorException {
         File source = folder.newFolder("source");
         File subFolder = new File(source, "subFolder");
         File fileOne = new File(source, "test.txt");
@@ -90,6 +95,27 @@ public class ModelTest {
         Transferable t = c.getContents(this);
         Assert.assertTrue(Arrays.stream(t.getTransferDataFlavors()).anyMatch(dataFlavor -> dataFlavor.equals(DataFlavor.javaFileListFlavor)));
         Assert.assertEquals(files, t.getTransferData(DataFlavor.javaFileListFlavor));
+    }
+
+    @Test
+    public void fileShouldNotBeRenamed() throws IOException{
+        File fileA = folder.newFile("fileA");
+        File fileB = folder.newFile("fileB");
+        String newName = "fileB";
+        Assert.assertTrue(fileA.exists());
+        model.renameFile(fileA, newName);
+        Assert.assertTrue(fileA.exists());
+        Assert.assertTrue(new File(fileA.getParent()+File.separator+newName).exists());
+    }
+
+    @Test
+    public void fileShouldBeRenamed() throws IOException{
+        File fileA = folder.newFile("fileA");
+        String newName = "fileB";
+        Assert.assertTrue(fileA.exists());
+        model.renameFile(fileA, newName);
+        Assert.assertFalse(fileA.exists());
+        Assert.assertTrue(new File(fileA.getParent()+File.separator+newName).exists());
     }
 
 }
