@@ -91,7 +91,6 @@ class MouseEventsHelper {
         final ArrayList<FileNodeSelectable> nodesSelectedBeforeDrawing = new ArrayList<>();
         final ArrayList<FileNodeSelectable> draggedNodes = new ArrayList<>();
         final ArrayList<FileNodeSelectable> onePaneChildNodes = new ArrayList<>();
-        final ArrayList<FileNodeSelectable> allNodes = new ArrayList<>();
         fileLists[whichList].addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
             dragDelta.startX = event.getSceneX();
             dragDelta.startY = event.getSceneY();
@@ -105,10 +104,6 @@ class MouseEventsHelper {
                 if (event.isControlDown() || event.isShiftDown() || clickedNode.isSelected()) {
                     nodesSelectedBeforeDrawing.addAll(onePaneChildNodes.stream().filter(FileNodeSelectable::isSelected).collect(Collectors.toList()));
                     if (selectedNodeWasClicked) {
-                        allNodes.addAll(Stream.concat(fileLists[0].getChildrenUnmodifiable().stream(), fileLists[1].getChildrenUnmodifiable().stream())
-                                .filter(node -> node instanceof FileNodeSelectable)
-                                .map(node -> (FileNodeSelectable) node)
-                                .collect(Collectors.toList()));
                         draggedNodes.addAll(nodesSelectedBeforeDrawing);
                     }
                 } else if (event.getButton() == MouseButton.SECONDARY) {
@@ -211,7 +206,6 @@ class MouseEventsHelper {
             nodesSelectedBeforeDrawing.clear();
             draggedNodes.clear();
             onePaneChildNodes.clear();
-            allNodes.clear();
             fileLists[whichList].getScene().setCursor(Cursor.DEFAULT);
         });
     }

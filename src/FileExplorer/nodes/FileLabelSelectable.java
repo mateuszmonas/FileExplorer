@@ -1,10 +1,7 @@
 package FileExplorer.nodes;
 
-import FileExplorer.main.BoundsHelper;
-import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -59,7 +56,7 @@ public class FileLabelSelectable extends Label implements FileNodeSelectable {
 
     @Override
     public boolean contains(double x, double y){
-        Bounds Bounds = localToScene(BoundsHelper.getVisibleBounds(this));
+        Bounds Bounds = localToScene(getBoundsInLocal());
         double minX = Bounds.getMinX();
         double maxX = Bounds.getMaxX();
         double maxY = Bounds.getMaxY();
