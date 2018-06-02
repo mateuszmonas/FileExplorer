@@ -3,8 +3,11 @@ package FileExplorer.main;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import FileExplorer.nodes.FileLabelSelectable;
@@ -20,6 +23,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -157,7 +161,8 @@ public class Controller implements Initializable, ViewContract.Controller {
                 nodes.add(replaceLabelWithTextField(nodesToRename.get(i), whichList));
             }
             firstTextField.requestFocus();
-            firstTextField.selectAll();
+            int fileExtensionStart = firstTextField.getText().indexOf(".");
+            firstTextField.selectRange(0, fileExtensionStart!=-1?fileExtensionStart:firstTextField.getText().length());
             boolean[] alreadyBound = new boolean[1];
             alreadyBound[0]=false;
             firstTextField.setOnKeyReleased(event -> {
@@ -168,15 +173,11 @@ public class Controller implements Initializable, ViewContract.Controller {
                     alreadyBound[0]=false;
                 } if (event.getCode()==KeyCode.ENTER){
                     //rename all nodes
-                    for (int i = 0; i < nodes.size(); i++) {
-                        String newName;
-                        if(nodes.get(i).getText().contains("?")) {
-                            newName = nodes.get(i).getText().replace("?", String.format("%02d", i+1));
-                        } else {
-                            newName=Integer.toString(i);
-                        }
-                        if(!nodes.get(i).getText().isEmpty()){
-                            model.renameFile(nodes.get(i).getOldText(), newName, whichList);
+                    List<String> newNames = nodes.stream().map(TextInputControl::getText).collect(Collectors.toList());
+                    replaceRegExp(newNames);
+                    for (int i = 0; i < newNames.size(); i++) {
+                        if(!newNames.get(i).isEmpty()){
+                            model.renameFile(nodes.get(i).getOldText(), newNames.get(i), whichList);
                         } else{
                             model.getFiles();
                         }
@@ -189,6 +190,30 @@ public class Controller implements Initializable, ViewContract.Controller {
                     model.getFiles();
                 }
             });
+        }
+    }
+
+    private void replaceRegExp(List<String> s){
+        ArrayList<Integer> matchIndexes = new ArrayList<>();
+        String patternString = "\\^[0-9][0-9]\\^";
+        Pattern pattern = Pattern.compile(patternString);
+        Matcher matcher = pattern.matcher(s.get(0));
+        while (matcher.find()){
+            matchIndexes.add(matcher.start());
+        }
+        for (int i = matchIndexes.size() - 1; i >= 0; i--) {
+            int firstMatch=matchIndexes.get(i);
+            String matchToReplace = s.get(0).substring(firstMatch, firstMatch+4);
+            int firstFileNumber = Integer.valueOf(s.get(0).charAt(firstMatch+1)+ "" +s.get(0).charAt(firstMatch+2));
+            for (int j = 0; j < s.size(); j++) {
+                s.set(j, s.get(j).replace(matchToReplace, String.format("%02d", firstFileNumber++)));
+            }
+        }
+        //make sure that all elements are distinct
+        if(!s.stream().allMatch(new HashSet<>()::add)){
+            for (int i = 0; i < s.size(); i++) {
+                s.set(i, s.get(i)+" "+Integer.toString(i));
+            }
         }
     }
 
@@ -214,7 +239,7 @@ public class Controller implements Initializable, ViewContract.Controller {
         if (System.getProperty("os.name").equals("Linux")) {
             fileListA.setPadding(new Insets(0, 0, 0, 5));
         }
-        MouseEventsHelper helper = new MouseEventsHelper(drawingPane, fileLists, fileEventHelper);
+        MouseEventsHelper helper = new MouseEventsHelper(drawingPane, fileLists, new ScrollPane[]{scrollPaneA, scrollPaneB}, fileEventHelper);
         helper.handleSelectionRectangle(0);
         helper.handleSelectionRectangle(1);
         helper.handleContextMenu(0);

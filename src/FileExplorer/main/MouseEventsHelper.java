@@ -13,6 +13,7 @@ import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -26,13 +27,15 @@ class MouseEventsHelper {
 
     final private Pane drawingPane;
     final private Pane fileLists[];
+    final private ScrollPane scrollPanes[];
     final private Rectangle selectionRectangle = new Rectangle();
     final private Delta dragDelta = new Delta();
     final private FileEventHelper fileEventHelper;
 
-    MouseEventsHelper(Pane drawingPane, Pane fileLists[], FileEventHelper fileEventHelper) {
+    MouseEventsHelper(Pane drawingPane, Pane fileLists[], ScrollPane scrollPanes[], FileEventHelper fileEventHelper) {
         this.drawingPane = drawingPane;
         this.fileLists = fileLists;
+        this.scrollPanes=scrollPanes;
         this.fileEventHelper = fileEventHelper;
 
     }
@@ -191,7 +194,7 @@ class MouseEventsHelper {
                     fileEventHelper.moveFilesEvent(draggedNodes.stream().map(FileNodeSelectable::getFile).collect(Collectors.toList()), currentNode.getFile().getPath());
                 } else {
                     for (int i = 0; i < 2; i++) {
-                        if (fileLists[i] != fileLists[whichList] && fileLists[i].contains(fileLists[i].sceneToLocal(event.getSceneX(), event.getSceneY()))) {
+                        if (i != whichList && scrollPanes[i].contains(scrollPanes[i].sceneToLocal(event.getSceneX(), event.getSceneY()))) {
                             fileEventHelper.moveFilesEvent(draggedNodes.stream().map(FileNodeSelectable::getFile).collect(Collectors.toList()), i);
                             break;
                         }
