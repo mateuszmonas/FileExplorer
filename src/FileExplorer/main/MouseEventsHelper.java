@@ -27,13 +27,15 @@ class MouseEventsHelper {
 
     final private Pane drawingPane;
     final private Pane fileLists[];
+    final private ScrollPane scrollPanes[];
     final private Rectangle selectionRectangle = new Rectangle();
     final private Delta dragDelta = new Delta();
     final private FileEventHelper fileEventHelper;
 
-    MouseEventsHelper(Pane drawingPane, Pane fileLists[], FileEventHelper fileEventHelper) {
+    MouseEventsHelper(Pane drawingPane, Pane fileLists[], ScrollPane scrollPanes[], FileEventHelper fileEventHelper) {
         this.drawingPane = drawingPane;
         this.fileLists = fileLists;
+        this.scrollPanes=scrollPanes;
         this.fileEventHelper = fileEventHelper;
 
     }
@@ -185,17 +187,21 @@ class MouseEventsHelper {
         //after the mouse is released remove the rectangle and clear its position
         fileLists[whichList].setOnMouseReleased(event -> {
             if (!draggedNodes.isEmpty()) {
-                FileNodeSelectable currentNode = allNodes.stream()
-                        .filter(node -> node.contains(event.getSceneX(), event.getSceneY()))
-                        .findAny().orElse(null);
-                if (currentNode != null && !draggedNodes.contains(currentNode)) {
-                    fileEventHelper.moveFilesEvent(draggedNodes.stream().map(FileNodeSelectable::getFile).collect(Collectors.toList()), currentNode.getFile().getPath());
-                } else {
-                    for (int i = 0; i < 2; i++) {
-                        if (i != whichList && BoundsHelper.getVisibleBounds(fileLists[i]).contains(fileLists[i].sceneToLocal(event.getSceneX(), event.getSceneY()))) {
+                //check on which list the files were dropped
+                for (int i = 0; i < 2; i++) {
+                    if (scrollPanes[i].contains(scrollPanes[i].sceneToLocal(event.getSceneX(), event.getSceneY()))) {
+                        FileNodeSelectable currentNode = fileLists[i].getChildren().stream()
+                                .filter(node -> node.contains(event.getSceneX(), event.getSceneY()))
+                                .map(node -> (FileNodeSelectable)node)
+                                .findAny().orElse(null);
+                        if (currentNode != null){
+                            if(!draggedNodes.contains(currentNode)) {
+                                fileEventHelper.moveFilesEvent(draggedNodes.stream().map(FileNodeSelectable::getFile).collect(Collectors.toList()), currentNode.getFile().getPath());
+                            }
+                        }else if(i != whichList){
                             fileEventHelper.moveFilesEvent(draggedNodes.stream().map(FileNodeSelectable::getFile).collect(Collectors.toList()), i);
-                            break;
                         }
+                        break;
                     }
                 }
             }
