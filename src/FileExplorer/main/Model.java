@@ -19,6 +19,7 @@ import FileExplorer.file.FileTransferable;
 public class Model implements ViewContract.Model {
 
     private ViewContract.Controller controller;
+    private DialogHelper dialogHelper;
     private String[] paths = new String[2];
     private boolean cuttingFiles = false;
     private ClipboardOwner lostOwnership = (clipboard, contents) -> {
@@ -54,13 +55,14 @@ public class Model implements ViewContract.Model {
         if (new File(path).isDirectory()) {
             changePath(path, whichList);
         } else if (!new File(path).isFile()) {
-            DialogHelper.destinationDirectoryDoesNotExistDialog();
+            dialogHelper.destinationDirectoryDoesNotExistDialog();
         }
         getFiles();
     }
 
     @Override
-    public void start(ViewContract.Controller controller) {
+    public void start(ViewContract.Controller controller, DialogHelper dialogHelper) {
+        this.dialogHelper = dialogHelper;
         this.controller = controller;
         getFiles();
     }
@@ -86,11 +88,11 @@ public class Model implements ViewContract.Model {
                     FileUtils.moveDirectory(oldFile, new File(oldFile.getParent() + File.separator + newName));
                 }
             } catch (IOException e) {
-                DialogHelper.somethingWentWrongDialog();
+                dialogHelper.somethingWentWrongDialog();
                 e.printStackTrace();
             }
         } else {
-            DialogHelper.fileAlreadyExistsDialog();
+            dialogHelper.fileAlreadyExistsDialog();
         }
         getFiles();
     }
@@ -103,7 +105,7 @@ public class Model implements ViewContract.Model {
                         FileUtils.forceDelete(file);
                     } catch (IOException e) {
                         e.printStackTrace();
-                        DialogHelper.fileCouldNotBeDeletedDialog();
+                        dialogHelper.fileCouldNotBeDeletedDialog();
                     }
                 }
         );
@@ -116,11 +118,11 @@ public class Model implements ViewContract.Model {
             try {
                 com.sun.jna.platform.FileUtils.getInstance().moveToTrash(files.toArray(new File[0]));
             } catch (IOException e) {
-                DialogHelper.somethingWentWrongDialog();
+                dialogHelper.somethingWentWrongDialog();
                 e.printStackTrace();
             }
         } else {
-            DialogHelper.fineCouldNotBeMovedToTrashDialog();
+            dialogHelper.fineCouldNotBeMovedToTrashDialog();
         }
         getFiles();
     }
@@ -130,10 +132,10 @@ public class Model implements ViewContract.Model {
         File newFile = new File(paths[whichList] + File.separator + name);
         if (!newFile.exists()) {
             if (!newFile.mkdir()) {
-                DialogHelper.fileWasNotCreatedDialog();
+                dialogHelper.fileWasNotCreatedDialog();
             }
         } else {
-            DialogHelper.fileAlreadyExistsDialog();
+            dialogHelper.fileAlreadyExistsDialog();
         }
         getFiles();
     }
@@ -162,13 +164,13 @@ public class Model implements ViewContract.Model {
                             FileUtils.copyFileToDirectory(file, dest);
                         }
                     } catch (IOException e) {
-                        DialogHelper.somethingWentWrongDialog();
+                        dialogHelper.somethingWentWrongDialog();
                         e.printStackTrace();
                     }
                 });
             }
         } catch (UnsupportedFlavorException | IOException e) {
-            DialogHelper.somethingWentWrongDialog();
+            dialogHelper.somethingWentWrongDialog();
             e.printStackTrace();
         }
         getFiles();
@@ -188,7 +190,7 @@ public class Model implements ViewContract.Model {
         if (dest.exists()) {
             for (File file : files) {
                 if (new File(dest.getPath() + File.separator + file.getName()).exists()) {
-                    DialogHelper.fileAlreadyExistsDialog();
+                    dialogHelper.fileAlreadyExistsDialog();
                     return;
                 }
             }
@@ -200,12 +202,12 @@ public class Model implements ViewContract.Model {
                         FileUtils.moveFileToDirectory(file, new File(path), false);
                     }
                 } catch (IOException e) {
-                    DialogHelper.somethingWentWrongDialog();
+                    dialogHelper.somethingWentWrongDialog();
                     e.printStackTrace();
                 }
             });
         } else {
-            DialogHelper.destinationDirectoryDoesNotExistDialog();
+            dialogHelper.destinationDirectoryDoesNotExistDialog();
         }
         getFiles();
     }
@@ -222,7 +224,7 @@ public class Model implements ViewContract.Model {
                         FileUtils.moveFileToDirectory(file, dest, false);
                     }
                 } catch (IOException e) {
-                    DialogHelper.somethingWentWrongDialog();
+                    dialogHelper.somethingWentWrongDialog();
                     e.printStackTrace();
                 }
             });

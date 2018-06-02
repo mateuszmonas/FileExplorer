@@ -6,7 +6,7 @@ import java.util.List;
 public interface ViewContract {
 
     interface Model {
-        void start(Controller controller);
+        void start(Controller controller, DialogHelper dialogHelper);
 
         void cutFiles(List<File> files);
 

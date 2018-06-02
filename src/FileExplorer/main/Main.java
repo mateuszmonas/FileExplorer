@@ -23,7 +23,7 @@ public class Main extends Application {
         stage.setScene(new Scene(loader.load(), 690, 490));
         stage.setResizable(false);
         stage.show();
-        model.start(controller);
+        model.start(controller, new DialogHelperImpl());
     }
 }
 

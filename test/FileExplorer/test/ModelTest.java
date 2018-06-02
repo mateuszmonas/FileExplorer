@@ -36,6 +36,36 @@ public class ModelTest {
             public void displayFiles(File[] files, int whichList) {
 
             }
+        }, new DialogHelper() {
+            @Override
+            public void fileAlreadyExistsDialog() {
+
+            }
+
+            @Override
+            public void fileWasNotCreatedDialog() {
+
+            }
+
+            @Override
+            public void fineCouldNotBeMovedToTrashDialog() {
+
+            }
+
+            @Override
+            public void fileCouldNotBeDeletedDialog() {
+
+            }
+
+            @Override
+            public void destinationDirectoryDoesNotExistDialog() {
+
+            }
+
+            @Override
+            public void somethingWentWrongDialog() {
+
+            }
         });
     }
 
