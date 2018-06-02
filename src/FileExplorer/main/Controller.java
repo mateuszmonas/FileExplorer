@@ -1,6 +1,8 @@
 package FileExplorer.main;
 
 import FileExplorer.nodes.FileNodeSelectable;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -57,18 +59,30 @@ public class Controller implements Initializable, ViewContract.Controller {
         helper.handleContextMenu(1);
         handleKeyEvents(scrollPaneA, 0);
         handleKeyEvents(scrollPaneB, 1);
-        filePathA.setOnKeyPressed(event -> { if(event.getCode()==KeyCode.ENTER){
-            directoryClickedTwice(filePaths[0].getText(), 0);
-            fileLists[0].requestFocus();
-        } });
-        filePathB.setOnKeyPressed(event -> { if(event.getCode()==KeyCode.ENTER) {
-            directoryClickedTwice(filePaths[1].getText(), 1);
-            fileLists[1].requestFocus();
-        } });
+        handleFilePath(filePathA, 0);
+        handleFilePath(filePathB, 1);
         copyFilesButtonA.setOnMouseClicked(event -> fileEventHelper.copyFilesToClipboardEvent(0));
         copyFilesButtonB.setOnMouseClicked(event -> fileEventHelper.copyFilesToClipboardEvent(1));
         goToParentButtonA.setOnMouseClicked(event -> goToParentDirectory(0));
         goToParentButtonB.setOnMouseClicked(event -> goToParentDirectory(1));
+    }
+
+    private void handleFilePath(TextField filePath, int whichList){
+        String[] prevText = new String[1];
+        filePath.focusedProperty().addListener((observableValue, oldPropertyValue, newPropertyValue) -> {
+            if(newPropertyValue){
+                prevText[0]=filePath.getText();
+                filePath.positionCaret(filePath.getText().length());
+            } else {
+                filePath.setText(prevText[0]);
+            }
+        });
+        filePath.setOnKeyPressed(event -> {
+            if(event.getCode()==KeyCode.ENTER){
+                pathChanged(filePath.getText(), whichList);
+                filePath.requestFocus();
+            }
+        });
     }
 
     private void goToParentDirectory(int whichList){
@@ -210,7 +224,7 @@ public class Controller implements Initializable, ViewContract.Controller {
         filePaths[whichList].setText(path);
     }
 
-    private void directoryClickedTwice(String path, int whichList){
+    private void pathChanged(String path, int whichList){
         model.enterDirectory(path, whichList);
     }
 
@@ -274,7 +288,7 @@ public class Controller implements Initializable, ViewContract.Controller {
                         label.setSelected(!label.isSelected());
                     } else {
                         if (event.getButton()==MouseButton.PRIMARY && label.isSelected()) {
-                            directoryClickedTwice(label.getFile().getPath(), whichList);
+                            pathChanged(label.getFile().getPath(), whichList);
                         } else {
                             if(event.getButton()!=MouseButton.SECONDARY) {
                                 nodes.forEach(n -> {
