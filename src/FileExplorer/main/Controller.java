@@ -239,7 +239,7 @@ public class Controller implements Initializable, ViewContract.Controller {
         if (System.getProperty("os.name").equals("Linux")) {
             fileListA.setPadding(new Insets(0, 0, 0, 5));
         }
-        MouseEventsHelper helper = new MouseEventsHelper(drawingPane, fileLists, new ScrollPane[]{scrollPaneA, scrollPaneB}, fileEventHelper);
+        MouseEventsHelper helper = new MouseEventsHelper(drawingPane, fileLists, fileEventHelper);
         helper.handleSelectionRectangle(0);
         helper.handleSelectionRectangle(1);
         helper.handleContextMenu(0);

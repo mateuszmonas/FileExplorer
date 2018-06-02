@@ -27,15 +27,13 @@ class MouseEventsHelper {
 
     final private Pane drawingPane;
     final private Pane fileLists[];
-    final private ScrollPane scrollPanes[];
     final private Rectangle selectionRectangle = new Rectangle();
     final private Delta dragDelta = new Delta();
     final private FileEventHelper fileEventHelper;
 
-    MouseEventsHelper(Pane drawingPane, Pane fileLists[], ScrollPane scrollPanes[], FileEventHelper fileEventHelper) {
+    MouseEventsHelper(Pane drawingPane, Pane fileLists[], FileEventHelper fileEventHelper) {
         this.drawingPane = drawingPane;
         this.fileLists = fileLists;
-        this.scrollPanes=scrollPanes;
         this.fileEventHelper = fileEventHelper;
 
     }
@@ -194,7 +192,7 @@ class MouseEventsHelper {
                     fileEventHelper.moveFilesEvent(draggedNodes.stream().map(FileNodeSelectable::getFile).collect(Collectors.toList()), currentNode.getFile().getPath());
                 } else {
                     for (int i = 0; i < 2; i++) {
-                        if (i != whichList && scrollPanes[i].contains(scrollPanes[i].sceneToLocal(event.getSceneX(), event.getSceneY()))) {
+                        if (i != whichList && BoundsHelper.getVisibleBounds(fileLists[i]).contains(fileLists[i].sceneToLocal(event.getSceneX(), event.getSceneY()))) {
                             fileEventHelper.moveFilesEvent(draggedNodes.stream().map(FileNodeSelectable::getFile).collect(Collectors.toList()), i);
                             break;
                         }
