@@ -1,36 +1,42 @@
 package FileExplorer.main;
 
-import FileExplorer.file.FileTransferable;
 import org.apache.commons.io.FileUtils;
 
-import java.awt.*;
+import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import FileExplorer.file.FileTransferable;
 
 public class Model implements ViewContract.Model {
 
     private ViewContract.Controller controller;
     private String[] paths = new String[2];
     private boolean cuttingFiles = false;
+    private ClipboardOwner lostOwnership = (clipboard, contents) -> {
+        System.out.println("Lost ownership");
+        cuttingFiles = false;
+    };
 
     public Model() {
-        if(System.getProperty("os.name").equals("Linux")){
+        if (System.getProperty("os.name").equals("Linux")) {
             paths[0] = "/media/storage/tests";
             paths[1] = "/media/storage/tests";
-        } else if(System.getProperty("os.name").startsWith("Windows")){
+        } else if (System.getProperty("os.name").startsWith("Windows")) {
             paths[0] = "D:\\";
             paths[1] = "D:\\";
         }
     }
 
-    private void changePath(String path, int whichList){
+    private void changePath(String path, int whichList) {
         paths[whichList] = path;
         getFiles();
     }
@@ -38,29 +44,29 @@ public class Model implements ViewContract.Model {
     @Override
     public void goToParentDirectory(int whichList) {
         String parentPath = new File(paths[whichList]).getParent();
-        if(parentPath!=null) {
+        if (parentPath != null) {
             changePath(parentPath, whichList);
         }
     }
 
     @Override
-    public void enterDirectory(String path, int whichList){
-        if(new File(path).isDirectory()) {
+    public void enterDirectory(String path, int whichList) {
+        if (new File(path).isDirectory()) {
             changePath(path, whichList);
-        }else if(!new File(path).isFile()) {
+        } else if (!new File(path).isFile()) {
             DialogHelper.destinationDirectoryDoesNotExistDialog();
         }
         getFiles();
     }
 
     @Override
-    public void start(ViewContract.Controller controller){
-        this.controller=controller;
+    public void start(ViewContract.Controller controller) {
+        this.controller = controller;
         getFiles();
     }
 
     @Override
-    public void cutFiles(List<File> files){
+    public void cutFiles(List<File> files) {
         //set cutting files to true
         cuttingFiles = true;
         //add files to clipboard
@@ -70,31 +76,32 @@ public class Model implements ViewContract.Model {
 
     @Override
     public void renameFile(File oldFile, String newName) {
-        File newFile = new File(oldFile.getParent()+File.separator+newName);
-        if(!newFile.exists()) {
+        File newFile = new File(oldFile.getParent() + File.separator + newName);
+        if (!newFile.exists()) {
             try {
-                if(oldFile.isFile()) {
+                if (oldFile.isFile()) {
                     FileUtils.moveFile(oldFile, new File(oldFile.getParent() + File.separator + newName));
-                }if(oldFile.isDirectory()){
+                }
+                if (oldFile.isDirectory()) {
                     FileUtils.moveDirectory(oldFile, new File(oldFile.getParent() + File.separator + newName));
                 }
             } catch (IOException e) {
                 DialogHelper.somethingWentWrongDialog();
                 e.printStackTrace();
             }
-        }else {
+        } else {
             DialogHelper.fileAlreadyExistsDialog();
         }
         getFiles();
     }
 
     @Override
-    public void deleteFiles(List<File> files){
+    public void deleteFiles(List<File> files) {
         files.forEach(
                 file -> {
                     try {
                         FileUtils.forceDelete(file);
-                    }catch (IOException e){
+                    } catch (IOException e) {
                         e.printStackTrace();
                         DialogHelper.fileCouldNotBeDeletedDialog();
                     }
@@ -104,11 +111,11 @@ public class Model implements ViewContract.Model {
     }
 
     @Override
-    public void moveFilesToTrash(List<File> files){
-        if(com.sun.jna.platform.FileUtils.getInstance().hasTrash()){
+    public void moveFilesToTrash(List<File> files) {
+        if (com.sun.jna.platform.FileUtils.getInstance().hasTrash()) {
             try {
                 com.sun.jna.platform.FileUtils.getInstance().moveToTrash(files.toArray(new File[0]));
-            } catch (IOException e){
+            } catch (IOException e) {
                 DialogHelper.somethingWentWrongDialog();
                 e.printStackTrace();
             }
@@ -119,23 +126,21 @@ public class Model implements ViewContract.Model {
     }
 
     @Override
-    public void createFile(String name, int whichList){
+    public void createFile(String name, int whichList) {
         File newFile = new File(paths[whichList] + File.separator + name);
-        if(!newFile.exists()){
-            if(!newFile.mkdir()){
+        if (!newFile.exists()) {
+            if (!newFile.mkdir()) {
                 DialogHelper.fileWasNotCreatedDialog();
             }
-        }else {
+        } else {
             DialogHelper.fileAlreadyExistsDialog();
         }
         getFiles();
     }
 
-
-
     @SuppressWarnings("unchecked")
     @Override
-    public void pasteFilesFromClipboard(int whichList){
+    public void pasteFilesFromClipboard(int whichList) {
         Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
         Transferable t = c.getContents(this);
         File dest = new File(paths[whichList]);
@@ -143,49 +148,46 @@ public class Model implements ViewContract.Model {
             return;
         try {
             List<File> filesFromClipboard = new ArrayList<>();
-            if(Arrays.stream(t.getTransferDataFlavors()).anyMatch(dataFlavor -> dataFlavor.equals(DataFlavor.javaFileListFlavor))) {
+            if (Arrays.stream(t.getTransferDataFlavors()).anyMatch(dataFlavor -> dataFlavor.equals(DataFlavor.javaFileListFlavor))) {
                 filesFromClipboard.addAll((List<File>) t.getTransferData(DataFlavor.javaFileListFlavor));
             }
-            if(cuttingFiles){
+            if (cuttingFiles) {
                 moveFiles(filesFromClipboard, whichList);
             } else {
                 filesFromClipboard.forEach(file -> {
                     try {
                         if (file.isDirectory()) {
                             FileUtils.copyDirectoryToDirectory(file, dest);
-                        } else if (file.isFile()){
+                        } else if (file.isFile()) {
                             FileUtils.copyFileToDirectory(file, dest);
                         }
-                    }catch (IOException e){
+                    } catch (IOException e) {
                         DialogHelper.somethingWentWrongDialog();
                         e.printStackTrace();
                     }
                 });
             }
-        }
-        catch (UnsupportedFlavorException | IOException e){
+        } catch (UnsupportedFlavorException | IOException e) {
             DialogHelper.somethingWentWrongDialog();
             e.printStackTrace();
         }
         getFiles();
     }
 
-
     @Override
-    public void copyFilesToClipboard(List<File> files){
-        cuttingFiles=false;
+    public void copyFilesToClipboard(List<File> files) {
+        cuttingFiles = false;
         FileTransferable ft = new FileTransferable(files);
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ft, lostOwnership);
     }
 
-
     @Override
-    public void moveFiles(List<File> files, String path){
+    public void moveFiles(List<File> files, String path) {
         File dest = new File(path);
 
-        if(dest.exists()) {
+        if (dest.exists()) {
             for (File file : files) {
-                if(new File(dest.getPath()+File.separator+file.getName()).exists()){
+                if (new File(dest.getPath() + File.separator + file.getName()).exists()) {
                     DialogHelper.fileAlreadyExistsDialog();
                     return;
                 }
@@ -202,17 +204,16 @@ public class Model implements ViewContract.Model {
                     e.printStackTrace();
                 }
             });
-        }else {
+        } else {
             DialogHelper.destinationDirectoryDoesNotExistDialog();
         }
         getFiles();
     }
 
-
     @Override
-    public void moveFiles(List<File> files, int whichList){
+    public void moveFiles(List<File> files, int whichList) {
         File dest = new File(paths[whichList]);
-        if(dest.exists() && !paths[0].equals(paths[1])) {
+        if (dest.exists() && !paths[0].equals(paths[1])) {
             files.forEach(file -> {
                 try {
                     if (file.isDirectory()) {
@@ -233,8 +234,8 @@ public class Model implements ViewContract.Model {
      * Gets all files in the given paths
      * and updates the controller
      */
-    private void getFiles(){
-        for(int whichList = 0;whichList<2;whichList++) {
+    private void getFiles() {
+        for (int whichList = 0; whichList < 2; whichList++) {
             File folder = new File(paths[whichList]);
             File[] fileList = folder.listFiles();
             if (fileList != null) {
@@ -244,10 +245,5 @@ public class Model implements ViewContract.Model {
             controller.displayFiles(fileList, whichList);
         }
     }
-
-    private ClipboardOwner lostOwnership = (clipboard, contents) -> {
-            System.out.println("Lost ownership");
-            cuttingFiles = false;
-        };
 
 }

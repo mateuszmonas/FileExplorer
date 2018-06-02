@@ -2,11 +2,10 @@ package FileExplorer.main;
 
 
 import javafx.scene.control.Alert;
-import javafx.scene.control.Dialog;
 
 class DialogHelper {
 
-    static void fileAlreadyExistsDialog(){
+    static void fileAlreadyExistsDialog() {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Something went wrong");
         alert.setHeaderText(null);
@@ -14,7 +13,7 @@ class DialogHelper {
         alert.showAndWait();
     }
 
-    static void fileWasNotCreatedDialog(){
+    static void fileWasNotCreatedDialog() {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Something went wrong");
         alert.setHeaderText(null);
@@ -22,7 +21,7 @@ class DialogHelper {
         alert.showAndWait();
     }
 
-    static void fineCouldNotBeMovedToTrashDialog(){
+    static void fineCouldNotBeMovedToTrashDialog() {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Something went wrong");
         alert.setHeaderText(null);
@@ -30,7 +29,7 @@ class DialogHelper {
         alert.showAndWait();
     }
 
-    static void fileCouldNotBeDeletedDialog(){
+    static void fileCouldNotBeDeletedDialog() {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Something went wrong");
         alert.setHeaderText(null);
@@ -38,7 +37,7 @@ class DialogHelper {
         alert.showAndWait();
     }
 
-    static void destinationDirectoryDoesNotExistDialog(){
+    static void destinationDirectoryDoesNotExistDialog() {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Something went wrong");
         alert.setHeaderText(null);
@@ -46,7 +45,7 @@ class DialogHelper {
         alert.showAndWait();
     }
 
-    static void somethingWentWrongDialog(){
+    static void somethingWentWrongDialog() {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Something went wrong");
         alert.setHeaderText(null);

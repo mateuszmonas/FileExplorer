@@ -1,5 +1,10 @@
 package FileExplorer.main;
 
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import FileExplorer.nodes.FileLabelSelectable;
 import FileExplorer.nodes.FileNodeSelectable;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
@@ -10,14 +15,9 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import FileExplorer.nodes.FileLabelSelectable;
-
-import java.util.ArrayList;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * sole purpose of this class is containing all the code responsible for the selection rectangle
@@ -32,19 +32,19 @@ class MouseEventsHelper {
 
     MouseEventsHelper(Pane drawingPane, Pane fileLists[], FileEventHelper fileEventHelper) {
         this.drawingPane = drawingPane;
-        this.fileLists=fileLists;
-        this.fileEventHelper=fileEventHelper;
+        this.fileLists = fileLists;
+        this.fileEventHelper = fileEventHelper;
 
     }
 
-    private void setSelectionRectangleDimensions(double startX, double startY, double width, double height){
+    private void setSelectionRectangleDimensions(double startX, double startY, double width, double height) {
         selectionRectangle.setX(startX);
         selectionRectangle.setY(startY);
         selectionRectangle.setWidth(width);
         selectionRectangle.setHeight(height);
     }
 
-    void handleContextMenu(int whichList){
+    void handleContextMenu(int whichList) {
         final ContextMenu contextMenu = new ContextMenu();
         MenuItem cutContextItem = new MenuItem("Cut");
         cutContextItem.setOnAction(event -> fileEventHelper.cutFilesEvent(0));
@@ -58,7 +58,7 @@ class MouseEventsHelper {
         renameContextItem.setOnAction(event -> {
             FileNodeSelectable clickedNode = fileLists[whichList].getChildrenUnmodifiable().stream()
                     .filter(node -> node instanceof FileNodeSelectable && node.localToScreen(node.getBoundsInLocal()).contains(contextMenu.getAnchorX(), contextMenu.getAnchorY()))
-                    .map(node -> (FileNodeSelectable)node)
+                    .map(node -> (FileNodeSelectable) node)
                     .findAny().orElse(null);
             fileEventHelper.renameFile(clickedNode, whichList);
         });
@@ -77,34 +77,34 @@ class MouseEventsHelper {
         MousePosition pressedMousePosition = MousePosition.ZERO;
         fileLists[whichList].addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
             pressedMousePosition.setPosition(event.getSceneX(), event.getSceneY());
-            if(contextMenu.isShowing()){
+            if (contextMenu.isShowing()) {
                 contextMenu.hide();
             }
         });
         fileLists[whichList].addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-            if(pressedMousePosition.equals(event.getSceneX(), event.getSceneY()) && event.getButton()==MouseButton.SECONDARY){
+            if (pressedMousePosition.equals(event.getSceneX(), event.getSceneY()) && event.getButton() == MouseButton.SECONDARY) {
                 contextMenu.show(fileLists[whichList], event.getScreenX(), event.getScreenY());
             }
         });
     }
 
-    void handleSelectionRectangle(int whichList){
+    void handleSelectionRectangle(int whichList) {
         selectionRectangle.setOpacity(0.5);
         selectionRectangle.setFill(Color.BLUE);
         final ArrayList<FileNodeSelectable> nodesSelectedBeforeDrawing = new ArrayList<>();
         final ArrayList<FileNodeSelectable> draggedNodes = new ArrayList<>();
         final ArrayList<FileNodeSelectable> onePaneChildNodes = new ArrayList<>();
         final ArrayList<FileNodeSelectable> allNodes = new ArrayList<>();
-        fileLists[whichList].addEventHandler(MouseEvent.MOUSE_PRESSED, event->{
+        fileLists[whichList].addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
             dragDelta.startX = event.getSceneX();
             dragDelta.startY = event.getSceneY();
-            onePaneChildNodes.addAll(fileLists[whichList].getChildrenUnmodifiable().stream().filter(node -> node instanceof FileNodeSelectable).map(node -> (FileNodeSelectable)node).collect(Collectors.toList()));
+            onePaneChildNodes.addAll(fileLists[whichList].getChildrenUnmodifiable().stream().filter(node -> node instanceof FileNodeSelectable).map(node -> (FileNodeSelectable) node).collect(Collectors.toList()));
             boolean selectedNodeWasClicked = onePaneChildNodes.stream().anyMatch(
                     node -> node.contains(dragDelta.startX, dragDelta.startY) && node.isSelected());
             FileNodeSelectable clickedNode = onePaneChildNodes.stream().filter(node -> node.contains(event.getSceneX(), event.getSceneY())).findAny().orElse(null);
             //if control is pressed or if clicked node was already selected
             //don't remove the selection from previously selected FileExplorer.nodes
-            if(clickedNode!=null) {
+            if (clickedNode != null) {
                 if (event.isControlDown() || event.isShiftDown() || clickedNode.isSelected()) {
                     nodesSelectedBeforeDrawing.addAll(onePaneChildNodes.stream().filter(FileNodeSelectable::isSelected).collect(Collectors.toList()));
                     if (selectedNodeWasClicked) {
@@ -114,29 +114,29 @@ class MouseEventsHelper {
                                 .collect(Collectors.toList()));
                         draggedNodes.addAll(nodesSelectedBeforeDrawing);
                     }
-                } else if(event.getButton()==MouseButton.SECONDARY) {
+                } else if (event.getButton() == MouseButton.SECONDARY) {
                     onePaneChildNodes.forEach(node -> {
-                        if(node!=clickedNode){
+                        if (node != clickedNode) {
                             node.setSelected(false);
                         }
                     });
                 }
-            }else if(event.getButton()==MouseButton.PRIMARY){
+            } else if (event.getButton() == MouseButton.PRIMARY) {
                 onePaneChildNodes.forEach(node -> node.setSelected(false));
             }
         });
         fileLists[whichList].addEventHandler(MouseEvent.DRAG_DETECTED, event -> {
-            if(event.getButton()==MouseButton.PRIMARY && !draggedNodes.isEmpty()){
+            if (event.getButton() == MouseButton.PRIMARY && !draggedNodes.isEmpty()) {
                 fileLists[whichList].getScene().setCursor(Cursor.CLOSED_HAND);
             }
         });
         //dirty hack used to around lambda's need for final variables
         FileNodeSelectable[] f = new FileLabelSelectable[1];
-        fileLists[whichList].addEventHandler(MouseEvent.MOUSE_DRAGGED, event-> {
+        fileLists[whichList].addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
             //check if first node clicked was not already selected
             //drawing selection grid and selecting FileExplorer.nodes
-            if(nodesSelectedBeforeDrawing.stream().noneMatch(
-                    node -> node.contains(dragDelta.startX, dragDelta.startY)) && event.getButton()==MouseButton.PRIMARY) {
+            if (nodesSelectedBeforeDrawing.stream().noneMatch(
+                    node -> node.contains(dragDelta.startX, dragDelta.startY)) && event.getButton() == MouseButton.PRIMARY) {
                 ObservableList<Node> nodes = drawingPane.getChildren();
                 nodes.remove(selectionRectangle);
                 dragDelta.x = event.getSceneX();
@@ -154,42 +154,42 @@ class MouseEventsHelper {
                 }
                 nodes.add(selectionRectangle);
                 onePaneChildNodes.forEach(node -> {
-                        Bounds nodeBounds = node.localToScene(node.getBoundsInLocal());
-                        double nodeMinX = nodeBounds.getMinX();
-                        double nodeMaxX = nodeBounds.getMaxX();
-                        double nodeMaxY = nodeBounds.getMaxY();
-                        double nodeMinY = nodeBounds.getMinY();
-                        double selectionMinX = dragDelta.startX < dragDelta.x ? dragDelta.startX : dragDelta.x;
-                        double selectionMaxX = dragDelta.startX > dragDelta.x ? dragDelta.startX : dragDelta.x;
-                        double selectionMinY = dragDelta.startY < dragDelta.y ? dragDelta.startY : dragDelta.y;
-                        double selectionMaxY = dragDelta.startY > dragDelta.y ? dragDelta.startY : dragDelta.y;
-                        //check if node is in the selection rectangle
-                        if (selectionMinY <= nodeMaxY && selectionMaxY >= nodeMinY && selectionMinX <= nodeMaxX && selectionMaxX >= nodeMinX) {
-                            node.setSelected(true);
-                        } else if (!nodesSelectedBeforeDrawing.contains(node)) {
-                            node.setSelected(false);
-                        }
+                    Bounds nodeBounds = node.localToScene(node.getBoundsInLocal());
+                    double nodeMinX = nodeBounds.getMinX();
+                    double nodeMaxX = nodeBounds.getMaxX();
+                    double nodeMaxY = nodeBounds.getMaxY();
+                    double nodeMinY = nodeBounds.getMinY();
+                    double selectionMinX = dragDelta.startX < dragDelta.x ? dragDelta.startX : dragDelta.x;
+                    double selectionMaxX = dragDelta.startX > dragDelta.x ? dragDelta.startX : dragDelta.x;
+                    double selectionMinY = dragDelta.startY < dragDelta.y ? dragDelta.startY : dragDelta.y;
+                    double selectionMaxY = dragDelta.startY > dragDelta.y ? dragDelta.startY : dragDelta.y;
+                    //check if node is in the selection rectangle
+                    if (selectionMinY <= nodeMaxY && selectionMaxY >= nodeMinY && selectionMinX <= nodeMaxX && selectionMaxX >= nodeMinX) {
+                        node.setSelected(true);
+                    } else if (!nodesSelectedBeforeDrawing.contains(node)) {
+                        node.setSelected(false);
+                    }
                 });
-            }else {
+            } else {
                 //code responsible for highlighting nodes hovered over
                 //it is pretty ugly, but it works
                 Object fa = event.getPickResult().getIntersectedNode();
-                if(fa instanceof FileNodeSelectable){
-                    if(fa!=f[0]){
+                if (fa instanceof FileNodeSelectable) {
+                    if (fa != f[0]) {
                         ((FileNodeSelectable) fa).onMouseHoverEnter();
-                        if(f[0]!=null) {
+                        if (f[0] != null) {
                             f[0].onMouseHoverLeave();
                         }
-                        f[0]=(FileNodeSelectable) fa;
+                        f[0] = (FileNodeSelectable) fa;
                     }
-                } else if(f[0]!=null) {
+                } else if (f[0] != null) {
                     f[0].onMouseHoverLeave();
                 }
             }
         });
         //after the mouse is released remove the rectangle and clear its position
         fileLists[whichList].setOnMouseReleased(event -> {
-            if(!draggedNodes.isEmpty()){
+            if (!draggedNodes.isEmpty()) {
                 FileNodeSelectable currentNode = allNodes.stream()
                         .filter(node -> node.contains(event.getSceneX(), event.getSceneY()))
                         .findAny().orElse(null);
@@ -197,7 +197,7 @@ class MouseEventsHelper {
                     fileEventHelper.moveFilesEvent(draggedNodes.stream().map(FileNodeSelectable::getFile).collect(Collectors.toList()), currentNode.getFile().getPath());
                 } else {
                     for (int i = 0; i < 2; i++) {
-                        if(fileLists[i]!=fileLists[whichList] && fileLists[i].contains(fileLists[i].sceneToLocal(event.getSceneX(), event.getSceneY()))){
+                        if (fileLists[i] != fileLists[whichList] && fileLists[i].contains(fileLists[i].sceneToLocal(event.getSceneX(), event.getSceneY()))) {
                             fileEventHelper.moveFilesEvent(draggedNodes.stream().map(FileNodeSelectable::getFile).collect(Collectors.toList()), i);
                             break;
                         }
@@ -205,7 +205,7 @@ class MouseEventsHelper {
                 }
             }
             drawingPane.getChildren().remove(selectionRectangle);
-            setSelectionRectangleDimensions(0,0,0,0);
+            setSelectionRectangleDimensions(0, 0, 0, 0);
             dragDelta.reset();
             nodesSelectedBeforeDrawing.clear();
             draggedNodes.clear();
@@ -215,16 +215,17 @@ class MouseEventsHelper {
         });
     }
 
-    private class Delta{
+    private class Delta {
         double startX = 0;
         double startY = 0;
         double x = 0;
         double y = 0;
-        void reset(){
-            startY=0;
-            startX=0;
-            x=0;
-            y=0;
+
+        void reset() {
+            startY = 0;
+            startX = 0;
+            x = 0;
+            y = 0;
         }
     }
 }

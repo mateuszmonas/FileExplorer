@@ -1,119 +1,63 @@
 package FileExplorer.main;
 
-import FileExplorer.nodes.FileNodeSelectable;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
-import javafx.scene.Node;
-import javafx.scene.control.*;
-import javafx.scene.input.*;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import FileExplorer.nodes.FileLabelSelectable;
-
 import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+import FileExplorer.nodes.FileLabelSelectable;
+import FileExplorer.nodes.FileNodeSelectable;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.Control;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+
 public class Controller implements Initializable, ViewContract.Controller {
 
-    @FXML private ScrollPane scrollPaneA;
-    @FXML private ScrollPane scrollPaneB;
+    @FXML
+    private ScrollPane scrollPaneA;
+    @FXML
+    private ScrollPane scrollPaneB;
     private ViewContract.Model model;
-    @FXML private VBox fileListA;
-    @FXML private VBox fileListB;
-    @FXML private TextField filePathA;
-    @FXML private TextField filePathB;
-    @FXML private Button goToParentButtonA;
-    @FXML private Button goToParentButtonB;
-    @FXML private Button copyFilesButtonA;
-    @FXML private Button copyFilesButtonB;
-    @FXML private Pane drawingPane;
+    @FXML
+    private VBox fileListA;
+    @FXML
+    private VBox fileListB;
+    @FXML
+    private TextField filePathA;
+    @FXML
+    private TextField filePathB;
+    @FXML
+    private Button goToParentButtonA;
+    @FXML
+    private Button goToParentButtonB;
+    @FXML
+    private Button copyFilesButtonA;
+    @FXML
+    private Button copyFilesButtonB;
+    @FXML
+    private Pane drawingPane;
     private TextField[] filePaths = new TextField[2];
-    private VBox[] fileLists= new VBox[2];
-
-    Controller(ViewContract.Model model) {
-        this.model = model;
-    }
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        fileLists[0] = fileListA;
-        fileLists[1] = fileListB;
-        filePaths[0]= filePathA;
-        filePaths[1]= filePathB;
-        //on my distro the window is shifted to the left a bit and hides the names of the files
-        //so we add padding
-        if(System.getProperty("os.name").equals("Linux")){
-            fileListA.setPadding(new Insets(0,0,0,5));
-        }
-        MouseEventsHelper helper = new MouseEventsHelper(drawingPane, fileLists, fileEventHelper);
-        helper.handleSelectionRectangle(0);
-        helper.handleSelectionRectangle(1);
-        helper.handleContextMenu(0);
-        helper.handleContextMenu(1);
-        handleKeyEvents(scrollPaneA, 0);
-        handleKeyEvents(scrollPaneB, 1);
-        handleFilePath(filePathA, 0);
-        handleFilePath(filePathB, 1);
-        copyFilesButtonA.setOnMouseClicked(event -> fileEventHelper.copyFilesToClipboardEvent(0));
-        copyFilesButtonB.setOnMouseClicked(event -> fileEventHelper.copyFilesToClipboardEvent(1));
-        goToParentButtonA.setOnMouseClicked(event -> goToParentDirectory(0));
-        goToParentButtonB.setOnMouseClicked(event -> goToParentDirectory(1));
-    }
-
-    private void handleFilePath(TextField filePath, int whichList){
-        String[] prevText = new String[1];
-        filePath.focusedProperty().addListener((observableValue, oldPropertyValue, newPropertyValue) -> {
-            if(newPropertyValue){
-                prevText[0]=filePath.getText();
-                filePath.positionCaret(filePath.getText().length());
-            } else {
-                filePath.setText(prevText[0]);
-            }
-        });
-        filePath.setOnKeyPressed(event -> {
-            if(event.getCode()==KeyCode.ENTER){
-                pathChanged(filePath.getText(), whichList);
-                filePath.requestFocus();
-            }
-        });
-    }
-
-    private void goToParentDirectory(int whichList){
-        model.goToParentDirectory(whichList);
-    }
-
-    private void handleKeyEvents(Control pane, int whichList){
-        pane.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN).match(event)) {
-                fileEventHelper.copyFilesToClipboardEvent(whichList);
-            }
-            else if (new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_DOWN).match(event)) {
-                fileEventHelper.pasteFilesFromClipboardEvent(whichList);
-            }
-            else if (new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN).match(event)) {
-                fileEventHelper.cutFilesEvent(whichList);
-            }
-            else if (new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN).match(event)) {
-                fileLists[whichList].getChildrenUnmodifiable().forEach(node -> {
-                    if(node instanceof FileLabelSelectable) ((FileLabelSelectable) node).setSelected(true);
-                });
-            }
-            else if (new KeyCodeCombination(KeyCode.DELETE, KeyCombination.SHIFT_DOWN).match(event)){
-                fileEventHelper.deleteFilesEvent(whichList);
-            }
-            else if (event.getCode()==KeyCode.DELETE){
-                fileEventHelper.moveFilesToTrash(whichList);
-            }
-        });
-    }
-
+    private VBox[] fileLists = new VBox[2];
     private FileEventHelper fileEventHelper = new FileEventHelper() {
         @Override
         public void deleteFilesEvent(int whichList) {
@@ -139,7 +83,7 @@ public class Controller implements Initializable, ViewContract.Controller {
         public void cutFilesEvent(int whichList) {
             List<File> files = fileLists[whichList].getChildrenUnmodifiable().stream().filter(node ->
                     node instanceof FileLabelSelectable && ((FileLabelSelectable) node).isSelected()
-            ).map(node -> ((FileLabelSelectable)node).getFile()
+            ).map(node -> ((FileLabelSelectable) node).getFile()
             ).collect(Collectors.toList());
             model.cutFiles(files);
         }
@@ -158,7 +102,7 @@ public class Controller implements Initializable, ViewContract.Controller {
         public void copyFilesToClipboardEvent(int whichList) {
             List<File> files = fileLists[whichList].getChildrenUnmodifiable().stream().filter(node ->
                     node instanceof FileLabelSelectable && ((FileLabelSelectable) node).isSelected()
-            ).map(node -> ((FileLabelSelectable)node).getFile()
+            ).map(node -> ((FileLabelSelectable) node).getFile()
             ).collect(Collectors.toList());
             model.copyFilesToClipboard(files);
         }
@@ -168,24 +112,24 @@ public class Controller implements Initializable, ViewContract.Controller {
             //add new node to the list
             long l = fileLists[whichList].getChildrenUnmodifiable().stream()
                     .filter(node -> node instanceof FileNodeSelectable && ((FileNodeSelectable) node).getFile().getName().startsWith("new File") &&
-                    ((FileNodeSelectable) node).getFile().getName().endsWith(extension))
+                            ((FileNodeSelectable) node).getFile().getName().endsWith(extension))
                     .count();
             TextField tf = new TextField("new File " + ++l + extension);
             tf.setPadding(new Insets(0));
             tf.setOnKeyReleased(event -> {
-                if(event.getCode()==KeyCode.ENTER){
+                if (event.getCode() == KeyCode.ENTER) {
                     model.createFile(tf.getText(), whichList);
                 }
             });
             tf.focusedProperty().addListener((observableValue, oldPropertyValue, newPropertyValue) -> {
-                if(!newPropertyValue){
+                if (!newPropertyValue) {
                     //whe field goes out of focus without clicking enter we restore the old label
                     fileLists[whichList].getChildren().remove(tf);
                 }
             });
             fileLists[whichList].getChildren().add(tf);
             tf.requestFocus();
-            tf.selectRange(0, tf.getText().length()-extension.length());
+            tf.selectRange(0, tf.getText().length() - extension.length());
         }
 
         @Override
@@ -193,12 +137,12 @@ public class Controller implements Initializable, ViewContract.Controller {
             TextField tf = new TextField(nodeToRename.getFile().getName());
             tf.setPadding(new Insets(0));
             tf.setOnKeyReleased(event -> {
-                if(event.getCode()==KeyCode.ENTER){
+                if (event.getCode() == KeyCode.ENTER) {
                     model.renameFile(nodeToRename.getFile(), tf.getText());
                 }
             });
             tf.focusedProperty().addListener((observableValue, oldPropertyValue, newPropertyValue) -> {
-                if(!newPropertyValue){
+                if (!newPropertyValue) {
                     //whe field goes out of focus without clicking enter we restore the old label
                     replaceNode(tf, (Node) nodeToRename, whichList);
                 }
@@ -209,10 +153,83 @@ public class Controller implements Initializable, ViewContract.Controller {
         }
     };
 
-    private void replaceNode(Object nodeToReplace, Node nodeToReplaceWith, int whichList){
+    Controller(ViewContract.Model model) {
+        this.model = model;
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        fileLists[0] = fileListA;
+        fileLists[1] = fileListB;
+        filePaths[0] = filePathA;
+        filePaths[1] = filePathB;
+        //on my distro the window is shifted to the left a bit and hides the names of the files
+        //so we add padding
+        if (System.getProperty("os.name").equals("Linux")) {
+            fileListA.setPadding(new Insets(0, 0, 0, 5));
+        }
+        MouseEventsHelper helper = new MouseEventsHelper(drawingPane, fileLists, fileEventHelper);
+        helper.handleSelectionRectangle(0);
+        helper.handleSelectionRectangle(1);
+        helper.handleContextMenu(0);
+        helper.handleContextMenu(1);
+        handleKeyEvents(scrollPaneA, 0);
+        handleKeyEvents(scrollPaneB, 1);
+        handleFilePath(filePathA, 0);
+        handleFilePath(filePathB, 1);
+        copyFilesButtonA.setOnMouseClicked(event -> fileEventHelper.copyFilesToClipboardEvent(0));
+        copyFilesButtonB.setOnMouseClicked(event -> fileEventHelper.copyFilesToClipboardEvent(1));
+        goToParentButtonA.setOnMouseClicked(event -> goToParentDirectory(0));
+        goToParentButtonB.setOnMouseClicked(event -> goToParentDirectory(1));
+    }
+
+    private void handleFilePath(TextField filePath, int whichList) {
+        String[] prevText = new String[1];
+        filePath.focusedProperty().addListener((observableValue, oldPropertyValue, newPropertyValue) -> {
+            if (newPropertyValue) {
+                prevText[0] = filePath.getText();
+                filePath.positionCaret(filePath.getText().length());
+            } else {
+                filePath.setText(prevText[0]);
+            }
+        });
+        filePath.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                pathChanged(filePath.getText(), whichList);
+                filePath.requestFocus();
+            }
+        });
+    }
+
+    private void goToParentDirectory(int whichList) {
+        model.goToParentDirectory(whichList);
+    }
+
+    private void handleKeyEvents(Control pane, int whichList) {
+        pane.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN).match(event)) {
+                fileEventHelper.copyFilesToClipboardEvent(whichList);
+            } else if (new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_DOWN).match(event)) {
+                fileEventHelper.pasteFilesFromClipboardEvent(whichList);
+            } else if (new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN).match(event)) {
+                fileEventHelper.cutFilesEvent(whichList);
+            } else if (new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN).match(event)) {
+                fileLists[whichList].getChildrenUnmodifiable().forEach(node -> {
+                    if (node instanceof FileLabelSelectable)
+                        ((FileLabelSelectable) node).setSelected(true);
+                });
+            } else if (new KeyCodeCombination(KeyCode.DELETE, KeyCombination.SHIFT_DOWN).match(event)) {
+                fileEventHelper.deleteFilesEvent(whichList);
+            } else if (event.getCode() == KeyCode.DELETE) {
+                fileEventHelper.moveFilesToTrash(whichList);
+            }
+        });
+    }
+
+    private void replaceNode(Object nodeToReplace, Node nodeToReplaceWith, int whichList) {
         ObservableList<Node> nodes = fileLists[whichList].getChildren();
-        for(int i = 0;i<nodes.size();i++){
-            if(nodes.get(i)==nodeToReplace){
+        for (int i = 0; i < nodes.size(); i++) {
+            if (nodes.get(i) == nodeToReplace) {
                 nodes.set(i, nodeToReplaceWith);
                 break;
             }
@@ -220,24 +237,24 @@ public class Controller implements Initializable, ViewContract.Controller {
     }
 
     @Override
-    public void displayPath(String path, int whichList){
+    public void displayPath(String path, int whichList) {
         filePaths[whichList].setText(path);
     }
 
-    private void pathChanged(String path, int whichList){
+    private void pathChanged(String path, int whichList) {
         model.enterDirectory(path, whichList);
     }
 
-    private void viewFiles(File[] files, int whichList){
+    private void viewFiles(File[] files, int whichList) {
         for (File file : files) {
             FileLabelSelectable label = new FileLabelSelectable(file);
             //createLabelContextMenu(label, whichList);
             //class used to check if mouse position while released is same as while pressed
             final MousePosition pressedMousePosition = MousePosition.ZERO;
-            label.addEventHandler(MouseEvent.MOUSE_PRESSED ,event -> pressedMousePosition.setPosition(event.getSceneX(), event.getSceneY()));
-            label.addEventHandler(MouseEvent.MOUSE_CLICKED ,event -> {
+            label.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> pressedMousePosition.setPosition(event.getSceneX(), event.getSceneY()));
+            label.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
                 ObservableList<Node> nodes = label.getParent().getChildrenUnmodifiable();
-                if(pressedMousePosition.equals(event.getSceneX(), event.getSceneY())) {
+                if (pressedMousePosition.equals(event.getSceneX(), event.getSceneY())) {
                     if (event.isShiftDown()) {
                         int clickedItemPosition = 0;
                         int firstSelectedItemPosition = 0;
@@ -287,10 +304,10 @@ public class Controller implements Initializable, ViewContract.Controller {
                     } else if (event.isControlDown()) {
                         label.setSelected(!label.isSelected());
                     } else {
-                        if (event.getButton()==MouseButton.PRIMARY && label.isSelected()) {
+                        if (event.getButton() == MouseButton.PRIMARY && label.isSelected()) {
                             pathChanged(label.getFile().getPath(), whichList);
                         } else {
-                            if(event.getButton()!=MouseButton.SECONDARY) {
+                            if (event.getButton() != MouseButton.SECONDARY) {
                                 nodes.forEach(n -> {
                                     if (n instanceof FileLabelSelectable && !label.equals(n))
                                         ((FileLabelSelectable) n).setSelected(false);
@@ -315,12 +332,13 @@ public class Controller implements Initializable, ViewContract.Controller {
 
     /**
      * displays the names of all the files in the given path
+     *
      * @param files array of files to display
      */
     @Override
-    public void displayFiles(File[] files, int whichList){
+    public void displayFiles(File[] files, int whichList) {
         fileLists[whichList].getChildren().clear();
-        if(files!=null) {
+        if (files != null) {
             viewFiles(files, whichList);
         } else {
             Label label = new Label();
