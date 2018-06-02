@@ -175,7 +175,11 @@ public class Controller implements Initializable, ViewContract.Controller {
                         } else {
                             newName=Integer.toString(i);
                         }
-                        model.renameFile(nodes.get(i).getOldText(), newName, whichList);
+                        if(!nodes.get(i).getText().isEmpty()){
+                            model.renameFile(nodes.get(i).getOldText(), newName, whichList);
+                        } else{
+                            model.getFiles();
+                        }
                     }
                 }
             });
