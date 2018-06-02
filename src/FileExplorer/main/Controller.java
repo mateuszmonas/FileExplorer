@@ -2,12 +2,14 @@ package FileExplorer.main;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 import FileExplorer.nodes.FileLabelSelectable;
 import FileExplorer.nodes.FileNodeSelectable;
+import FileExplorer.nodes.FileTextField;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -54,6 +56,10 @@ public class Controller implements Initializable, ViewContract.Controller {
     private Button copyFilesButtonA;
     @FXML
     private Button copyFilesButtonB;
+    @FXML
+    private Button renameAllButtonA;
+    @FXML
+    private Button renameAllButtonB;
     @FXML
     private Pane drawingPane;
     private TextField[] filePaths = new TextField[2];
@@ -108,7 +114,7 @@ public class Controller implements Initializable, ViewContract.Controller {
         }
 
         @Override
-        public void createNewFile(int whichList, String extension) {
+        public void createNewFileEvent(int whichList, String extension) {
             //add new node to the list
             long l = fileLists[whichList].getChildrenUnmodifiable().stream()
                     .filter(node -> node instanceof FileNodeSelectable && ((FileNodeSelectable) node).getFile().getName().startsWith("new File") &&
@@ -133,25 +139,61 @@ public class Controller implements Initializable, ViewContract.Controller {
         }
 
         @Override
-        public void renameFile(FileNodeSelectable nodeToRename, int whichList) {
-            TextField tf = new TextField(nodeToRename.getFile().getName());
-            tf.setPadding(new Insets(0));
-            tf.setOnKeyReleased(event -> {
-                if (event.getCode() == KeyCode.ENTER) {
-                    model.renameFile(nodeToRename.getFile(), tf.getText());
-                }
-            });
-            tf.focusedProperty().addListener((observableValue, oldPropertyValue, newPropertyValue) -> {
-                if (!newPropertyValue) {
-                    //whe field goes out of focus without clicking enter we restore the old label
-                    replaceNode(tf, (Node) nodeToRename, whichList);
-                }
-            });
-            replaceNode(nodeToRename, tf, whichList);
-            tf.requestFocus();
-            tf.selectAll();
+        public void renameFileEvent(int whichList) {
+            startRenamingFiles(whichList);
         }
     };
+
+    private void startRenamingFiles(int whichList){
+        List<FileNodeSelectable> nodesToRename = fileLists[whichList].getChildrenUnmodifiable()
+                .stream().filter(node -> node instanceof FileNodeSelectable && ((FileNodeSelectable) node).isSelected())
+                .map(node -> (FileNodeSelectable)node)
+                .collect(Collectors.toList());
+        if(nodesToRename.size()>0) {
+            FileTextField firstTextField = replaceLabelWithTextField(nodesToRename.get(0), whichList);
+            final List<FileTextField> nodes = new ArrayList<>();
+            nodes.add(firstTextField);
+            for (int i = 1; i < nodesToRename.size(); i++) {
+                nodes.add(replaceLabelWithTextField(nodesToRename.get(i), whichList));
+            }
+            firstTextField.requestFocus();
+            firstTextField.selectAll();
+            boolean[] alreadyBound = new boolean[1];
+            alreadyBound[0]=false;
+            firstTextField.setOnKeyReleased(event -> {
+                if(!alreadyBound[0]) {
+                    for (int i = 1; i < nodes.size(); i++) {
+                        nodes.get(i).textProperty().bind(firstTextField.textProperty());
+                    }
+                    alreadyBound[0]=false;
+                } if (event.getCode()==KeyCode.ENTER){
+                    //rename all nodes
+                    for (int i = 0; i < nodes.size(); i++) {
+                        String newName;
+                        if(nodes.get(i).getText().contains("?")) {
+                            newName = nodes.get(i).getText().replace("?", String.format("%02d", i+1));
+                        } else {
+                            newName=Integer.toString(i);
+                        }
+                        model.renameFile(nodes.get(i).getOldText(), newName, whichList);
+                    }
+                }
+            });
+            firstTextField.focusedProperty().addListener((observableValue, oldPropertyValue, newPropertyValue) -> {
+                if (!newPropertyValue) {
+                    //replace each node value with previous one
+                    model.getFiles();
+                }
+            });
+        }
+    }
+
+    private FileTextField replaceLabelWithTextField(FileNodeSelectable nodeToRename, int whichList){
+        FileTextField tf = new FileTextField(nodeToRename.getFile().getName());
+        tf.setPadding(new Insets(0));
+        replaceNode(nodeToRename, tf, whichList);
+        return tf;
+    }
 
     Controller(ViewContract.Model model) {
         this.model = model;
@@ -177,6 +219,8 @@ public class Controller implements Initializable, ViewContract.Controller {
         handleKeyEvents(scrollPaneB, 1);
         handleFilePath(filePathA, 0);
         handleFilePath(filePathB, 1);
+        renameAllButtonA.setOnMouseClicked(mouseEvent -> startRenamingFiles(0));
+        renameAllButtonB.setOnMouseClicked(mouseEvent -> startRenamingFiles(1));
         copyFilesButtonA.setOnMouseClicked(event -> fileEventHelper.copyFilesToClipboardEvent(0));
         copyFilesButtonB.setOnMouseClicked(event -> fileEventHelper.copyFilesToClipboardEvent(1));
         goToParentButtonA.setOnMouseClicked(event -> goToParentDirectory(0));

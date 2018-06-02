@@ -29,6 +29,10 @@ public interface ViewContract {
         void createFile(String name, int whichList);
 
         void renameFile(File oldFile, String newName);
+
+        void renameFile(String oldName, String newName, int whichList);
+
+        void getFiles();
     }
 
     interface Controller {

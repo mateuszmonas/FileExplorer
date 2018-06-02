@@ -98,6 +98,28 @@ public class Model implements ViewContract.Model {
     }
 
     @Override
+    public void renameFile(String oldName, String newName, int whichList) {
+        File newFile = new File(paths[whichList] + File.separator + newName);
+        File oldFile = new File(paths[whichList] + File.separator + oldName);
+        if (!newFile.exists()) {
+            try {
+                if (oldFile.isFile()) {
+                    FileUtils.moveFile(oldFile, new File(oldFile.getParent() + File.separator + newName));
+                }
+                if (oldFile.isDirectory()) {
+                    FileUtils.moveDirectory(oldFile, new File(oldFile.getParent() + File.separator + newName));
+                }
+            } catch (IOException e) {
+                dialogHelper.somethingWentWrongDialog();
+                e.printStackTrace();
+            }
+        } else {
+            dialogHelper.fileAlreadyExistsDialog();
+        }
+        getFiles();
+    }
+
+    @Override
     public void deleteFiles(List<File> files) {
         files.forEach(
                 file -> {
@@ -236,7 +258,8 @@ public class Model implements ViewContract.Model {
      * Gets all files in the given paths
      * and updates the controller
      */
-    private void getFiles() {
+    @Override
+    public void getFiles() {
         for (int whichList = 0; whichList < 2; whichList++) {
             File folder = new File(paths[whichList]);
             File[] fileList = folder.listFiles();

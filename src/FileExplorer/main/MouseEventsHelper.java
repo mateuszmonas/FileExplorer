@@ -55,21 +55,15 @@ class MouseEventsHelper {
         MenuItem deleteContextItem = new MenuItem("Delete");
         deleteContextItem.setOnAction(event -> fileEventHelper.moveFilesToTrash(whichList));
         MenuItem renameContextItem = new MenuItem("Rename");
-        renameContextItem.setOnAction(event -> {
-            FileNodeSelectable clickedNode = fileLists[whichList].getChildrenUnmodifiable().stream()
-                    .filter(node -> node instanceof FileNodeSelectable && node.localToScreen(node.getBoundsInLocal()).contains(contextMenu.getAnchorX(), contextMenu.getAnchorY()))
-                    .map(node -> (FileNodeSelectable) node)
-                    .findAny().orElse(null);
-            fileEventHelper.renameFile(clickedNode, whichList);
-        });
+        renameContextItem.setOnAction(event -> fileEventHelper.renameFileEvent(whichList));
         Menu newItemMenu = new Menu("New");
 
         MenuItem folder = new MenuItem("folder");
-        folder.setOnAction(event -> fileEventHelper.createNewFile(whichList, ""));
+        folder.setOnAction(event -> fileEventHelper.createNewFileEvent(whichList, ""));
         newItemMenu.getItems().addAll(folder);
 
         MenuItem txt = new MenuItem(".txt");
-        txt.setOnAction(event -> fileEventHelper.createNewFile(whichList, ".txt"));
+        txt.setOnAction(event -> fileEventHelper.createNewFileEvent(whichList, ".txt"));
         newItemMenu.getItems().addAll(txt);
 
         contextMenu.getItems().addAll(cutContextItem, copyContextItem, pasteContextItem, deleteContextItem, renameContextItem, newItemMenu);

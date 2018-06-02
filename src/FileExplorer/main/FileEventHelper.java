@@ -21,9 +21,9 @@ public interface FileEventHelper {
 
     void copyFilesToClipboardEvent(int whichList);
 
-    void createNewFile(int whichList, String extension);
+    void createNewFileEvent(int whichList, String extension);
 
-    void renameFile(FileNodeSelectable node, int whichList);
+    void renameFileEvent(int whichList);
 
 }
 

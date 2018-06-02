@@ -10,11 +10,13 @@
                 maxHeight="25" minHeight="25" prefHeight="25">
             <Button fx:id="goToParentButtonA">go back</Button>
             <Button fx:id="copyFilesButtonA">copy files</Button>
+            <Button fx:id="renameAllButtonA">rename all</Button>
         </HBox>
         <HBox maxWidth="350" minWidth="350" prefWidth="350"
               maxHeight="25" minHeight="25" prefHeight="25">
             <Button fx:id="goToParentButtonB">go back</Button>
             <Button fx:id="copyFilesButtonB">copy files</Button>
+            <Button fx:id="renameAllButtonB">rename all</Button>
         </HBox>
     </HBox>
     <HBox  maxWidth="700" minWidth="700" prefWidth="700"
