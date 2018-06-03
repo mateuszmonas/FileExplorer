@@ -1,5 +1,5 @@
 # FileExplorer
-Application made to easily change names of multiple files at once. It uses javaFX to create the gui
+File explorer made in JavaFX, using Java 8 streams and lambda expression. It's main feature is group file renaming.
 
 ### Dependencies
 
